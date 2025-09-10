@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" href="./richfavicon.png" sizes="32x32">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rive Tests</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #FFF;
+    }
+    #rive-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      background: #FFF;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="rive-canvas"></canvas>
+
+  <script src="https://unpkg.com/@rive-app/webgl2@2" crossorigin="anonymous"></script>
+  <script>
+    const layout = new rive.Layout({
+      fit: rive.Fit.layout || rive.Fit.Layout,
+      layoutScaleFactor: 1,
+    });
+
+    const canvas = document.getElementById('rive-canvas');
+
+    let riveInstance, vmi;
+    let addValue, buttonPress, buttonTxt, progress;
+
+    function resizeCanvas() {
+      try { riveInstance.resizeDrawingSurfaceToCanvas(); } catch {}
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    window.matchMedia(`(resolution: ${devicePixelRatio}dppx)`)
+      .addEventListener('change', resizeCanvas);
+
+    riveInstance = new rive.Rive({
+      src: 'duolingointeraction.riv',
+      canvas: canvas,
+      autoplay: true,
+      autoBind: true,
+      stateMachines: 'State Machine 1',
+      artboard: 'Dashboard',
+      layout: layout,
+      onLoad: function () {
+        vmi = riveInstance.viewModelInstance;
+
+        if (!vmi) {
+          console.warn('No ViewModel instance found');
+        } else {
+          // Bind properties
+          addValue    = vmi.number?.('AddValue');
+          buttonPress = vmi.bool?.('ButtonPress') || vmi.boolean?.('ButtonPress');
+          buttonTxt   = vmi.string?.('ButtonTxt');
+          progress    = vmi.number?.('Progress');
+
+          console.log('ViewModel ready:', { addValue, buttonPress, buttonTxt, progress });
+
+          // 👉 Set initial values here (defaults on load)
+          if (buttonTxt) buttonTxt.value = "CONTINUE";
+          if (progress) progress.value = 0;
+          if (addValue) addValue.value = 10;
+          if (buttonPress) buttonPress.value = false;
+
+          // Expose helpers globally
+          window.vmSetAddValue = (val) => addValue && ('value' in addValue) && (addValue.value = Number(val));
+          window.vmSetButtonPress = (bool) => buttonPress && ('value' in buttonPress) && (buttonPress.value = !!bool);
+          window.vmSetButtonTxt = (str) => buttonTxt && ('value' in buttonTxt) && (buttonTxt.value = String(str));
+          window.vmSetProgress = (val) => progress && ('value' in progress) && (progress.value = Number(val));
+        }
+
+        resizeCanvas();
+      }
+    });
+  </script>
+</body>
+</html>

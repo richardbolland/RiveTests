@@ -16,46 +16,40 @@
 
   <script src="https://unpkg.com/@rive-app/webgl2@2" crossorigin="anonymous"></script>
   <script>
-    // === 1) Layout & canvas sizing ===
+    // === Layout & canvas sizing ===
     const layout = new rive.Layout({
       fit: rive.Fit.layout || rive.Fit.Layout,
       layoutScaleFactor: 1,
     });
 
     const canvas = document.getElementById('rive-canvas');
-
     function resizeCanvas() {
       try { riveInstance.resizeDrawingSurfaceToCanvas(); } catch {}
     }
     window.addEventListener('resize', resizeCanvas);
     window.matchMedia(`(resolution: ${devicePixelRatio}dppx)`).addEventListener('change', resizeCanvas);
 
-    // === 2) CSV source (Sheet2) ===
+    // === CSV source ===
     const SHEET_CSV_URL =
       'https://docs.google.com/spreadsheets/d/e/2PACX-1vS64L8Iiv3nFx37zMVVVm6XBUv216nmMXpBp4s_bpU-wD9BmrdfyGVGqB94Lkcdrn24jwLFYeArTs6p/pub?gid=443444412&single=true&output=csv';
 
-    // CSV splitter that respects quotes
+    // Split CSV line respecting quotes
     function splitCSVLine(line) {
-      const out = [];
-      let cur = '';
-      let inQuotes = false;
+      const out = []; let cur = ''; let inQuotes = false;
       for (let i = 0; i < line.length; i++) {
         const ch = line[i];
         if (ch === '"') {
           if (inQuotes && line[i + 1] === '"') { cur += '"'; i++; }
           else inQuotes = !inQuotes;
         } else if (ch === ',' && !inQuotes) {
-          out.push(cur.trim());
-          cur = '';
-        } else {
-          cur += ch;
-        }
+          out.push(cur.trim()); cur = '';
+        } else cur += ch;
       }
       out.push(cur.trim());
       return out.map(s => s.replace(/^"|"$/g, '').trim());
     }
 
-    // Fetch rows and map -> { q, correct, distractors: [..] }
+    // Fetch questions & answers from sheet
     async function fetchQA() {
       const res = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
       const text = await res.text();
@@ -67,17 +61,16 @@
           const cols = splitCSVLine(line);
           return {
             q: (cols[0] ?? '').trim(),
-            correct: (cols[1] ?? '').trim(),            // Column B is ALWAYS correct
+            correct: (cols[1] ?? '').trim(),
             distractors: [cols[2] ?? '', cols[3] ?? '', cols[4] ?? '']
-              .map(s => String(s).trim())
+              .map(s => s.trim())
               .filter(s => s.length)
           };
         })
-        // Keep rows that at least have a question + a correct answer
         .filter(r => r.q && r.correct);
     }
 
-    // Fisher–Yates shuffle
+    // Shuffle util
     function shuffle(arr) {
       const a = arr.slice();
       for (let i = a.length - 1; i > 0; i--) {
@@ -87,14 +80,13 @@
       return a;
     }
 
-    // === 3) Rive setup ===
+    // === Rive setup ===
     let riveInstance, vmi;
-    let btnTrigger, questionProp, ans1, ans2, ans3, ans4, answerSelect, scoreProp;
+    let btnTrigger, questionProp, ans1, ans2, ans3, ans4, answerSelect;
     let qaRows = [];
     let idx = 0;
-    let currentCorrectSlot = 0; // 1..4 position where the correct answer ended up
+    let currentCorrectSlot = 0; // 1..4 where correct landed
 
-    // Watch a VM prop (prefers prop.on, else polls)
     function observe(prop, cb) {
       if (!prop) return () => {};
       if (typeof prop.on === 'function') {
@@ -104,10 +96,7 @@
       let last = prop.value;
       const id = setInterval(() => {
         const now = prop.value;
-        if (now !== last) {
-          last = now;
-          try { cb(now); } catch {}
-        }
+        if (now !== last) { last = now; try { cb(now); } catch {} }
       }, 100);
       return () => clearInterval(id);
     }
@@ -116,27 +105,19 @@
       if (!qaRows.length) return;
       const r = qaRows[((i % qaRows.length) + qaRows.length) % qaRows.length];
 
-      // Build options: ensure we have up to 4 options including the correct one.
       const options = [r.correct, ...(r.distractors || [])].slice(0, 4);
-      // If fewer than 4, pad with blanks to avoid undefined
       while (options.length < 4) options.push('');
 
-      // Shuffle while tracking where the correct one lands
       const shuffled = shuffle(options);
-      currentCorrectSlot = (shuffled.findIndex(x => x === r.correct) + 1) || 0; // 1..4
+      currentCorrectSlot = (shuffled.findIndex(x => x === r.correct) + 1) || 0;
 
-      // Push into VM
-      if (questionProp) questionProp.value = String(r.q);
-      if (ans1) ans1.value = String(shuffled[0] ?? '');
-      if (ans2) ans2.value = String(shuffled[1] ?? '');
-      if (ans3) ans3.value = String(shuffled[2] ?? '');
-      if (ans4) ans4.value = String(shuffled[3] ?? '');
+      if (questionProp) questionProp.value = r.q;
+      if (ans1) ans1.value = shuffled[0] ?? '';
+      if (ans2) ans2.value = shuffled[1] ?? '';
+      if (ans3) ans3.value = shuffled[2] ?? '';
+      if (ans4) ans4.value = shuffled[3] ?? '';
 
-      // Reset selection each question
-      if (answerSelect && typeof answerSelect.value !== 'undefined') {
-        answerSelect.value = 0;
-      }
-
+      if (answerSelect) answerSelect.value = 0;
       idx = i;
     }
 
@@ -156,50 +137,35 @@
         vmi = riveInstance.viewModelInstance;
         if (!vmi) { console.warn('No ViewModel instance found.'); return; }
 
-        // Bind VM properties (ensure they’re visible in Rive)
-        questionProp  = vmi.string?.('Question');
-        ans1          = vmi.string?.('Answer1');
-        ans2          = vmi.string?.('Answer2');
-        ans3          = vmi.string?.('Answer3');
-        ans4          = vmi.string?.('Answer4');
-        answerSelect  = vmi.number?.('AnswerSelect');  // expects 0 (none) or 1..4
-        scoreProp     = vmi.number?.('Score');         // optional, if you want to track score
-        btnTrigger    = vmi.trigger?.('BtnPressTrig');
+        // Bind props
+        questionProp = vmi.string?.('Question');
+        ans1 = vmi.string?.('Answer1');
+        ans2 = vmi.string?.('Answer2');
+        ans3 = vmi.string?.('Answer3');
+        ans4 = vmi.string?.('Answer4');
+        answerSelect = vmi.number?.('AnswerSelect');
+        btnTrigger = vmi.trigger?.('BtnPressTrig');
 
-        // Load QA, apply first row
         try {
           qaRows = await fetchQA();
+          qaRows = shuffle(qaRows);   // 👈 randomise question order
           if (qaRows.length) applyRow(0);
-          else console.warn('No rows found in sheet.');
         } catch (e) {
           console.warn('Failed to fetch questions:', e);
         }
 
-        // Advance on trigger fire
         if (btnTrigger && typeof btnTrigger.on === 'function') {
           btnTrigger.on(() => next());
         }
 
-        // Listen for answer selection changes and report correctness
         observe(answerSelect, (val) => {
           const choice = Number(val);
-          if (!Number.isFinite(choice) || choice === 0) return; // 0 = none selected
+          if (!Number.isFinite(choice) || choice === 0) return;
           const isCorrect = (choice === currentCorrectSlot);
-          console.log(isCorrect ? '✅ Correct!' : `❌ Wrong (picked ${choice}, correct is ${currentCorrectSlot})`);
-
-          // Optional: update score
-          // if (isCorrect && scoreProp && typeof scoreProp.value !== 'undefined') {
-          //   scoreProp.value = Number(scoreProp.value || 0) + 1;
-          // }
+          console.log(isCorrect ? '✅ Correct!' : `❌ Wrong (picked ${choice}, correct was ${currentCorrectSlot})`);
         });
 
-        // Debug helpers
-        window._vm = {
-          next, applyRow,
-          get rows(){ return qaRows; },
-          get index(){ return idx; },
-          get correctSlot(){ return currentCorrectSlot; }
-        };
+        window._vm = { next, applyRow, get rows(){return qaRows;}, get index(){return idx;}, get correctSlot(){return currentCorrectSlot;} };
       }
     });
   </script>

@@ -23,9 +23,7 @@
     });
 
     const canvas = document.getElementById('rive-canvas');
-    function resizeCanvas() {
-      try { riveInstance.resizeDrawingSurfaceToCanvas(); } catch {}
-    }
+    function resizeCanvas() { try { riveInstance.resizeDrawingSurfaceToCanvas(); } catch {} }
     window.addEventListener('resize', resizeCanvas);
     window.matchMedia(`(resolution: ${devicePixelRatio}dppx)`).addEventListener('change', resizeCanvas);
 
@@ -33,7 +31,7 @@
     const SHEET_CSV_URL =
       'https://docs.google.com/spreadsheets/d/e/2PACX-1vS64L8Iiv3nFx37zMVVVm6XBUv216nmMXpBp4s_bpU-wD9BmrdfyGVGqB94Lkcdrn24jwLFYeArTs6p/pub?gid=443444412&single=true&output=csv';
 
-    // Split CSV line respecting quotes
+    // CSV line split that respects quotes
     function splitCSVLine(line) {
       const out = []; let cur = ''; let inQuotes = false;
       for (let i = 0; i < line.length; i++) {
@@ -41,9 +39,8 @@
         if (ch === '"') {
           if (inQuotes && line[i + 1] === '"') { cur += '"'; i++; }
           else inQuotes = !inQuotes;
-        } else if (ch === ',' && !inQuotes) {
-          out.push(cur.trim()); cur = '';
-        } else cur += ch;
+        } else if (ch === ',' && !inQuotes) { out.push(cur.trim()); cur = ''; }
+        else { cur += ch; }
       }
       out.push(cur.trim());
       return out.map(s => s.replace(/^"|"$/g, '').trim());
@@ -61,7 +58,7 @@
           const cols = splitCSVLine(line);
           return {
             q: (cols[0] ?? '').trim(),
-            correct: (cols[1] ?? '').trim(),
+            correct: (cols[1] ?? '').trim(),                  // B = correct
             distractors: [cols[2] ?? '', cols[3] ?? '', cols[4] ?? '']
               .map(s => s.trim())
               .filter(s => s.length)
@@ -82,17 +79,16 @@
 
     // === Rive setup ===
     let riveInstance, vmi;
-    let btnTrigger, questionProp, ans1, ans2, ans3, ans4, answerSelect;
+    let btnTrigger, questionProp, ans1, ans2, ans3, ans4, answerSelect, isCorrectProp, progressProp;
+
     let qaRows = [];
     let idx = 0;
     let currentCorrectSlot = 0; // 1..4 where correct landed
+    let advancing = false;       // latch to prevent double-advance on rapid clicks
 
     function observe(prop, cb) {
       if (!prop) return () => {};
-      if (typeof prop.on === 'function') {
-        prop.on(cb);
-        return () => { try { prop.on(null); } catch {} };
-      }
+      if (typeof prop.on === 'function') { prop.on(cb); return () => { try { prop.on(null); } catch {} }; }
       let last = prop.value;
       const id = setInterval(() => {
         const now = prop.value;
@@ -100,6 +96,8 @@
       }, 100);
       return () => clearInterval(id);
     }
+
+    function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
 
     function applyRow(i) {
       if (!qaRows.length) return;
@@ -117,57 +115,85 @@
       if (ans3) ans3.value = shuffled[2] ?? '';
       if (ans4) ans4.value = shuffled[3] ?? '';
 
+      // Rive timelines will also reset this, but we hard reset for safety
       if (answerSelect) answerSelect.value = 0;
+
       idx = i;
+      advancing = false;
     }
 
     function next() { applyRow(idx + 1); }
 
     riveInstance = new rive.Rive({
-      src: 'duolingointeraction.riv',
-      canvas: canvas,
-      autoplay: true,
-      autoBind: true,
-      stateMachines: 'State Machine 1',
-      artboard: 'Dashboard',
-      layout: layout,
-      onLoad: async function () {
-        resizeCanvas();
+    src: 'duolingointeraction.riv',
+    canvas: canvas,
+    autoplay: true,
+    autoBind: true,
+    stateMachines: 'State Machine 1',
+    artboard: 'Dashboard',
+    layout: layout,
+    onLoad: async function () {
+      resizeCanvas();
 
-        vmi = riveInstance.viewModelInstance;
-        if (!vmi) { console.warn('No ViewModel instance found.'); return; }
+      vmi = riveInstance.viewModelInstance;
+      if (!vmi) { console.warn('No ViewModel instance found.'); return; }
 
-        // Bind props
-        questionProp = vmi.string?.('Question');
-        ans1 = vmi.string?.('Answer1');
-        ans2 = vmi.string?.('Answer2');
-        ans3 = vmi.string?.('Answer3');
-        ans4 = vmi.string?.('Answer4');
-        answerSelect = vmi.number?.('AnswerSelect');
-        btnTrigger = vmi.trigger?.('BtnPressTrig');
+      // Bind props
+      questionProp  = vmi.string?.('Question');
+      ans1          = vmi.string?.('Answer1');
+      ans2          = vmi.string?.('Answer2');
+      ans3          = vmi.string?.('Answer3');
+      ans4          = vmi.string?.('Answer4');
+      answerSelect  = vmi.number?.('AnswerSelect'); 
+      isCorrectProp = (vmi.bool || vmi.boolean)?.call(vmi, 'isCorrect'); 
+      progressProp  = vmi.number?.('Progress');     
+      btnTrigger    = vmi.trigger?.('BtnPressTrig');
 
-        try {
-          qaRows = await fetchQA();
-          qaRows = shuffle(qaRows);   // 👈 randomise question order
-          if (qaRows.length) applyRow(0);
-        } catch (e) {
-          console.warn('Failed to fetch questions:', e);
-        }
-
-        if (btnTrigger && typeof btnTrigger.on === 'function') {
-          btnTrigger.on(() => next());
-        }
-
-        observe(answerSelect, (val) => {
-          const choice = Number(val);
-          if (!Number.isFinite(choice) || choice === 0) return;
-          const isCorrect = (choice === currentCorrectSlot);
-          console.log(isCorrect ? '✅ Correct!' : `❌ Wrong (picked ${choice}, correct was ${currentCorrectSlot})`);
-        });
-
-        window._vm = { next, applyRow, get rows(){return qaRows;}, get index(){return idx;}, get correctSlot(){return currentCorrectSlot;} };
+      try {
+        qaRows = await fetchQA();
+        qaRows = shuffle(qaRows);   
+        if (qaRows.length) applyRow(0);
+      } catch (e) {
+        console.warn('Failed to fetch questions:', e);
       }
-    });
-  </script>
+
+      // Watch answer selection — set isCorrect here
+      observe(answerSelect, (val) => {
+        const choice = Number(val);
+        if (!Number.isFinite(choice) || choice === 0) return;
+
+        const correct = (choice === currentCorrectSlot);
+
+        if (isCorrectProp && 'value' in isCorrectProp) {
+          isCorrectProp.value = !!correct;   // update boolean immediately
+        }
+
+        console.log(`User selected option ${choice} → ${correct ? '✅ Correct' : '❌ Wrong'}`);
+      });
+
+      // Confirm button (BtnPressTrig)
+      if (btnTrigger && typeof btnTrigger.on === 'function') {
+        btnTrigger.on(() => {
+          if (advancing) return;
+
+          const choice = Number(answerSelect?.value ?? 0);
+          if (!Number.isFinite(choice) || choice === 0) return;
+
+          const correct = (choice === currentCorrectSlot);
+
+          if (correct) {
+            if (progressProp && typeof progressProp.value !== 'undefined') {
+              const cur = Number(progressProp.value || 0);
+              progressProp.value = clamp(cur + 10, 0, 100);
+            }
+            advancing = true;
+            setTimeout(() => { next(); }, 550);
+          }
+          // If wrong: do nothing — Rive will reset AnswerSelect to 0 via timeline
+        });
+      }
+    }
+  });
+</script>
 </body>
 </html>

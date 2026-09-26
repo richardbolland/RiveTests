@@ -77,12 +77,19 @@ local function performAction(self: CollectState, listenerContext: ListenerContex
 	local itemsPerDig = if itemsPerDigProp then math.floor(itemsPerDigProp.value) else 1
 
 	local added = 0
+	local digTotal = 0
 	for _ = 1, itemsPerDig do
 		if inventory.length >= MAX_INVENTORY then
 			break
 		end
-		inventory:push(Data.Item.new(pickItemName()))
+		local item = Data.Item.new(pickItemName())
+		inventory:push(item)
 		added += 1
+
+		local value = item:getNumber('value')
+		if value then
+			digTotal += value.value
+		end
 	end
 
 	if added > 0 then
@@ -91,6 +98,13 @@ local function performAction(self: CollectState, listenerContext: ListenerContex
 		local lastPulseTime = economy:getNumber('lastPulseTime')
 		if lastPulseTime then
 			lastPulseTime.value = gameTime.value
+		end
+
+		local lastDigPopupTime = economy:getNumber('lastDigPopupTime')
+		local digPopupText = economy:getString('digPopupText')
+		if lastDigPopupTime and digPopupText then
+			lastDigPopupTime.value = gameTime.value
+			digPopupText.value = '+$' .. tostring(digTotal)
 		end
 	end
 end

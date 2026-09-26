@@ -1,9 +1,9 @@
 --- The economy's clock. Runs every frame and owns everything that is
 --- "computed" rather than "reacted to": gameTime, the dig cooldown ring
 --- fraction, the item's pop/pulse scale (on dig and on becoming ready
---- again), each upgrade panel's affordable/maxed state, and the live
---- inventory total shown on Sell All. Grows into the full driver (bot
---- timers, auto-sell) in later milestones.
+--- again), each upgrade panel's and the Sell All button's affordable
+--- state, the live inventory total, and the fading "+$N" dig popup.
+--- Grows into the full driver (bot timers, auto-sell) in later milestones.
 
 type ClockState = {
 	context: Context?,
@@ -14,10 +14,10 @@ local UPGRADE_COST = 110
 local PULSE_DURATION = 0.25
 local PULSE_SCALE = 0.15
 local DIMMED_ALPHA = 0.4
+local POPUP_DURATION = 1.0
 
 local ITEMS_PER_DIG_MAX = 6
 local DIG_SPEED_MIN = 5
-local AUTO_SELL_MIN = 5
 
 local function init(self: ClockState, context: Context): boolean
 	self.context = context
@@ -103,20 +103,12 @@ local function advance(self: ClockState, seconds: number): boolean
 		digSpeedCostLabel.value = maxed and 'MAX' or tostring(UPGRADE_COST)
 	end
 
-	local autoSellSeconds = economy:getNumber('autoSellSeconds')
-	local autoSellAffordable = economy:getNumber('autoSellAffordable')
-	local autoSellCostLabel = economy:getString('autoSellCostLabel')
-	if autoSellSeconds and autoSellAffordable and autoSellCostLabel then
-		local maxed = autoSellSeconds.value <= AUTO_SELL_MIN
-		autoSellAffordable.value = (canAfford and not maxed) and 1 or DIMMED_ALPHA
-		autoSellCostLabel.value = maxed and 'MAX' or tostring(UPGRADE_COST)
-	end
-
-	-- Live inventory total, for the Sell All preview
+	-- Live inventory total, for the Sell All preview, and whether selling
+	-- would do anything right now
 	local inventory = economy:getList('inventory')
 	local inventoryValue = economy:getNumber('inventoryValue')
+	local total = 0
 	if inventory and inventoryValue then
-		local total = 0
 		for i = 1, inventory.length do
 			local item = inventory[i]
 			local value = item:getNumber('value')
@@ -125,6 +117,19 @@ local function advance(self: ClockState, seconds: number): boolean
 			end
 		end
 		inventoryValue.value = total
+	end
+
+	local sellAffordable = economy:getNumber('sellAffordable')
+	if sellAffordable then
+		sellAffordable.value = (total > 0) and 1 or DIMMED_ALPHA
+	end
+
+	-- Dig popup ("+$36"), fading out after POPUP_DURATION seconds
+	local lastDigPopupTime = economy:getNumber('lastDigPopupTime')
+	local digPopupAlpha = economy:getNumber('digPopupAlpha')
+	if lastDigPopupTime and digPopupAlpha and gameTime then
+		local sincePopup = gameTime.value - lastDigPopupTime.value
+		digPopupAlpha.value = clamp01(1 - (sincePopup / POPUP_DURATION))
 	end
 
 	return true

@@ -77,6 +77,17 @@
                             </TrimPath>
                         </Stroke>
                     </Shape>
+
+                    <Text name="DigPopup" id="0:38">
+                        <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="DigPopup Layout"/>
+                        <DataBindContext sourcePathIds="0:200-0:241" propertyKey="18"/>
+                        <TextStylePaint fontSize="18" fontAssetId="0:300" name="DigPopupStyle" id="0:39">
+                            <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextValueRun styleId="0:39" text="" name="DigPopupRun">
+                            <DataBindContext sourcePathIds="0:200-0:240" propertyKey="268"/>
+                        </TextValueRun>
+                    </Text>
                 </LayoutComponent>
             </LayoutComponent>
 
@@ -165,48 +176,12 @@
                     </Text>
                 </LayoutComponent>
 
-                <LayoutComponent width="240" height="64" styleId="0:91" name="AutoSellPanel" id="0:90">
-                    <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
-                                          flexDirectionValue="row" layoutAlignmentType="spaceBetweenCenter"
-                                          paddingLeft="16" paddingLeftUnitsValue="points"
-                                          paddingRight="16" paddingRightUnitsValue="points"
-                                          cornerRadiusTL="10" cornerRadiusTR="10" cornerRadiusBL="10" cornerRadiusBR="10"
-                                          name="AutoSellPanel Style" id="0:91"/>
-                    <DataBindContext sourcePathIds="0:200-0:234" propertyKey="18"/>
-                    <Fill name="Fill">
-                        <SolidColor colorValue="FF4F7062" name="C">
-                            <DataBindContext sourcePathIds="0:100-0:108" propertyKey="37"/>
-                        </SolidColor>
-                    </Fill>
-
-                    <Text name="AutoSellLabel" id="0:92">
-                        <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="AutoSellLabel Layout"/>
-                        <TextStylePaint fontSize="16" fontAssetId="0:300" name="AutoSellStyle" id="0:93">
-                            <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
-                        </TextStylePaint>
-                        <TextValueRun styleId="0:93" text="Auto-Sell " name="AutoSellPrefix"/>
-                        <TextValueRun styleId="0:93" text="60" name="AutoSellValue">
-                            <DataBindContext sourcePathIds="0:200-0:204" propertyKey="268" converterId="0:301"/>
-                        </TextValueRun>
-                        <TextValueRun styleId="0:93" text="s" name="AutoSellSuffix"/>
-                    </Text>
-
-                    <Text name="AutoSellCost" id="0:94">
-                        <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="AutoSellCost Layout"/>
-                        <TextStylePaint fontSize="14" fontAssetId="0:300" name="AutoSellCostStyle" id="0:95">
-                            <Fill name="Fill"><SolidColor colorValue="FFE8C27A" name="C"/></Fill>
-                        </TextStylePaint>
-                        <TextValueRun styleId="0:95" text="110" name="AutoSellCostRun">
-                            <DataBindContext sourcePathIds="0:200-0:237" propertyKey="268"/>
-                        </TextValueRun>
-                    </Text>
-                </LayoutComponent>
-
                 <LayoutComponent width="200" height="56" styleId="0:61" name="SellButton" id="0:60">
                     <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
                                           layoutAlignmentType="center"
                                           cornerRadiusTL="12" cornerRadiusTR="12" cornerRadiusBL="12" cornerRadiusBR="12"
                                           name="SellButton Style" id="0:61"/>
+                    <DataBindContext sourcePathIds="0:200-0:239" propertyKey="18"/>
                     <Fill name="Fill">
                         <SolidColor colorValue="FFE8785A" name="C">
                             <DataBindContext sourcePathIds="0:100-0:106" propertyKey="37"/>
@@ -289,15 +264,6 @@
                     <ScriptInputNumber propertyValue="15" name="maxValue"/>
                 </ScriptedListenerAction>
             </StateMachineListenerSingle>
-
-            <StateMachineListenerSingle targetId="0:90" listenerTypeValue="click" name="BuyAutoSell" id="0:96">
-                <ScriptedListenerAction scriptAssetId="0:312" id="0:97">
-                    <ScriptInputString propertyValue="autoSellSeconds" name="statName"/>
-                    <ScriptInputNumber propertyValue="-10" name="step"/>
-                    <ScriptInputNumber propertyValue="5" name="minValue"/>
-                    <ScriptInputNumber propertyValue="60" name="maxValue"/>
-                </ScriptedListenerAction>
-            </StateMachineListenerSingle>
         </StateMachine>
     </Artboard>
 
@@ -351,11 +317,13 @@
         <ViewModelPropertyNumber name="lastPulseTime" id="0:231"/>
         <ViewModelPropertyNumber name="itemsPerDigAffordable" id="0:232"/>
         <ViewModelPropertyNumber name="digSpeedAffordable" id="0:233"/>
-        <ViewModelPropertyNumber name="autoSellAffordable" id="0:234"/>
         <ViewModelPropertyString name="itemsPerDigCostLabel" id="0:235"/>
         <ViewModelPropertyString name="digSpeedCostLabel" id="0:236"/>
-        <ViewModelPropertyString name="autoSellCostLabel" id="0:237"/>
         <ViewModelPropertyNumber name="inventoryValue" id="0:238"/>
+        <ViewModelPropertyNumber name="sellAffordable" id="0:239"/>
+        <ViewModelPropertyString name="digPopupText" id="0:240"/>
+        <ViewModelPropertyNumber name="digPopupAlpha" id="0:241"/>
+        <ViewModelPropertyNumber name="lastDigPopupTime" id="0:242"/>
         <ViewModelInstance exports="true" name="Default" id="0:210">
             <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:201"/>
             <ViewModelInstanceNumber propertyValue="3" viewModelPropertyId="0:202"/>
@@ -369,11 +337,13 @@
             <ViewModelInstanceNumber propertyValue="-100000" viewModelPropertyId="0:231"/>
             <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:232"/>
             <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:233"/>
-            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:234"/>
             <ViewModelInstanceString propertyValue="110" viewModelPropertyId="0:235"/>
             <ViewModelInstanceString propertyValue="110" viewModelPropertyId="0:236"/>
-            <ViewModelInstanceString propertyValue="110" viewModelPropertyId="0:237"/>
             <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:238"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:239"/>
+            <ViewModelInstanceString propertyValue="" viewModelPropertyId="0:240"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:241"/>
+            <ViewModelInstanceNumber propertyValue="-100000" viewModelPropertyId="0:242"/>
         </ViewModelInstance>
     </ViewModel>
 </Rive>

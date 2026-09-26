@@ -140,6 +140,23 @@ Confirms the "scripts compute, RML/state-machines interact" split still
 holds even for polish: none of this needed a new listener or state
 machine — every visual reacts to a number `clock.luau` already owns.
 
+**Follow-up 2** (still before milestone 4):
+- **Removed the Auto-Sell panel entirely** rather than leaving it
+  purchasable-but-inert — spending $110 on a stat with no behaviour yet
+  would read as worse than a bug, it'd read as the game lying. The
+  underlying `Economy.autoSellSeconds` stays untouched for milestone 6,
+  when the panel (and its actual passive-sell behaviour) comes back
+  together.
+- **Sell All now dims when the inventory is empty**, the same
+  affordable/no-op pattern as the upgrade panels (`Economy.sellAffordable`,
+  computed alongside `inventoryValue` in `clock.luau` since both are
+  already iterating the list every frame).
+- **Added a fading "+$N" popup** on the item after each dig
+  (`Economy.digPopupText`/`digPopupAlpha`, a `lastDigPopupTime` stamped
+  in `main.luau`, faded over 1s in `clock.luau` the same way the pulse
+  decays over 0.25s). Pulled forward from the planned milestone 8 pass
+  since the decay-curve pattern already existed and the win was cheap.
+
 4. **First bot (Beach Boy)** — purchasable, driver script auto-collects
    Beach Boy's 3 item types into inventory on its own timer, independent of
    clicking.

@@ -44,6 +44,17 @@ local ELBOW_GREASE_MAX = 10
 
 local BEACH_BOY_COST = 458
 
+-- Roaming: each producer drifts toward a random point, then picks a new
+-- one on arrival. Bounds are a conservative box that fits inside the
+-- beach area at the narrowest tested viewport (1024x640); revisit once
+-- the responsive-layout pass can report the area's real resolved size.
+local ROAM_SPEED = 40 -- points per second
+local ROAM_MIN_X = 20
+local ROAM_MAX_X = 520
+local ROAM_MIN_Y = 20
+local ROAM_MAX_Y = 320
+local ROAM_ARRIVE_THRESHOLD = 4
+
 local function init(self: ClockState, context: Context): boolean
 	self.context = context
 	return true
@@ -167,6 +178,26 @@ local function advance(self: ClockState, seconds: number): boolean
 			if lastDigPopupTime and digPopupAlpha then
 				local sincePopup = gameTime - lastDigPopupTime.value
 				digPopupAlpha.value = clamp01(1 - (sincePopup / POPUP_DURATION))
+			end
+
+			-- Roaming: drift toward roamTarget*, pick a new one on arrival,
+			-- so the producer looks like it's wandering around collecting.
+			local roamX = producer:getNumber('roamX')
+			local roamY = producer:getNumber('roamY')
+			local roamTargetX = producer:getNumber('roamTargetX')
+			local roamTargetY = producer:getNumber('roamTargetY')
+			if roamX and roamY and roamTargetX and roamTargetY then
+				local dx = roamTargetX.value - roamX.value
+				local dy = roamTargetY.value - roamY.value
+				local dist = math.sqrt(dx * dx + dy * dy)
+				if dist < ROAM_ARRIVE_THRESHOLD then
+					roamTargetX.value = ROAM_MIN_X + math.random() * (ROAM_MAX_X - ROAM_MIN_X)
+					roamTargetY.value = ROAM_MIN_Y + math.random() * (ROAM_MAX_Y - ROAM_MIN_Y)
+				else
+					local step = math.min(ROAM_SPEED * seconds, dist)
+					roamX.value += (dx / dist) * step
+					roamY.value += (dy / dist) * step
+				end
 			end
 		end
 	end

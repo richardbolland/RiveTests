@@ -6,7 +6,13 @@
          only digSpeedSeconds, itemsPerDig and elbowGreasePercent are shared
          (Economy) upgrades applying to every producer alike. -->
     <Artboard isComponent="true" viewModelId="0:500" styleId="0:502" x="1600" y="0" width="110" height="110" name="ProducerWidget" id="0:501">
-        <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" name="ProducerWidget Style" id="0:502"/>
+        <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                              positionTypeValue="absolute"
+                              positionLeftUnitsValue="points" positionTopUnitsValue="points"
+                              name="ProducerWidget Style" id="0:502">
+            <DataBindContext sourcePathIds="0:500-0:520" propertyKey="516"/>
+            <DataBindContext sourcePathIds="0:500-0:521" propertyKey="518"/>
+        </LayoutComponentStyle>
 
         <LayoutComponent width="110" height="110" styleId="0:541" name="Stack" id="0:540">
             <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
@@ -79,6 +85,10 @@
         <ViewModelPropertyNumber name="digPopupAlpha" id="0:517"/>
         <ViewModelPropertyNumber name="lastDigPopupTime" id="0:518"/>
         <ViewModelPropertyString name="itemPoolName" id="0:519"/>
+        <ViewModelPropertyNumber name="roamX" id="0:520"/>
+        <ViewModelPropertyNumber name="roamY" id="0:521"/>
+        <ViewModelPropertyNumber name="roamTargetX" id="0:522"/>
+        <ViewModelPropertyNumber name="roamTargetY" id="0:523"/>
 
         <ViewModelInstance exports="true" name="Default" id="0:530">
             <ViewModelInstanceColor propertyValue="FFE8785A" viewModelPropertyId="0:510"/>
@@ -91,6 +101,10 @@
             <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:517"/>
             <ViewModelInstanceNumber propertyValue="-100000" viewModelPropertyId="0:518"/>
             <ViewModelInstanceString propertyValue="all" viewModelPropertyId="0:519"/>
+            <ViewModelInstanceNumber propertyValue="100" viewModelPropertyId="0:520"/>
+            <ViewModelInstanceNumber propertyValue="100" viewModelPropertyId="0:521"/>
+            <ViewModelInstanceNumber propertyValue="100" viewModelPropertyId="0:522"/>
+            <ViewModelInstanceNumber propertyValue="100" viewModelPropertyId="0:523"/>
         </ViewModelInstance>
 
         <ViewModelInstance exports="true" name="Starter" id="0:531">
@@ -104,6 +118,10 @@
             <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:517"/>
             <ViewModelInstanceNumber propertyValue="-100000" viewModelPropertyId="0:518"/>
             <ViewModelInstanceString propertyValue="all" viewModelPropertyId="0:519"/>
+            <ViewModelInstanceNumber propertyValue="120" viewModelPropertyId="0:520"/>
+            <ViewModelInstanceNumber propertyValue="150" viewModelPropertyId="0:521"/>
+            <ViewModelInstanceNumber propertyValue="120" viewModelPropertyId="0:522"/>
+            <ViewModelInstanceNumber propertyValue="150" viewModelPropertyId="0:523"/>
         </ViewModelInstance>
 
         <ViewModelInstance exports="true" name="BeachBoy" id="0:532">
@@ -117,6 +135,10 @@
             <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:517"/>
             <ViewModelInstanceNumber propertyValue="-100000" viewModelPropertyId="0:518"/>
             <ViewModelInstanceString propertyValue="beachBoy" viewModelPropertyId="0:519"/>
+            <ViewModelInstanceNumber propertyValue="400" viewModelPropertyId="0:520"/>
+            <ViewModelInstanceNumber propertyValue="150" viewModelPropertyId="0:521"/>
+            <ViewModelInstanceNumber propertyValue="400" viewModelPropertyId="0:522"/>
+            <ViewModelInstanceNumber propertyValue="150" viewModelPropertyId="0:523"/>
         </ViewModelInstance>
     </ViewModel>
 </Rive>

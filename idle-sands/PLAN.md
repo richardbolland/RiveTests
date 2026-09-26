@@ -258,6 +258,33 @@ boost scales with the purchased level.
    (proving separate cycles, not a shared one), Beach Boy's `itemPoolName`
    correctly `"beachBoy"` against the starter's `"all"`, and a screenshot
    showing two distinctly-coloured circles side by side in the beach area.
+
+**Roaming producers** (still before milestone 5): producers now wander
+the beach area instead of sitting in a fixed flex slot, so they read as
+actively out collecting rather than static icons. Each `Producer`
+instance gained `roamX`/`roamY` (current position) and
+`roamTargetX`/`roamTargetY` (current destination); `clock.luau` drifts
+position toward target at `ROAM_SPEED` (40pt/s) each frame and picks a
+new random target on arrival. Mechanically this needed
+`ProducerWidget`'s own `LayoutComponentStyle` to become
+`positionTypeValue="absolute"` with `positionLeft`/`positionTop` bound to
+those coordinates — pulling each row out of the `ArtboardComponentList`'s
+flex flow so it can be positioned freely rather than laid out beside its
+siblings. Bounds are a conservative fixed box (20–520 × 20–320) rather
+than the beach area's real resolved size, since a script has no generic
+way to read an arbitrary sibling's computed layout size; noted as a
+placeholder to revisit in the milestone 9 responsive-layout pass, since
+at wider viewports the roam area won't use the full beach width.
+
+Verified clean, inspected with zero wiring problems. Confirmed with
+screenshots at t=0/5s/10s that a producer visibly moves across the beach
+area over time, and numerically that clicking a producer at its
+*current* roamed position (computed from `roamX`/`roamY`, not its
+original slot) still correctly applies Elbow Grease — proving hit-testing
+tracks the live rendered position, not an authored one. Confirmed two
+owned producers roam independently without converging or overlapping
+persistently.
+
 5. **Second bot (Steel Seeker)** — same pattern, different item pool; verify
    bots never cross-collect each other's items.
 6. **Auto-sell** — driver script sells inventory automatically on the

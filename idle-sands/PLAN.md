@@ -404,6 +404,31 @@ All (currency was needed first), capacity went 3→4 on the shared stat
 and on the Starter's own mirrored copy in the same frame, and the
 robot's badge read the new "n/4" immediately.
 
+**Repeatable Beach Boy purchase, cheaper entry price** — Beach Boy was
+a one-time $458 flag-gated purchase; changed to a repeatable buy at a
+much lower $150 entry, each subsequent one pricier on its own Cost(n)
+= base * growth^n curve (growth 1.6 - steeper than the $5-base stat
+upgrades' 2.8, since each purchase here is a whole extra producer, not
+a shared incremental stat). $150 was chosen as roughly "the first
+Beach Boy should feel reachable a little after the three cheap
+upgrades are within reach, not as a distant end-of-run goal" - the old
+$458 had been tuned as a one-off milestone, which stops making sense
+once it's the first rung of an open-ended ladder.
+`Economy.beachBoyOwned` (a 0/1 flag) became `beachBoyCount` (how many
+owned); `buyBot.luau` dropped its owned-flag gate for a count-based
+cost curve (mirroring `upgrade.luau`'s shape, parameterised so the
+same script still backs Steel Seeker later), and now applies a small
+random jitter to a newly-spawned producer's roam position/target -
+without it, every copy of the same bot would spawn stacked exactly on
+the template's fixed position until roaming happened to separate them.
+The panel label now reads "Beach Boy ×`<count>`" instead of toggling
+to "Owned". Verified headlessly: bought one at $150 (count 0→1, next
+price 150→240, matching 150*1.6 exactly), confirmed a second
+`ProducerRows` entry appeared with the Beach Boy item pool and a
+position jittered off the template's fixed spawn point, and screenshot
+-confirmed two producers on stage with the panel reading "Beach Boy
+×1" at the new $240 price.
+
 5. **Second bot (Steel Seeker)** — same pattern, different item pool; verify
    bots never cross-collect each other's items.
 6. **Auto-sell** — driver script sells inventory automatically on the

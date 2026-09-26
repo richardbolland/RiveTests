@@ -64,7 +64,13 @@ local STORAGE_CAPACITY_START = 3
 local STORAGE_CAPACITY_STEP = 1
 local STORAGE_CAPACITY_MAX = 8
 
-local BEACH_BOY_COST = 458
+-- Beach Boy is repeatable rather than a one-time flag: each purchase adds
+-- another producer and gets pricier, on its own (steeper, since these are
+-- whole extra producers rather than a shared stat) Cost(n) = base *
+-- growth^n curve, n being how many are already owned. Must match the
+-- ScriptInput* values on the BuyBeachBoy listener in scene.rml exactly.
+local BEACH_BOY_BASE_COST = 150
+local BEACH_BOY_GROWTH = 1.6
 
 local function levelsBought(currentValue: number, step: number, startValue: number): number
 	return math.floor(math.abs(currentValue - startValue) / math.abs(step) + 0.5)
@@ -72,6 +78,10 @@ end
 
 local function upgradeCost(level: number): number
 	return math.floor(UPGRADE_BASE_COST * (UPGRADE_GROWTH ^ level) + 0.5)
+end
+
+local function beachBoyCost(count: number): number
+	return math.floor(BEACH_BOY_BASE_COST * (BEACH_BOY_GROWTH ^ count) + 0.5)
 end
 
 -- Roaming: each producer drifts toward a random point, then picks a new
@@ -303,15 +313,15 @@ local function advance(self: ClockState, seconds: number): boolean
 		storageCapacityCostLabel.value = maxed and 'MAX' or tostring(cost)
 	end
 
-	-- Beach Boy purchase panel: affordable/owned state
-	local beachBoyOwned = economy:getNumber('beachBoyOwned')
+	-- Beach Boy purchase panel: repeatable, so just affordable/not - never
+	-- "owned" now that buying one doesn't stop you buying another
+	local beachBoyCount = economy:getNumber('beachBoyCount')
 	local beachBoyAffordable = economy:getNumber('beachBoyAffordable')
 	local beachBoyCostLabel = economy:getString('beachBoyCostLabel')
-	if beachBoyOwned and beachBoyAffordable and beachBoyCostLabel then
-		local owned = beachBoyOwned.value >= 1
-		local afford = currencyValue >= BEACH_BOY_COST
-		beachBoyAffordable.value = (afford and not owned) and 1 or DIMMED_ALPHA
-		beachBoyCostLabel.value = owned and 'Owned' or tostring(BEACH_BOY_COST)
+	if beachBoyCount and beachBoyAffordable and beachBoyCostLabel then
+		local cost = beachBoyCost(beachBoyCount.value)
+		beachBoyAffordable.value = (currencyValue >= cost) and 1 or DIMMED_ALPHA
+		beachBoyCostLabel.value = tostring(cost)
 	end
 
 	-- Live totals across every producer's own storage, for the bottom

@@ -227,7 +227,10 @@
                         <TextStylePaint fontSize="16" fontAssetId="0:300" name="BuyBeachBoyStyle" id="0:163">
                             <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
                         </TextStylePaint>
-                        <TextValueRun styleId="0:163" text="Beach Boy" name="BuyBeachBoyPrefix"/>
+                        <TextValueRun styleId="0:163" text="Beach Boy &#215;" name="BuyBeachBoyPrefix"/>
+                        <TextValueRun styleId="0:163" text="0" name="BuyBeachBoyCount">
+                            <DataBindContext sourcePathIds="0:200-0:252" propertyKey="268" converterId="0:301"/>
+                        </TextValueRun>
                     </Text>
 
                     <Text name="BuyBeachBoyCost" id="0:164">
@@ -235,7 +238,7 @@
                         <TextStylePaint fontSize="14" fontAssetId="0:300" name="BuyBeachBoyCostStyle" id="0:165">
                             <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
                         </TextStylePaint>
-                        <TextValueRun styleId="0:165" text="458" name="BuyBeachBoyCostRun">
+                        <TextValueRun styleId="0:165" text="150" name="BuyBeachBoyCostRun">
                             <DataBindContext sourcePathIds="0:200-0:254" propertyKey="268"/>
                         </TextValueRun>
                     </Text>
@@ -356,8 +359,9 @@
             <StateMachineListenerSingle targetId="0:160" listenerTypeValue="click" name="BuyBeachBoy" id="0:166">
                 <ScriptedListenerAction scriptAssetId="0:314" id="0:167">
                     <ScriptInputString propertyValue="BeachBoy" name="instanceName"/>
-                    <ScriptInputNumber propertyValue="458" name="cost"/>
-                    <ScriptInputString propertyValue="beachBoyOwned" name="ownedFlagName"/>
+                    <ScriptInputString propertyValue="beachBoyCount" name="countStatName"/>
+                    <ScriptInputNumber propertyValue="150" name="baseCost"/>
+                    <ScriptInputNumber propertyValue="1.6" name="growth"/>
                 </ScriptedListenerAction>
             </StateMachineListenerSingle>
         </StateMachine>
@@ -414,7 +418,7 @@
         <ViewModelPropertyNumber name="elbowGreaseAffordable" id="0:245"/>
         <ViewModelPropertyString name="elbowGreaseCostLabel" id="0:246"/>
         <ViewModelPropertyList name="producers" id="0:250"/>
-        <ViewModelPropertyNumber name="beachBoyOwned" id="0:252"/>
+        <ViewModelPropertyNumber name="beachBoyCount" id="0:252"/>
         <ViewModelPropertyNumber name="beachBoyAffordable" id="0:253"/>
         <ViewModelPropertyString name="beachBoyCostLabel" id="0:254"/>
         <ViewModelPropertyNumber name="storedCount" id="0:255"/>
@@ -441,7 +445,7 @@
             </ViewModelInstanceList>
             <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:252"/>
             <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:253"/>
-            <ViewModelInstanceString propertyValue="458" viewModelPropertyId="0:254"/>
+            <ViewModelInstanceString propertyValue="150" viewModelPropertyId="0:254"/>
             <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:255"/>
             <ViewModelInstanceNumber propertyValue="3" viewModelPropertyId="0:256"/>
             <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:257"/>

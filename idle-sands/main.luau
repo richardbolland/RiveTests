@@ -1,7 +1,11 @@
 --- The item is always auto-collecting on its own (clock.luau owns that).
---- Clicking it never collects directly - it just cuts a percentage off
---- whatever time is left on the current cycle, so enough rapid clicks
---- speed a producer up noticeably without ever fully replacing the wait.
+--- Clicking it never collects directly - it cuts a fixed percentage of the
+--- FULL cycle length off whatever time is left, so every click is worth
+--- the same amount regardless of when in the cycle it lands (a percentage
+--- of what's *remaining* would front-load all the value into the first
+--- click or two and make late-cycle clicks feel like nothing). It also
+--- means the boost automatically scales down if digSpeedSeconds is
+--- upgraded to a shorter cycle, with no rebalancing needed.
 
 type BoostState = {
 	context: Context?,
@@ -43,10 +47,13 @@ local function performAction(self: BoostState, listenerContext: ListenerContext)
 		return
 	end
 
-	-- Cutting X% off what's left is the same as moving lastDigTime backward
-	-- (simulating more time having passed since the last collect), since
-	-- remaining = digSpeed - (gameTime - lastDigTime).
-	lastDigTime.value -= remaining * CLICK_CUT_FRACTION
+	-- Cutting X% of the full cycle off what's left is the same as moving
+	-- lastDigTime backward (simulating more time having passed since the
+	-- last collect) by that same amount, since
+	-- remaining = digSpeed - (gameTime - lastDigTime). Clamp so a click
+	-- near the very end of a cycle can't push remaining negative.
+	local cut = math.min(remaining, digSpeed.value * CLICK_CUT_FRACTION)
+	lastDigTime.value -= cut
 
 	local lastPulseTime = economy:getNumber('lastPulseTime')
 	local pulseMagnitude = economy:getNumber('pulseMagnitude')

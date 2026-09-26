@@ -2,6 +2,37 @@
     <Artboard defaultStateMachineId="0:7" styleId="0:5" width="1280" height="720" name="IdleSands" id="0:2">
         <LayoutComponentStyle flexDirectionValue="column" name="Artboard Style" id="0:5"/>
 
+        <!-- Universal tooltip overlay, declared first so it draws on top
+             of everything else (first sibling draws on top - rive docs
+             transforms). Shown/hidden and positioned by showTooltip.luau
+             / hideTooltip.luau, never edited directly by any one feature. -->
+        <LayoutComponent width="10" height="10" styleId="0:261" name="Tooltip" id="0:260">
+            <LayoutComponentStyle layoutWidthScaleType="hug" layoutHeightScaleType="hug"
+                                  positionTypeValue="absolute"
+                                  positionLeftUnitsValue="points" positionTopUnitsValue="points"
+                                  paddingLeft="10" paddingRight="10"
+                                  paddingTop="6" paddingBottom="6"
+                                  cornerRadiusTL="8" cornerRadiusTR="8" cornerRadiusBL="8" cornerRadiusBR="8"
+                                  name="Tooltip Style" id="0:261">
+                <DataBindContext sourcePathIds="0:270-0:273" propertyKey="516"/>
+                <DataBindContext sourcePathIds="0:270-0:274" propertyKey="518"/>
+            </LayoutComponentStyle>
+            <DataBindContext sourcePathIds="0:270-0:272" propertyKey="18"/>
+            <Fill name="Fill">
+                <SolidColor colorValue="F01D2B27" name="C"/>
+            </Fill>
+
+            <Text name="TooltipLabel" id="0:263">
+                <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="TooltipLabel Layout"/>
+                <TextStylePaint fontSize="14" fontAssetId="0:300" name="TooltipStyle" id="0:264">
+                    <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="0:264" text="" name="TooltipRun">
+                    <DataBindContext sourcePathIds="0:270-0:271" propertyKey="268"/>
+                </TextValueRun>
+            </Text>
+        </LayoutComponent>
+
         <LayoutComponent width="0" height="0" styleId="0:131" name="Clock" id="0:130">
             <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" name="Clock Style" id="0:131"/>
             <ScriptedLayout scriptAssetId="0:313" name="ClockScript" id="0:132"/>
@@ -383,6 +414,8 @@
     <ScriptAsset file="upgrade.luau" name="upgrade" id="0:312"/>
     <ScriptAsset file="clock.luau" name="clock" id="0:313"/>
     <ScriptAsset file="buyBot.luau" name="buyBot" id="0:314"/>
+    <ScriptAsset file="showTooltip.luau" name="showTooltip" id="0:315"/>
+    <ScriptAsset file="hideTooltip.luau" name="hideTooltip" id="0:316"/>
 
     <!-- Design tokens: one global palette, swap these to re-theme the whole game -->
     <ViewModel viewModelType="global" defaultInstanceId="0:110" name="Theme" id="0:100">
@@ -459,6 +492,23 @@
             <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:257"/>
             <ViewModelInstanceString propertyValue="5" viewModelPropertyId="0:258"/>
             <ViewModelInstanceList viewModelPropertyId="0:259"/>
+        </ViewModelInstance>
+    </ViewModel>
+
+    <!-- Universal tooltip: one shared overlay, positioned and retextured by
+         whichever hoverable element last showed it (showTooltip.luau /
+         hideTooltip.luau). Any new hoverable UI reuses this same
+         subsystem instead of building its own bubble. -->
+    <ViewModel viewModelType="global" defaultInstanceId="0:275" name="Tooltip" id="0:270">
+        <ViewModelPropertyString name="text" id="0:271"/>
+        <ViewModelPropertyNumber name="visible" id="0:272"/>
+        <ViewModelPropertyNumber name="x" id="0:273"/>
+        <ViewModelPropertyNumber name="y" id="0:274"/>
+        <ViewModelInstance exports="true" name="Default" id="0:275">
+            <ViewModelInstanceString propertyValue="" viewModelPropertyId="0:271"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:272"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:273"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:274"/>
         </ViewModelInstance>
     </ViewModel>
 </Rive>

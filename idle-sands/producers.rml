@@ -99,6 +99,18 @@
             <StateMachineListenerSingle targetId="0:542" listenerTypeValue="click" name="Boost" id="0:552">
                 <ScriptedListenerAction scriptAssetId="0:310" id="0:553"/>
             </StateMachineListenerSingle>
+
+            <StateMachineListenerSingle targetId="0:542" listenerTypeValue="enter" name="ShowTooltip" id="0:554">
+                <ScriptedListenerAction scriptAssetId="0:315" id="0:555">
+                    <ScriptInputString propertyValue="Click me to speed up my digging!" name="text"/>
+                    <ScriptInputNumber propertyValue="0" name="anchorX"/>
+                    <ScriptInputNumber propertyValue="-70" name="anchorY"/>
+                </ScriptedListenerAction>
+            </StateMachineListenerSingle>
+
+            <StateMachineListenerSingle targetId="0:542" listenerTypeValue="exit" name="HideTooltip" id="0:556">
+                <ScriptedListenerAction scriptAssetId="0:316" id="0:557"/>
+            </StateMachineListenerSingle>
         </StateMachine>
     </Artboard>
 

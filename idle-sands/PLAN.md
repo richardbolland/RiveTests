@@ -467,6 +467,54 @@ confirmed it holds exactly 40 items, proving the cap engages rather
 than growing unbounded. Verified clean, inspected with zero wiring
 problems.
 
+**Universal tooltip architecture, applied to Elbow Grease** — built as
+reusable infrastructure first, per explicit direction, rather than a
+one-off bubble on the robot. One shared subsystem: a global `Tooltip`
+view model (`text`, `visible`, `x`, `y`) and a single overlay
+(`scene.rml`, declared as the root artboard's *first* child so it
+draws on top of everything - draw order is front-to-back by
+declaration, the same gotcha the storage badge hit) that any feature
+can retext and reposition. Two shared scripts,
+`showTooltip.luau`/`hideTooltip.luau`, do the retexting: wiring a
+tooltip onto anything is two `StateMachineListenerSingle` entries
+(`enter`/`exit`) plus a `text`/`anchorX`/`anchorY` input on the enter
+one - no new script logic per feature, matching the same
+"parameterise one shared script via `ScriptInput*`" shape as
+`upgrade.luau`/`buyBot.luau`.
+
+The one real design problem: a tooltip needs a screen position, but
+the *host* differs per feature - a static side panel's position is
+fixed at author time, while a producer's position changes every frame
+as it roams. `showTooltip.luau` resolves this once, generically,
+instead of pushing the problem onto every caller: it checks whether
+its own host's view model exposes `roamX`/`roamY` (`context:viewModel()`
+- the same lookup `main.luau` already uses to read "this row's own
+producer"); if so, that becomes the tooltip's base position (converted
+from BeachArea-local into root-artboard coordinates via two fixed
+offsets - `PRODUCER_WIDGET_CENTER` and `BEACH_AREA_ROOT_Y`, both
+already known from the roaming/badge work), and `anchorX`/`anchorY`
+apply as a small offset on top (e.g. "70pt above it"); if not (a
+static panel with no such properties), base is `(0, 0)` and
+`anchorX`/`anchorY` become plain root coordinates. One code path
+covers both a fixed element and a moving one with no per-caller
+branching.
+
+Applied to Elbow Grease exactly as the player asked when reviewing the
+game's thematic fit ("give it a tooltip that will help explain that by
+clicking on the robot, you are helping it to speed up it's collection
+of items"): the robot's own clickable circle (already wired for the
+Boost click listener in `producers.rml`) gained matching `enter`/`exit`
+listeners reading "Click me to speed up my digging!". Verified
+headlessly (with a temporary `ROAM_SPEED = 0`, the same trick used to
+test the storage badge, so a hover coordinate stays valid across the
+build): a `move` pointer event onto the robot set `Tooltip.visible` to
+1 with the right text and a position matching the robot's actual
+on-screen centre minus the 70pt offset; moving away set `visible` back
+to 0; a screenshot confirmed the bubble renders above every other
+layer. Confirmed the new hover listeners don't interfere with the
+existing click-to-boost listener on the same target. Verified clean,
+inspected with zero wiring problems.
+
 5. **Second bot (Steel Seeker)** — same pattern, different item pool; verify
    bots never cross-collect each other's items.
 6. **Auto-sell** — driver script sells inventory automatically on the

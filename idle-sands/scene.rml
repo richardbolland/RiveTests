@@ -53,22 +53,54 @@
             </LayoutComponent>
 
             <LayoutComponent width="280" height="556" styleId="0:41" name="SidePanel" id="0:40">
-                <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fill" name="SidePanel Style" id="0:41"/>
+                <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fill"
+                                      flexDirectionValue="column" layoutAlignmentType="topCenter"
+                                      paddingTop="24" paddingTopUnitsValue="points"
+                                      name="SidePanel Style" id="0:41"/>
                 <Fill name="Fill">
                     <SolidColor colorValue="FF3E5C50" name="C">
                         <DataBindContext sourcePathIds="0:100-0:104" propertyKey="37"/>
                     </SolidColor>
                 </Fill>
+
+                <LayoutComponent width="200" height="56" styleId="0:61" name="SellButton" id="0:60">
+                    <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                          layoutAlignmentType="center"
+                                          cornerRadiusTL="12" cornerRadiusTR="12" cornerRadiusBL="12" cornerRadiusBR="12"
+                                          name="SellButton Style" id="0:61"/>
+                    <Fill name="Fill">
+                        <SolidColor colorValue="FFE8785A" name="C">
+                            <DataBindContext sourcePathIds="0:100-0:106" propertyKey="37"/>
+                        </SolidColor>
+                    </Fill>
+
+                    <Text name="SellLabel" id="0:62">
+                        <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="SellLabel Layout"/>
+                        <TextStylePaint fontSize="20" fontAssetId="0:300" name="SellStyle" id="0:63">
+                            <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextValueRun styleId="0:63" text="Sell All" name="SellRun"/>
+                    </Text>
+                </LayoutComponent>
             </LayoutComponent>
         </LayoutComponent>
 
         <LayoutComponent width="1280" height="100" styleId="0:51" name="InventoryStrip" id="0:50">
-            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fixed" name="InventoryStrip Style" id="0:51"/>
+            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fixed"
+                                  flexDirectionValue="row" layoutAlignmentType="centerLeft"
+                                  gapHorizontal="8" gapHorizontalUnitsValue="points"
+                                  paddingLeft="16" paddingLeftUnitsValue="points"
+                                  paddingRight="16" paddingRightUnitsValue="points"
+                                  name="InventoryStrip Style" id="0:51"/>
             <Fill name="Fill">
                 <SolidColor colorValue="FFD9C9A3" name="C">
                     <DataBindContext sourcePathIds="0:100-0:105" propertyKey="37"/>
                 </SolidColor>
             </Fill>
+
+            <ArtboardComponentList name="InventoryRows" id="0:52">
+                <DataBindContext sourcePathIds="0:200-0:220" propertyKey="800"/>
+            </ArtboardComponentList>
         </LayoutComponent>
 
         <StateMachine name="Main" id="0:7">
@@ -81,12 +113,17 @@
             <StateMachineListenerSingle targetId="0:32" listenerTypeValue="click" name="CollectItem" id="0:9">
                 <ScriptedListenerAction scriptAssetId="0:310" id="0:333"/>
             </StateMachineListenerSingle>
+
+            <StateMachineListenerSingle targetId="0:60" listenerTypeValue="click" name="SellAll" id="0:64">
+                <ScriptedListenerAction scriptAssetId="0:311" id="0:65"/>
+            </StateMachineListenerSingle>
         </StateMachine>
     </Artboard>
 
     <FontAsset file="Outfit-Bold.ttf" name="Outfit Bold" id="0:300"/>
     <DataConverterToString decimals="0" round="true" name="CurrencyFormat" id="0:301"/>
     <ScriptAsset file="main.luau" name="main" id="0:310"/>
+    <ScriptAsset file="sell.luau" name="sell" id="0:311"/>
 
     <!-- Design tokens: one global palette, swap these to re-theme the whole game -->
     <ViewModel viewModelType="global" defaultInstanceId="0:110" name="Theme" id="0:100">
@@ -114,11 +151,13 @@
         <ViewModelPropertyNumber name="itemsPerDig" id="0:202"/>
         <ViewModelPropertyNumber name="digSpeedSeconds" id="0:203"/>
         <ViewModelPropertyNumber name="autoSellSeconds" id="0:204"/>
+        <ViewModelPropertyList name="inventory" id="0:220"/>
         <ViewModelInstance exports="true" name="Default" id="0:210">
             <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:201"/>
             <ViewModelInstanceNumber propertyValue="3" viewModelPropertyId="0:202"/>
             <ViewModelInstanceNumber propertyValue="15" viewModelPropertyId="0:203"/>
             <ViewModelInstanceNumber propertyValue="60" viewModelPropertyId="0:204"/>
+            <ViewModelInstanceList viewModelPropertyId="0:220"/>
         </ViewModelInstance>
     </ViewModel>
 </Rive>

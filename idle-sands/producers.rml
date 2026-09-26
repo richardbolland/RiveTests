@@ -1,0 +1,122 @@
+<Rive version="1" kind="fragment">
+    <!-- Reusable producer widget: the digging circle + cooldown ring + popup.
+         One instance per owned producer - the free starter, then purchased
+         bots - rendered via the ArtboardComponentList bound to
+         Economy.producers. Each row owns its own cycle/pulse/popup state;
+         only digSpeedSeconds, itemsPerDig and elbowGreasePercent are shared
+         (Economy) upgrades applying to every producer alike. -->
+    <Artboard isComponent="true" viewModelId="0:500" styleId="0:502" x="1600" y="0" width="110" height="110" name="ProducerWidget" id="0:501">
+        <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" name="ProducerWidget Style" id="0:502"/>
+
+        <LayoutComponent width="110" height="110" styleId="0:541" name="Stack" id="0:540">
+            <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                  layoutTypeValue="stack" layoutAlignmentType="center"
+                                  name="Stack Style" id="0:541"/>
+
+            <Shape name="Item" id="0:542">
+                <LayoutParticipant layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                   width="80" height="80" name="Item Layout"/>
+                <DataBindContext sourcePathIds="0:500-0:512" propertyKey="18" converterId="0:302"/>
+                <DataBindContext sourcePathIds="0:500-0:513" propertyKey="16"/>
+                <DataBindContext sourcePathIds="0:500-0:513" propertyKey="17"/>
+                <Ellipse width="80" height="80" originX="0.5" originY="0.5" name="Path"/>
+                <Fill name="Fill">
+                    <SolidColor colorValue="FFE8785A" name="C">
+                        <DataBindContext sourcePathIds="0:500-0:510" propertyKey="37"/>
+                    </SolidColor>
+                </Fill>
+            </Shape>
+
+            <Shape name="CooldownRing" id="0:543">
+                <LayoutParticipant layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                   width="110" height="110" name="CooldownRing Layout"/>
+                <Ellipse width="100" height="100" originX="0.5" originY="0.5" name="Path"/>
+                <Stroke thickness="6" name="Stroke">
+                    <SolidColor colorValue="FF1D2B27" name="Color">
+                        <DataBindContext sourcePathIds="0:100-0:107" propertyKey="37"/>
+                    </SolidColor>
+                    <TrimPath start="0" end="0" name="Trim" id="0:544">
+                        <DataBindContext sourcePathIds="0:500-0:512" propertyKey="115"/>
+                    </TrimPath>
+                </Stroke>
+            </Shape>
+
+            <Text name="DigPopup" id="0:545">
+                <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="DigPopup Layout"/>
+                <DataBindContext sourcePathIds="0:500-0:517" propertyKey="18"/>
+                <TextStylePaint fontSize="18" fontAssetId="0:300" name="DigPopupStyle" id="0:546">
+                    <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="0:546" text="" name="DigPopupRun">
+                    <DataBindContext sourcePathIds="0:500-0:516" propertyKey="268"/>
+                </TextValueRun>
+            </Text>
+        </LayoutComponent>
+
+        <StateMachine name="Main" id="0:550">
+            <StateMachineLayer name="Layer 1" id="0:551">
+                <AnyState x="0" y="-120"/>
+                <ExitState x="200" y="-120"/>
+                <EntryState x="-200" y="-120"/>
+            </StateMachineLayer>
+
+            <StateMachineListenerSingle targetId="0:542" listenerTypeValue="click" name="Boost" id="0:552">
+                <ScriptedListenerAction scriptAssetId="0:310" id="0:553"/>
+            </StateMachineListenerSingle>
+        </StateMachine>
+    </Artboard>
+
+    <ComponentAsset artboardId="0:501" name="ProducerWidget"/>
+
+    <ViewModel defaultInstanceId="0:530" name="Producer" id="0:500">
+        <ViewModelPropertyColor name="swatch" id="0:510"/>
+        <ViewModelPropertyNumber name="lastDigTime" id="0:511"/>
+        <ViewModelPropertyNumber name="digCooldownFraction" id="0:512"/>
+        <ViewModelPropertyNumber name="itemPulseScale" id="0:513"/>
+        <ViewModelPropertyNumber name="lastPulseTime" id="0:514"/>
+        <ViewModelPropertyNumber name="pulseMagnitude" id="0:515"/>
+        <ViewModelPropertyString name="digPopupText" id="0:516"/>
+        <ViewModelPropertyNumber name="digPopupAlpha" id="0:517"/>
+        <ViewModelPropertyNumber name="lastDigPopupTime" id="0:518"/>
+        <ViewModelPropertyString name="itemPoolName" id="0:519"/>
+
+        <ViewModelInstance exports="true" name="Default" id="0:530">
+            <ViewModelInstanceColor propertyValue="FFE8785A" viewModelPropertyId="0:510"/>
+            <ViewModelInstanceNumber propertyValue="-100000" viewModelPropertyId="0:511"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:512"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:513"/>
+            <ViewModelInstanceNumber propertyValue="-100000" viewModelPropertyId="0:514"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:515"/>
+            <ViewModelInstanceString propertyValue="" viewModelPropertyId="0:516"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:517"/>
+            <ViewModelInstanceNumber propertyValue="-100000" viewModelPropertyId="0:518"/>
+            <ViewModelInstanceString propertyValue="all" viewModelPropertyId="0:519"/>
+        </ViewModelInstance>
+
+        <ViewModelInstance exports="true" name="Starter" id="0:531">
+            <ViewModelInstanceColor propertyValue="FFE8785A" viewModelPropertyId="0:510"/>
+            <ViewModelInstanceNumber propertyValue="-100000" viewModelPropertyId="0:511"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:512"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:513"/>
+            <ViewModelInstanceNumber propertyValue="-100000" viewModelPropertyId="0:514"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:515"/>
+            <ViewModelInstanceString propertyValue="" viewModelPropertyId="0:516"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:517"/>
+            <ViewModelInstanceNumber propertyValue="-100000" viewModelPropertyId="0:518"/>
+            <ViewModelInstanceString propertyValue="all" viewModelPropertyId="0:519"/>
+        </ViewModelInstance>
+
+        <ViewModelInstance exports="true" name="BeachBoy" id="0:532">
+            <ViewModelInstanceColor propertyValue="FFD9B84A" viewModelPropertyId="0:510"/>
+            <ViewModelInstanceNumber propertyValue="-100000" viewModelPropertyId="0:511"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:512"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:513"/>
+            <ViewModelInstanceNumber propertyValue="-100000" viewModelPropertyId="0:514"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:515"/>
+            <ViewModelInstanceString propertyValue="" viewModelPropertyId="0:516"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:517"/>
+            <ViewModelInstanceNumber propertyValue="-100000" viewModelPropertyId="0:518"/>
+            <ViewModelInstanceString propertyValue="beachBoy" viewModelPropertyId="0:519"/>
+        </ViewModelInstance>
+    </ViewModel>
+</Rive>

@@ -33,24 +33,35 @@ and each click-boostable.
 
 ## Rive architecture
 
-- **One global View Model (`Economy`)**: currency, itemsPerDig, digSpeedSeconds,
-  autoSellSeconds, and nested instances/lists for inventory slots, owned bot
-  counts, and upgrade levels. Everything on screen binds to this — no manual UI
-  refresh code.
-- **One invisible driver script** (`ScriptedLayout`, zero size, attached once):
-  owns `advance(self, seconds)`. Ticks the dig cooldown, each owned bot's
-  collection timer, and the auto-sell countdown; on each timer firing it picks
-  a weighted-random item for that source and writes into the `Economy` view
-  model via `context:globalViewModel("Economy")`. This is the only Luau in the
-  project for v1 — everything else stays in RML/state machines per the
-  scripts-are-for-computation, not-interfaces rule in the CLI docs.
-- **Inventory & bot-shop rows**: Rive `List` component bound to view-model
-  arrays, not hand-placed instances — matches how the achievement/inventory
-  grids would need to scale later.
-- **Beach items**: a small reusable artboard/component per item type, spawned
-  dynamically (not hand-placed), driven by state-machine input for the
-  collect-on-click reaction (scale/fade out) rather than bespoke script hit
-  testing.
+- **One global View Model (`Economy`)**: account-wide stats only —
+  currency, itemsPerDig, digSpeedSeconds, elbowGreasePercent,
+  autoSellSeconds, gameTime, the shared `inventory` list, and each
+  panel's affordable/cost-label state. Everything on screen binds to
+  this — no manual UI refresh code.
+- **One `Producer` view model** (producers.rml), one instance per owned
+  producer (the free starter, then each purchased bot): its own
+  `lastDigTime`/`digCooldownFraction`/`itemPulseScale`/pulse/popup state,
+  plus `swatch` (colour) and `itemPoolName`. `Economy.producers` is a
+  list of these, rendered through a reusable `ProducerWidget` artboard
+  (an `ArtboardComponentList`, same mechanism as the inventory rows) —
+  the beach area is "one widget per owned producer," starting at one.
+  Buying a bot pushes a new instance onto the list; there is no
+  "owned but inactive" state to track.
+- **One invisible driver script** (`clock.luau`, a zero-size
+  `ScriptedLayout`): owns `advance(self, seconds)`. Ticks `gameTime`,
+  then iterates `Economy.producers` running the identical auto-collect
+  cycle for each row — collects when a producer's own remaining time
+  hits zero, picks a weighted-random item from *that producer's*
+  `itemPoolName` pool, restarts its cycle. Also computes every upgrade
+  panel's affordable/maxed state and the live inventory total. This plus
+  the per-row click-boost script (`main.luau`, living inside
+  `ProducerWidget`) are the only Luau in the project for v1 — everything
+  else stays in RML/state machines per the scripts-are-for-computation,
+  not-interfaces rule in the CLI docs.
+- **Inventory & producer rows**: Rive `List`/`ArtboardComponentList`
+  bound to view-model arrays, not hand-placed instances — the same
+  mechanism serves both, and adding a third list (achievements, say)
+  later is the same pattern again.
 - **Colour tokens**: a second small global View Model (`Theme`) holding named
   colour properties (background, accent, text, etc.), bound throughout via
   data binding, so re-theming later is "change 6 values" not "hunt through
@@ -205,9 +216,48 @@ setup with and without a final click, at Elbow Grease level 2, differs
 by exactly 0.021 in `digCooldownFraction` — a real 2%, confirming the
 boost scales with the purchased level.
 
-4. **First bot (Beach Boy)** — purchasable, an additional producer of the
-   same kind as the starter item: its own independent auto-collect cycle
-   over its 3 item types, its own click-boost.
+4. ✅ **First bot (Beach Boy)** — purchasable ($458), an additional producer
+   of the same kind as the starter item: its own independent auto-collect
+   cycle over its 3 item types (Bottle Cap/Nail/Tin Can), its own
+   click-boost.
+
+   Generalized the architecture rather than duplicating the starter's
+   logic a second time, since Steel Seeker (milestone 5) needs a third
+   copy of the same thing regardless: introduced a `Producer` view model
+   (producers.rml) holding everything that used to live directly on
+   `Economy` — `lastDigTime`, `digCooldownFraction`, `itemPulseScale`,
+   `lastPulseTime`, `pulseMagnitude`, `digPopupText`/`digPopupAlpha`/
+   `lastDigPopupTime`, plus a new `swatch` colour and `itemPoolName`.
+   `Economy.producers` is a `ViewModelPropertyList` of these, rendered via
+   an `ArtboardComponentList` exactly like the inventory rows, through a
+   new reusable `ProducerWidget` artboard (isComponent, its own internal
+   `StateMachine` + click listener) — so the beach area is just "one
+   widget per owned producer," starting with one (the free starter) and
+   growing as bots are bought. `clock.luau` now iterates the list running
+   the identical per-producer cycle for each row, keyed off each
+   producer's own `itemPoolName` for which weighted item table to draw
+   from (`ITEM_POOLS`, keyed by name). `main.luau`'s click-boost script
+   now lives *inside* `ProducerWidget`, reading the row's own bound
+   instance via `context:viewModel()` for producer-specific state while
+   still reaching `context:globalViewModel('Economy')` for the shared
+   upgrades (`digSpeedSeconds`, `elbowGreasePercent`) that apply to every
+   producer alike.
+
+   Buying a bot is a `Data.Producer.new(instanceName)` pushed onto
+   `Economy.producers` (a new shared `buyBot.luau`, parameterised via
+   `ScriptInput*` the same way `upgrade.luau` already was) — no "owned but
+   inactive" state to track, a bot simply doesn't exist in the list (and
+   its widget doesn't render) until it's bought. The purchase panel dims
+   when unaffordable and its cost label swaps to "Owned" once bought,
+   same pattern as the upgrade panels.
+
+   Verified clean, inspected with zero wiring problems (across all three
+   `.rml` files now compiling as one document). Confirmed headlessly by
+   dumping the full `producers` list after buying Beach Boy: two entries
+   with completely independent `lastDigTime`/`digCooldownFraction` values
+   (proving separate cycles, not a shared one), Beach Boy's `itemPoolName`
+   correctly `"beachBoy"` against the starter's `"all"`, and a screenshot
+   showing two distinctly-coloured circles side by side in the beach area.
 5. **Second bot (Steel Seeker)** — same pattern, different item pool; verify
    bots never cross-collect each other's items.
 6. **Auto-sell** — driver script sells inventory automatically on the

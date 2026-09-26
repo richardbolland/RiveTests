@@ -1,7 +1,9 @@
---- The item is always auto-collecting on its own (clock.luau owns that).
---- Clicking it never collects directly - it's Elbow Grease: pitching in
---- yourself cuts Economy.elbowGreasePercent (an upgradeable stat, stored as
---- whole percentage points) off the FULL cycle length, so every click is
+--- Lives inside ProducerWidget (producers.rml), so one copy of this script
+--- backs every producer row - the free starter and every purchased bot
+--- alike. The row is always auto-collecting on its own (clock.luau owns
+--- that, iterating Economy.producers). Clicking it never collects directly
+--- - it's Elbow Grease: pitching in yourself cuts elbowGreasePercent (a
+--- shared, upgradeable stat) off the FULL cycle length, so every click is
 --- worth the same amount regardless of when in the cycle it lands (a
 --- percentage of what's *remaining* would front-load all the value into
 --- the first click or two and make late-cycle clicks feel like nothing).
@@ -29,16 +31,22 @@ local function performAction(self: BoostState, listenerContext: ListenerContext)
 		return
 	end
 
+	-- This row's own producer instance (bound via the artboard's viewModelId).
+	local producer = context:viewModel() or context:rootViewModel()
+	if not producer then
+		return
+	end
+
 	local economy = context:globalViewModel('Economy')
 	if not economy then
 		return
 	end
 
 	local digSpeed = economy:getNumber('digSpeedSeconds')
-	local gameTime = economy:getNumber('gameTime')
-	local lastDigTime = economy:getNumber('lastDigTime')
 	local elbowGreasePercent = economy:getNumber('elbowGreasePercent')
-	if not digSpeed or not gameTime or not lastDigTime or not elbowGreasePercent then
+	local gameTime = economy:getNumber('gameTime')
+	local lastDigTime = producer:getNumber('lastDigTime')
+	if not digSpeed or not elbowGreasePercent or not gameTime or not lastDigTime then
 		return
 	end
 
@@ -56,8 +64,8 @@ local function performAction(self: BoostState, listenerContext: ListenerContext)
 	local cut = math.min(remaining, digSpeed.value * (elbowGreasePercent.value / 100))
 	lastDigTime.value -= cut
 
-	local lastPulseTime = economy:getNumber('lastPulseTime')
-	local pulseMagnitude = economy:getNumber('pulseMagnitude')
+	local lastPulseTime = producer:getNumber('lastPulseTime')
+	local pulseMagnitude = producer:getNumber('pulseMagnitude')
 	if lastPulseTime and pulseMagnitude then
 		lastPulseTime.value = gameTime.value
 		pulseMagnitude.value = CLICK_PULSE_MAGNITUDE

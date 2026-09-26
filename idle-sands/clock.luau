@@ -1,32 +1,35 @@
---- The economy's clock, and now the actual producer: the beach item is an
---- always-on auto-collector. Every frame this ticks gameTime, and whenever
---- the current cycle's remaining time reaches zero it collects itemsPerDig
---- items on its own and restarts the cycle - no click required. Clicking
---- (main.luau) only nudges the cycle along faster; it never collects
---- directly. Also owns the cooldown ring fraction, the item's pop/pulse
---- scale (collect vs. click-boost use different magnitudes), each upgrade
---- panel's and Sell All's affordable state, the live inventory total, and
---- the fading "+$N" collect popup.
+--- The economy's clock. Runs every frame. Iterates Economy.producers,
+--- running the identical auto-collect cycle for each row (the free starter,
+--- then every purchased bot) - same pattern as the inventory list, so
+--- adding a bot later is one more list entry, not more duplicated logic.
+--- Each producer owns its own cycle/pulse/popup state; only
+--- digSpeedSeconds, itemsPerDig and elbowGreasePercent are shared upgrades
+--- applying to every producer alike. Also owns each upgrade panel's and
+--- Sell All's affordable state, the live inventory total, and whether
+--- Beach Boy is affordable to buy.
 
 type ClockState = {
 	context: Context?,
 }
 
--- Common items turn up far more than rare ones. Weights are relative, not
--- percentages; higher-value items are deliberately rarer finds.
-local ITEM_WEIGHTS = {
-	{ name = 'BottleCap', weight = 30 },
-	{ name = 'Nail', weight = 25 },
-	{ name = 'TinCan', weight = 20 },
-	{ name = 'Screw', weight = 12 },
-	{ name = 'Key', weight = 8 },
-	{ name = 'Coin', weight = 5 },
+-- Item pools, by name (Producer.itemPoolName). Common items turn up far
+-- more than rare ones within a pool; weights are relative, not percentages.
+type ItemWeight = { name: string, weight: number }
+local ITEM_POOLS: { [string]: { ItemWeight } } = {
+	all = {
+		{ name = 'BottleCap', weight = 30 },
+		{ name = 'Nail', weight = 25 },
+		{ name = 'TinCan', weight = 20 },
+		{ name = 'Screw', weight = 12 },
+		{ name = 'Key', weight = 8 },
+		{ name = 'Coin', weight = 5 },
+	},
+	beachBoy = {
+		{ name = 'BottleCap', weight = 30 },
+		{ name = 'Nail', weight = 25 },
+		{ name = 'TinCan', weight = 20 },
+	},
 }
-
-local TOTAL_WEIGHT = 0
-for _, entry in ITEM_WEIGHTS do
-	TOTAL_WEIGHT += entry.weight
-end
 
 local MAX_INVENTORY = 12
 local UPGRADE_COST = 110
@@ -38,6 +41,8 @@ local POPUP_DURATION = 1.0
 local ITEMS_PER_DIG_MAX = 6
 local DIG_SPEED_MIN = 5
 local ELBOW_GREASE_MAX = 10
+
+local BEACH_BOY_COST = 458
 
 local function init(self: ClockState, context: Context): boolean
 	self.context = context
@@ -53,16 +58,22 @@ local function clamp01(value: number): number
 	return value
 end
 
-local function pickItemName(): string
-	local roll = math.random() * TOTAL_WEIGHT
+local function pickItemName(poolName: string): string
+	local pool = ITEM_POOLS[poolName] or ITEM_POOLS.all
+	local totalWeight = 0
+	for _, entry in pool do
+		totalWeight += entry.weight
+	end
+
+	local roll = math.random() * totalWeight
 	local cumulative = 0
-	for _, entry in ITEM_WEIGHTS do
+	for _, entry in pool do
 		cumulative += entry.weight
 		if roll <= cumulative then
 			return entry.name
 		end
 	end
-	return ITEM_WEIGHTS[1].name
+	return pool[1].name
 end
 
 local function advance(self: ClockState, seconds: number): boolean
@@ -76,90 +87,106 @@ local function advance(self: ClockState, seconds: number): boolean
 		return true
 	end
 
-	local gameTime = economy:getNumber('gameTime')
-	if gameTime then
-		gameTime.value = gameTime.value + seconds
+	local gameTimeProp = economy:getNumber('gameTime')
+	if gameTimeProp then
+		gameTimeProp.value = gameTimeProp.value + seconds
 	end
+	local gameTime = if gameTimeProp then gameTimeProp.value else 0
 
-	-- The producer cycle: ticks down on its own, collects and restarts
-	-- when it reaches zero. Clicking (main.luau) only pulls lastDigTime
-	-- forward to shorten what's left; it never collects.
 	local digSpeed = economy:getNumber('digSpeedSeconds')
-	local lastDigTime = economy:getNumber('lastDigTime')
-	local cooldownFraction = economy:getNumber('digCooldownFraction')
-	if gameTime and digSpeed and lastDigTime and cooldownFraction and digSpeed.value > 0 then
-		local remaining = digSpeed.value - (gameTime.value - lastDigTime.value)
-		if remaining <= 0 then
-			local inventory = economy:getList('inventory')
-			local itemsPerDigProp = economy:getNumber('itemsPerDig')
-			local itemsPerDig = if itemsPerDigProp then math.floor(itemsPerDigProp.value) else 1
+	local itemsPerDigProp = economy:getNumber('itemsPerDig')
+	local itemsPerDig = if itemsPerDigProp then math.floor(itemsPerDigProp.value) else 1
+	local inventory = economy:getList('inventory')
 
-			local collectedTotal = 0
-			if inventory then
-				for _ = 1, itemsPerDig do
-					if inventory.length >= MAX_INVENTORY then
-						break
+	-- Every producer runs the same cycle: tick down, collect and restart
+	-- when it reaches zero. Clicking (main.luau, inside the row) only
+	-- pulls a producer's own lastDigTime forward to shorten what's left;
+	-- it never collects.
+	local producers = economy:getList('producers')
+	if producers and digSpeed and digSpeed.value > 0 and inventory then
+		for i = 1, producers.length do
+			local producer = producers[i]
+			local lastDigTime = producer:getNumber('lastDigTime')
+			local cooldownFraction = producer:getNumber('digCooldownFraction')
+			if lastDigTime and cooldownFraction then
+				local remaining = digSpeed.value - (gameTime - lastDigTime.value)
+				if remaining <= 0 then
+					local itemPoolNameProp = producer:getString('itemPoolName')
+					local poolName = if itemPoolNameProp then itemPoolNameProp.value else 'all'
+
+					local collectedTotal = 0
+					for _ = 1, itemsPerDig do
+						if inventory.length >= MAX_INVENTORY then
+							break
+						end
+						local item = Data.Item.new(pickItemName(poolName))
+						inventory:push(item)
+						local value = item:getNumber('value')
+						if value then
+							collectedTotal += value.value
+						end
 					end
-					local item = Data.Item.new(pickItemName())
-					inventory:push(item)
-					local value = item:getNumber('value')
-					if value then
-						collectedTotal += value.value
+
+					lastDigTime.value = gameTime
+					remaining = digSpeed.value
+
+					local lastPulseTime = producer:getNumber('lastPulseTime')
+					local pulseMagnitude = producer:getNumber('pulseMagnitude')
+					if lastPulseTime and pulseMagnitude then
+						lastPulseTime.value = gameTime
+						pulseMagnitude.value = COLLECT_PULSE_MAGNITUDE
+					end
+
+					local lastDigPopupTime = producer:getNumber('lastDigPopupTime')
+					local digPopupText = producer:getString('digPopupText')
+					if lastDigPopupTime and digPopupText and collectedTotal > 0 then
+						lastDigPopupTime.value = gameTime
+						digPopupText.value = '+$' .. tostring(collectedTotal)
 					end
 				end
+
+				cooldownFraction.value = clamp01(remaining / digSpeed.value)
 			end
 
-			lastDigTime.value = gameTime.value
-			remaining = digSpeed.value
-
-			local lastPulseTime = economy:getNumber('lastPulseTime')
-			local pulseMagnitude = economy:getNumber('pulseMagnitude')
-			if lastPulseTime and pulseMagnitude then
-				lastPulseTime.value = gameTime.value
-				pulseMagnitude.value = COLLECT_PULSE_MAGNITUDE
+			-- Pulse scale (collect vs. click-boost use different magnitudes)
+			local itemPulseScale = producer:getNumber('itemPulseScale')
+			local lastPulseTime = producer:getNumber('lastPulseTime')
+			local pulseMagnitude = producer:getNumber('pulseMagnitude')
+			if itemPulseScale and lastPulseTime and pulseMagnitude then
+				local sincePulse = gameTime - lastPulseTime.value
+				local pulse = 0
+				if sincePulse >= 0 and sincePulse < PULSE_DURATION then
+					pulse = 1 - (sincePulse / PULSE_DURATION)
+				end
+				itemPulseScale.value = 1 + pulse * pulseMagnitude.value
 			end
 
-			local lastDigPopupTime = economy:getNumber('lastDigPopupTime')
-			local digPopupText = economy:getString('digPopupText')
-			if lastDigPopupTime and digPopupText and collectedTotal > 0 then
-				lastDigPopupTime.value = gameTime.value
-				digPopupText.value = '+$' .. tostring(collectedTotal)
+			-- Collect popup ("+$36"), fading out after POPUP_DURATION seconds
+			local lastDigPopupTime = producer:getNumber('lastDigPopupTime')
+			local digPopupAlpha = producer:getNumber('digPopupAlpha')
+			if lastDigPopupTime and digPopupAlpha then
+				local sincePopup = gameTime - lastDigPopupTime.value
+				digPopupAlpha.value = clamp01(1 - (sincePopup / POPUP_DURATION))
 			end
 		end
-
-		cooldownFraction.value = clamp01(remaining / digSpeed.value)
-	end
-
-	local itemPulseScale = economy:getNumber('itemPulseScale')
-	local lastPulseTime = economy:getNumber('lastPulseTime')
-	local pulseMagnitude = economy:getNumber('pulseMagnitude')
-	if itemPulseScale and lastPulseTime and pulseMagnitude and gameTime then
-		local sincePulse = gameTime.value - lastPulseTime.value
-		local pulse = 0
-		if sincePulse >= 0 and sincePulse < PULSE_DURATION then
-			pulse = 1 - (sincePulse / PULSE_DURATION)
-		end
-		itemPulseScale.value = 1 + pulse * pulseMagnitude.value
 	end
 
 	-- Upgrade panels: affordable/maxed state
 	local currency = economy:getNumber('currency')
 	local canAfford = currency ~= nil and currency.value >= UPGRADE_COST
 
-	local itemsPerDig = economy:getNumber('itemsPerDig')
 	local itemsPerDigAffordable = economy:getNumber('itemsPerDigAffordable')
 	local itemsPerDigCostLabel = economy:getString('itemsPerDigCostLabel')
-	if itemsPerDig and itemsPerDigAffordable and itemsPerDigCostLabel then
-		local maxed = itemsPerDig.value >= ITEMS_PER_DIG_MAX
+	if itemsPerDigProp and itemsPerDigAffordable and itemsPerDigCostLabel then
+		local maxed = itemsPerDigProp.value >= ITEMS_PER_DIG_MAX
 		itemsPerDigAffordable.value = (canAfford and not maxed) and 1 or DIMMED_ALPHA
 		itemsPerDigCostLabel.value = maxed and 'MAX' or tostring(UPGRADE_COST)
 	end
 
-	local digSpeedSeconds = economy:getNumber('digSpeedSeconds')
 	local digSpeedAffordable = economy:getNumber('digSpeedAffordable')
 	local digSpeedCostLabel = economy:getString('digSpeedCostLabel')
-	if digSpeedSeconds and digSpeedAffordable and digSpeedCostLabel then
-		local maxed = digSpeedSeconds.value <= DIG_SPEED_MIN
+	if digSpeed and digSpeedAffordable and digSpeedCostLabel then
+		local maxed = digSpeed.value <= DIG_SPEED_MIN
 		digSpeedAffordable.value = (canAfford and not maxed) and 1 or DIMMED_ALPHA
 		digSpeedCostLabel.value = maxed and 'MAX' or tostring(UPGRADE_COST)
 	end
@@ -173,9 +200,19 @@ local function advance(self: ClockState, seconds: number): boolean
 		elbowGreaseCostLabel.value = maxed and 'MAX' or tostring(UPGRADE_COST)
 	end
 
+	-- Beach Boy purchase panel: affordable/owned state
+	local beachBoyOwned = economy:getNumber('beachBoyOwned')
+	local beachBoyAffordable = economy:getNumber('beachBoyAffordable')
+	local beachBoyCostLabel = economy:getString('beachBoyCostLabel')
+	if beachBoyOwned and beachBoyAffordable and beachBoyCostLabel then
+		local owned = beachBoyOwned.value >= 1
+		local afford = currency ~= nil and currency.value >= BEACH_BOY_COST
+		beachBoyAffordable.value = (afford and not owned) and 1 or DIMMED_ALPHA
+		beachBoyCostLabel.value = owned and 'Owned' or tostring(BEACH_BOY_COST)
+	end
+
 	-- Live inventory total, for the Sell All preview, and whether selling
 	-- would do anything right now
-	local inventory = economy:getList('inventory')
 	local inventoryValue = economy:getNumber('inventoryValue')
 	local total = 0
 	if inventory and inventoryValue then
@@ -192,14 +229,6 @@ local function advance(self: ClockState, seconds: number): boolean
 	local sellAffordable = economy:getNumber('sellAffordable')
 	if sellAffordable then
 		sellAffordable.value = (total > 0) and 1 or DIMMED_ALPHA
-	end
-
-	-- Collect popup ("+$36"), fading out after POPUP_DURATION seconds
-	local lastDigPopupTime = economy:getNumber('lastDigPopupTime')
-	local digPopupAlpha = economy:getNumber('digPopupAlpha')
-	if lastDigPopupTime and digPopupAlpha and gameTime then
-		local sincePopup = gameTime.value - lastDigPopupTime.value
-		digPopupAlpha.value = clamp01(1 - (sincePopup / POPUP_DURATION))
 	end
 
 	return true

@@ -123,7 +123,7 @@
                             <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
                         </TextStylePaint>
                         <TextValueRun styleId="0:73" text="Items/Dig " name="ItemsPerDigPrefix"/>
-                        <TextValueRun styleId="0:73" text="3" name="ItemsPerDigValue">
+                        <TextValueRun styleId="0:73" text="1" name="ItemsPerDigValue">
                             <DataBindContext sourcePathIds="0:200-0:202" propertyKey="268" converterId="0:301"/>
                         </TextValueRun>
                     </Text>
@@ -159,7 +159,7 @@
                             <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
                         </TextStylePaint>
                         <TextValueRun styleId="0:83" text="Dig Speed " name="DigSpeedPrefix"/>
-                        <TextValueRun styleId="0:83" text="15" name="DigSpeedValue">
+                        <TextValueRun styleId="0:83" text="60" name="DigSpeedValue">
                             <DataBindContext sourcePathIds="0:200-0:203" propertyKey="268" converterId="0:301"/>
                         </TextValueRun>
                         <TextValueRun styleId="0:83" text="s" name="DigSpeedSuffix"/>
@@ -251,7 +251,7 @@
                 <ScriptedListenerAction scriptAssetId="0:312" id="0:77">
                     <ScriptInputString propertyValue="itemsPerDig" name="statName"/>
                     <ScriptInputNumber propertyValue="1" name="step"/>
-                    <ScriptInputNumber propertyValue="3" name="minValue"/>
+                    <ScriptInputNumber propertyValue="1" name="minValue"/>
                     <ScriptInputNumber propertyValue="6" name="maxValue"/>
                 </ScriptedListenerAction>
             </StateMachineListenerSingle>
@@ -261,7 +261,7 @@
                     <ScriptInputString propertyValue="digSpeedSeconds" name="statName"/>
                     <ScriptInputNumber propertyValue="-2" name="step"/>
                     <ScriptInputNumber propertyValue="5" name="minValue"/>
-                    <ScriptInputNumber propertyValue="15" name="maxValue"/>
+                    <ScriptInputNumber propertyValue="60" name="maxValue"/>
                 </ScriptedListenerAction>
             </StateMachineListenerSingle>
         </StateMachine>
@@ -327,8 +327,8 @@
         <ViewModelPropertyNumber name="lastDigPopupTime" id="0:242"/>
         <ViewModelInstance exports="true" name="Default" id="0:210">
             <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:201"/>
-            <ViewModelInstanceNumber propertyValue="3" viewModelPropertyId="0:202"/>
-            <ViewModelInstanceNumber propertyValue="8" viewModelPropertyId="0:203"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:202"/>
+            <ViewModelInstanceNumber propertyValue="60" viewModelPropertyId="0:203"/>
             <ViewModelInstanceNumber propertyValue="60" viewModelPropertyId="0:204"/>
             <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:205"/>
             <ViewModelInstanceNumber propertyValue="-100000" viewModelPropertyId="0:206"/>

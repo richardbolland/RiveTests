@@ -1,22 +1,87 @@
 <Rive version="1" kind="fragment">
-    <Artboard defaultStateMachineId="0:7" styleId="0:5" width="500" height="500" name="Artboard" id="0:2">
-        <LayoutComponentStyle name="Artboard Style" id="0:5"/>
+    <Artboard defaultStateMachineId="0:7" styleId="0:5" width="1280" height="720" name="IdleSands" id="0:2">
+        <LayoutComponentStyle flexDirectionValue="column" name="Artboard Style" id="0:5"/>
 
-        <Fill name="Background">
-            <SolidColor colorValue="FF282828" name="Color"/>
-        </Fill>
+        <LayoutComponent width="1280" height="64" styleId="0:11" name="TopBar" id="0:10">
+            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fixed" name="TopBar Style" id="0:11"/>
+            <Fill name="Fill">
+                <SolidColor colorValue="FF2E7D8C" name="C">
+                    <DataBindContext sourcePathIds="0:100-0:102" propertyKey="37"/>
+                </SolidColor>
+            </Fill>
+        </LayoutComponent>
 
-        <StateMachine name="State Machine 1" id="0:7">
+        <LayoutComponent width="1280" height="556" styleId="0:21" name="MiddleRow" id="0:20">
+            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" flexDirectionValue="row" name="MiddleRow Style" id="0:21"/>
+
+            <LayoutComponent width="1000" height="556" styleId="0:31" name="BeachArea" id="0:30">
+                <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="BeachArea Style" id="0:31"/>
+                <Fill name="Fill">
+                    <SolidColor colorValue="FFE8C27A" name="C">
+                        <DataBindContext sourcePathIds="0:100-0:103" propertyKey="37"/>
+                    </SolidColor>
+                </Fill>
+            </LayoutComponent>
+
+            <LayoutComponent width="280" height="556" styleId="0:41" name="SidePanel" id="0:40">
+                <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fill" name="SidePanel Style" id="0:41"/>
+                <Fill name="Fill">
+                    <SolidColor colorValue="FF3E5C50" name="C">
+                        <DataBindContext sourcePathIds="0:100-0:104" propertyKey="37"/>
+                    </SolidColor>
+                </Fill>
+            </LayoutComponent>
+        </LayoutComponent>
+
+        <LayoutComponent width="1280" height="100" styleId="0:51" name="InventoryStrip" id="0:50">
+            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fixed" name="InventoryStrip Style" id="0:51"/>
+            <Fill name="Fill">
+                <SolidColor colorValue="FFD9C9A3" name="C">
+                    <DataBindContext sourcePathIds="0:100-0:105" propertyKey="37"/>
+                </SolidColor>
+            </Fill>
+        </LayoutComponent>
+
+        <StateMachine name="Main" id="0:7">
             <StateMachineLayer name="Layer 1" id="0:8">
-                <AnyState x="200" y="-120"/>
-                <ExitState x="400" y="-120"/>
-                <EntryState>
-                    <StateTransition stateToId="0:12"/>
-                </EntryState>
-                <AnimationState x="200" animationId="0:6" id="0:12"/>
+                <AnyState x="0" y="-120"/>
+                <ExitState x="200" y="-120"/>
+                <EntryState x="-200" y="-120"/>
             </StateMachineLayer>
         </StateMachine>
-
-        <LinearAnimation duration="60" name="Animation 1" id="0:6"/>
     </Artboard>
+
+    <!-- Design tokens: one global palette, swap these to re-theme the whole game -->
+    <ViewModel viewModelType="global" defaultInstanceId="0:110" name="Theme" id="0:100">
+        <ViewModelPropertyColor name="background" id="0:101"/>
+        <ViewModelPropertyColor name="topBar" id="0:102"/>
+        <ViewModelPropertyColor name="beach" id="0:103"/>
+        <ViewModelPropertyColor name="sidePanel" id="0:104"/>
+        <ViewModelPropertyColor name="inventoryStrip" id="0:105"/>
+        <ViewModelPropertyColor name="accent" id="0:106"/>
+        <ViewModelPropertyColor name="text" id="0:107"/>
+        <ViewModelInstance exports="true" name="Default" id="0:110">
+            <ViewModelInstanceColor propertyValue="FF1D2B27" viewModelPropertyId="0:101"/>
+            <ViewModelInstanceColor propertyValue="FF2E7D8C" viewModelPropertyId="0:102"/>
+            <ViewModelInstanceColor propertyValue="FFE8C27A" viewModelPropertyId="0:103"/>
+            <ViewModelInstanceColor propertyValue="FF3E5C50" viewModelPropertyId="0:104"/>
+            <ViewModelInstanceColor propertyValue="FFD9C9A3" viewModelPropertyId="0:105"/>
+            <ViewModelInstanceColor propertyValue="FFE8785A" viewModelPropertyId="0:106"/>
+            <ViewModelInstanceColor propertyValue="FF1D2B27" viewModelPropertyId="0:107"/>
+        </ViewModelInstance>
+    </ViewModel>
+
+    <!-- Shared game state: written by the driver script, read everywhere via data binding -->
+    <ViewModel viewModelType="global" defaultInstanceId="0:210" name="Economy" id="0:200">
+        <ViewModelPropertyNumber name="currency" id="0:201"/>
+        <ViewModelPropertyNumber name="itemsPerDig" id="0:202"/>
+        <ViewModelPropertyNumber name="digSpeedSeconds" id="0:203"/>
+        <ViewModelPropertyNumber name="autoSellSeconds" id="0:204"/>
+        <ViewModelInstance exports="true" name="Default" id="0:210">
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:201"/>
+            <ViewModelInstanceNumber propertyValue="3" viewModelPropertyId="0:202"/>
+            <ViewModelInstanceNumber propertyValue="15" viewModelPropertyId="0:203"/>
+            <ViewModelInstanceNumber propertyValue="60" viewModelPropertyId="0:204"/>
+        </ViewModelInstance>
+    </ViewModel>
 </Rive>

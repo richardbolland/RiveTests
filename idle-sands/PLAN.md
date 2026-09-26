@@ -74,18 +74,31 @@ Each one should build clean (`--verify`), inspect with zero wiring problems,
 screenshot to confirm it looks right, and be played/approved before starting
 the next. Commit after each.
 
-0. **Skeleton** — empty scene, `Economy` and `Theme` view models declared with
+0. ✅ **Skeleton** — empty scene, `Economy` and `Theme` view models declared with
    placeholder values, base layout wireframe (top bar / beach area / side
    panel / inventory strip) as flat filled boxes. `--verify` clean.
-1. **Click-to-collect, single item** — one item type spawns on click in the
+1. ✅ **Click-to-collect, single item** — one item type spawns on click in the
    beach area, clicking it adds 1 to currency (bound, visible readout). No
    economy depth yet — proves the click → view-model → UI pipeline end to end.
-2. **Full starting item set + inventory** — 6 items with real values, dig
+   Found: `context:globalViewModel()` returns nil on a script's first `init()`
+   call — cache `Context` and resolve the view model lazily instead.
+2. ✅ **Full starting item set + inventory** — 6 items with real values, dig
    spawns a random item from the pool, items land in the 12-slot inventory
    List (not straight to currency), manual "Sell All" button converts
-   inventory to currency.
-3. **Upgrades** — items-per-dig, dig speed, auto-sell-timer panels, each
-   purchasable at 110 gold/level, each visibly changing the loop's behaviour.
+   inventory to currency. Needed `rive.yaml`'s `main:` key once the project
+   spans multiple `.rml` files, since they compile in path order.
+3. ✅ **Upgrades** — items-per-dig, dig speed, auto-sell-timer panels, each
+   purchasable at 110 gold/level (one shared `upgrade.luau`, parameterised per
+   panel via `ScriptInput*`). itemsPerDig and dig-speed cooldown are live now;
+   auto-sell's timer value is purchasable but its passive-sell behaviour
+   still lands in milestone 6. Found: `Audio.time()` does not advance with
+   `--advance` in headless runs (it's the audio engine's own clock, not the
+   simulated timeline) — added `clock.luau`, a zero-size `ScriptedLayout`
+   ticking `Economy.gameTime` every frame, as the real clock every other
+   script reads. This is the "one invisible driver script" from the
+   architecture section below, arriving a few milestones earlier than
+   planned because the dig cooldown needed a reliable clock to be
+   headlessly testable at all.
 4. **First bot (Beach Boy)** — purchasable, driver script auto-collects
    Beach Boy's 3 item types into inventory on its own timer, independent of
    clicking.

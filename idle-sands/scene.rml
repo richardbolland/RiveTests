@@ -2,6 +2,11 @@
     <Artboard defaultStateMachineId="0:7" styleId="0:5" width="1280" height="720" name="IdleSands" id="0:2">
         <LayoutComponentStyle flexDirectionValue="column" name="Artboard Style" id="0:5"/>
 
+        <LayoutComponent width="0" height="0" styleId="0:131" name="Clock" id="0:130">
+            <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" name="Clock Style" id="0:131"/>
+            <ScriptedLayout scriptAssetId="0:313" name="ClockScript" id="0:132"/>
+        </LayoutComponent>
+
         <LayoutComponent width="1280" height="64" styleId="0:11" name="TopBar" id="0:10">
             <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fixed"
                                   flexDirectionValue="row" layoutAlignmentType="centerLeft"
@@ -56,12 +61,114 @@
                 <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fill"
                                       flexDirectionValue="column" layoutAlignmentType="topCenter"
                                       paddingTop="24" paddingTopUnitsValue="points"
+                                      gapVertical="12" gapVerticalUnitsValue="points"
                                       name="SidePanel Style" id="0:41"/>
                 <Fill name="Fill">
                     <SolidColor colorValue="FF3E5C50" name="C">
                         <DataBindContext sourcePathIds="0:100-0:104" propertyKey="37"/>
                     </SolidColor>
                 </Fill>
+
+                <LayoutComponent width="240" height="64" styleId="0:71" name="ItemsPerDigPanel" id="0:70">
+                    <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                          flexDirectionValue="row" layoutAlignmentType="spaceBetweenCenter"
+                                          paddingLeft="16" paddingLeftUnitsValue="points"
+                                          paddingRight="16" paddingRightUnitsValue="points"
+                                          cornerRadiusTL="10" cornerRadiusTR="10" cornerRadiusBL="10" cornerRadiusBR="10"
+                                          name="ItemsPerDigPanel Style" id="0:71"/>
+                    <Fill name="Fill">
+                        <SolidColor colorValue="FF4F7062" name="C">
+                            <DataBindContext sourcePathIds="0:100-0:108" propertyKey="37"/>
+                        </SolidColor>
+                    </Fill>
+
+                    <Text name="ItemsPerDigLabel" id="0:72">
+                        <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="ItemsPerDigLabel Layout"/>
+                        <TextStylePaint fontSize="16" fontAssetId="0:300" name="ItemsPerDigStyle" id="0:73">
+                            <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextValueRun styleId="0:73" text="Items/Dig " name="ItemsPerDigPrefix"/>
+                        <TextValueRun styleId="0:73" text="3" name="ItemsPerDigValue">
+                            <DataBindContext sourcePathIds="0:200-0:202" propertyKey="268" converterId="0:301"/>
+                        </TextValueRun>
+                    </Text>
+
+                    <Text name="ItemsPerDigCost" id="0:74">
+                        <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="ItemsPerDigCost Layout"/>
+                        <TextStylePaint fontSize="14" fontAssetId="0:300" name="ItemsPerDigCostStyle" id="0:75">
+                            <Fill name="Fill"><SolidColor colorValue="FFE8C27A" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextValueRun styleId="0:75" text="110" name="ItemsPerDigCostRun"/>
+                    </Text>
+                </LayoutComponent>
+
+                <LayoutComponent width="240" height="64" styleId="0:81" name="DigSpeedPanel" id="0:80">
+                    <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                          flexDirectionValue="row" layoutAlignmentType="spaceBetweenCenter"
+                                          paddingLeft="16" paddingLeftUnitsValue="points"
+                                          paddingRight="16" paddingRightUnitsValue="points"
+                                          cornerRadiusTL="10" cornerRadiusTR="10" cornerRadiusBL="10" cornerRadiusBR="10"
+                                          name="DigSpeedPanel Style" id="0:81"/>
+                    <Fill name="Fill">
+                        <SolidColor colorValue="FF4F7062" name="C">
+                            <DataBindContext sourcePathIds="0:100-0:108" propertyKey="37"/>
+                        </SolidColor>
+                    </Fill>
+
+                    <Text name="DigSpeedLabel" id="0:82">
+                        <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="DigSpeedLabel Layout"/>
+                        <TextStylePaint fontSize="16" fontAssetId="0:300" name="DigSpeedStyle" id="0:83">
+                            <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextValueRun styleId="0:83" text="Dig Speed " name="DigSpeedPrefix"/>
+                        <TextValueRun styleId="0:83" text="15" name="DigSpeedValue">
+                            <DataBindContext sourcePathIds="0:200-0:203" propertyKey="268" converterId="0:301"/>
+                        </TextValueRun>
+                        <TextValueRun styleId="0:83" text="s" name="DigSpeedSuffix"/>
+                    </Text>
+
+                    <Text name="DigSpeedCost" id="0:84">
+                        <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="DigSpeedCost Layout"/>
+                        <TextStylePaint fontSize="14" fontAssetId="0:300" name="DigSpeedCostStyle" id="0:85">
+                            <Fill name="Fill"><SolidColor colorValue="FFE8C27A" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextValueRun styleId="0:85" text="110" name="DigSpeedCostRun"/>
+                    </Text>
+                </LayoutComponent>
+
+                <LayoutComponent width="240" height="64" styleId="0:91" name="AutoSellPanel" id="0:90">
+                    <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                          flexDirectionValue="row" layoutAlignmentType="spaceBetweenCenter"
+                                          paddingLeft="16" paddingLeftUnitsValue="points"
+                                          paddingRight="16" paddingRightUnitsValue="points"
+                                          cornerRadiusTL="10" cornerRadiusTR="10" cornerRadiusBL="10" cornerRadiusBR="10"
+                                          name="AutoSellPanel Style" id="0:91"/>
+                    <Fill name="Fill">
+                        <SolidColor colorValue="FF4F7062" name="C">
+                            <DataBindContext sourcePathIds="0:100-0:108" propertyKey="37"/>
+                        </SolidColor>
+                    </Fill>
+
+                    <Text name="AutoSellLabel" id="0:92">
+                        <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="AutoSellLabel Layout"/>
+                        <TextStylePaint fontSize="16" fontAssetId="0:300" name="AutoSellStyle" id="0:93">
+                            <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextValueRun styleId="0:93" text="Auto-Sell " name="AutoSellPrefix"/>
+                        <TextValueRun styleId="0:93" text="60" name="AutoSellValue">
+                            <DataBindContext sourcePathIds="0:200-0:204" propertyKey="268" converterId="0:301"/>
+                        </TextValueRun>
+                        <TextValueRun styleId="0:93" text="s" name="AutoSellSuffix"/>
+                    </Text>
+
+                    <Text name="AutoSellCost" id="0:94">
+                        <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="AutoSellCost Layout"/>
+                        <TextStylePaint fontSize="14" fontAssetId="0:300" name="AutoSellCostStyle" id="0:95">
+                            <Fill name="Fill"><SolidColor colorValue="FFE8C27A" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextValueRun styleId="0:95" text="110" name="AutoSellCostRun"/>
+                    </Text>
+                </LayoutComponent>
 
                 <LayoutComponent width="200" height="56" styleId="0:61" name="SellButton" id="0:60">
                     <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
@@ -117,6 +224,33 @@
             <StateMachineListenerSingle targetId="0:60" listenerTypeValue="click" name="SellAll" id="0:64">
                 <ScriptedListenerAction scriptAssetId="0:311" id="0:65"/>
             </StateMachineListenerSingle>
+
+            <StateMachineListenerSingle targetId="0:70" listenerTypeValue="click" name="BuyItemsPerDig" id="0:76">
+                <ScriptedListenerAction scriptAssetId="0:312" id="0:77">
+                    <ScriptInputString propertyValue="itemsPerDig" name="statName"/>
+                    <ScriptInputNumber propertyValue="1" name="step"/>
+                    <ScriptInputNumber propertyValue="3" name="minValue"/>
+                    <ScriptInputNumber propertyValue="6" name="maxValue"/>
+                </ScriptedListenerAction>
+            </StateMachineListenerSingle>
+
+            <StateMachineListenerSingle targetId="0:80" listenerTypeValue="click" name="BuyDigSpeed" id="0:86">
+                <ScriptedListenerAction scriptAssetId="0:312" id="0:87">
+                    <ScriptInputString propertyValue="digSpeedSeconds" name="statName"/>
+                    <ScriptInputNumber propertyValue="-2" name="step"/>
+                    <ScriptInputNumber propertyValue="5" name="minValue"/>
+                    <ScriptInputNumber propertyValue="15" name="maxValue"/>
+                </ScriptedListenerAction>
+            </StateMachineListenerSingle>
+
+            <StateMachineListenerSingle targetId="0:90" listenerTypeValue="click" name="BuyAutoSell" id="0:96">
+                <ScriptedListenerAction scriptAssetId="0:312" id="0:97">
+                    <ScriptInputString propertyValue="autoSellSeconds" name="statName"/>
+                    <ScriptInputNumber propertyValue="-10" name="step"/>
+                    <ScriptInputNumber propertyValue="5" name="minValue"/>
+                    <ScriptInputNumber propertyValue="60" name="maxValue"/>
+                </ScriptedListenerAction>
+            </StateMachineListenerSingle>
         </StateMachine>
     </Artboard>
 
@@ -124,6 +258,8 @@
     <DataConverterToString decimals="0" round="true" name="CurrencyFormat" id="0:301"/>
     <ScriptAsset file="main.luau" name="main" id="0:310"/>
     <ScriptAsset file="sell.luau" name="sell" id="0:311"/>
+    <ScriptAsset file="upgrade.luau" name="upgrade" id="0:312"/>
+    <ScriptAsset file="clock.luau" name="clock" id="0:313"/>
 
     <!-- Design tokens: one global palette, swap these to re-theme the whole game -->
     <ViewModel viewModelType="global" defaultInstanceId="0:110" name="Theme" id="0:100">
@@ -134,6 +270,7 @@
         <ViewModelPropertyColor name="inventoryStrip" id="0:105"/>
         <ViewModelPropertyColor name="accent" id="0:106"/>
         <ViewModelPropertyColor name="text" id="0:107"/>
+        <ViewModelPropertyColor name="panel" id="0:108"/>
         <ViewModelInstance exports="true" name="Default" id="0:110">
             <ViewModelInstanceColor propertyValue="FF1D2B27" viewModelPropertyId="0:101"/>
             <ViewModelInstanceColor propertyValue="FF2E7D8C" viewModelPropertyId="0:102"/>
@@ -142,6 +279,7 @@
             <ViewModelInstanceColor propertyValue="FFD9C9A3" viewModelPropertyId="0:105"/>
             <ViewModelInstanceColor propertyValue="FFE8785A" viewModelPropertyId="0:106"/>
             <ViewModelInstanceColor propertyValue="FF1D2B27" viewModelPropertyId="0:107"/>
+            <ViewModelInstanceColor propertyValue="FF4F7062" viewModelPropertyId="0:108"/>
         </ViewModelInstance>
     </ViewModel>
 
@@ -151,12 +289,14 @@
         <ViewModelPropertyNumber name="itemsPerDig" id="0:202"/>
         <ViewModelPropertyNumber name="digSpeedSeconds" id="0:203"/>
         <ViewModelPropertyNumber name="autoSellSeconds" id="0:204"/>
+        <ViewModelPropertyNumber name="gameTime" id="0:205"/>
         <ViewModelPropertyList name="inventory" id="0:220"/>
         <ViewModelInstance exports="true" name="Default" id="0:210">
             <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:201"/>
             <ViewModelInstanceNumber propertyValue="3" viewModelPropertyId="0:202"/>
             <ViewModelInstanceNumber propertyValue="15" viewModelPropertyId="0:203"/>
             <ViewModelInstanceNumber propertyValue="60" viewModelPropertyId="0:204"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:205"/>
             <ViewModelInstanceList viewModelPropertyId="0:220"/>
         </ViewModelInstance>
     </ViewModel>

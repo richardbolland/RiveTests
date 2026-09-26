@@ -187,22 +187,23 @@ the 8s cycle); the same ~8s window with 5 rapid clicks yields 6 items
 instead of 3, confirming the boost genuinely pulls forward a second
 collection.
 
-**Boost tuning + Pep Talk upgrade** (still before milestone 4): 20% per
+**Boost tuning + Elbow Grease upgrade** (still before milestone 4): 20% per
 click was reported as feeling wrong once played - front-loaded, since
 cutting a percentage of a shrinking `remaining` value means the first
 click after a fresh cycle is worth a lot and a click near the end is
 worth almost nothing. Fixed by cutting a percentage of the FULL cycle
 instead (already the plan from the prior fix, this made it worse at
 20% since every click, cheap or not, is a large absolute chunk).
-Dropped to 1% and turned it into a fourth upgrade, **Pep Talk** —
-thematically "cheering your digger on" rather than doing the labour
-yourself, which is the framing the game already leans on for bots.
-`Economy.pepTalkPercent` starts at 1, steps by 1 per $110 purchase, caps
-at 10 (a placeholder ceiling — revisit if maxed-out clicking still feels
-too weak). Verified by isolating the click's effect: identical setup
-with and without a final click, at Pep Talk level 2, differs by exactly
-0.021 in `digCooldownFraction` — a real 2%, confirming the boost scales
-with the purchased level.
+Dropped to 1% and turned it into a fourth upgrade, **Elbow Grease** —
+thematically you pitching in yourself alongside the digger, the
+"manual click power" idle-game convention. (Named "Pep Talk" briefly
+first; renamed once played — "Elbow Grease" reads better.)
+`Economy.elbowGreasePercent` starts at 1, steps by 1 per $110 purchase,
+caps at 10 (a placeholder ceiling — revisit if maxed-out clicking still
+feels too weak). Verified by isolating the click's effect: identical
+setup with and without a final click, at Elbow Grease level 2, differs
+by exactly 0.021 in `digCooldownFraction` — a real 2%, confirming the
+boost scales with the purchased level.
 
 4. **First bot (Beach Boy)** — purchasable, an additional producer of the
    same kind as the starter item: its own independent auto-collect cycle

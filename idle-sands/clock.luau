@@ -37,7 +37,7 @@ local POPUP_DURATION = 1.0
 
 local ITEMS_PER_DIG_MAX = 6
 local DIG_SPEED_MIN = 5
-local PEP_TALK_MAX = 10
+local ELBOW_GREASE_MAX = 10
 
 local function init(self: ClockState, context: Context): boolean
 	self.context = context
@@ -164,13 +164,13 @@ local function advance(self: ClockState, seconds: number): boolean
 		digSpeedCostLabel.value = maxed and 'MAX' or tostring(UPGRADE_COST)
 	end
 
-	local pepTalkPercent = economy:getNumber('pepTalkPercent')
-	local pepTalkAffordable = economy:getNumber('pepTalkAffordable')
-	local pepTalkCostLabel = economy:getString('pepTalkCostLabel')
-	if pepTalkPercent and pepTalkAffordable and pepTalkCostLabel then
-		local maxed = pepTalkPercent.value >= PEP_TALK_MAX
-		pepTalkAffordable.value = (canAfford and not maxed) and 1 or DIMMED_ALPHA
-		pepTalkCostLabel.value = maxed and 'MAX' or tostring(UPGRADE_COST)
+	local elbowGreasePercent = economy:getNumber('elbowGreasePercent')
+	local elbowGreaseAffordable = economy:getNumber('elbowGreaseAffordable')
+	local elbowGreaseCostLabel = economy:getString('elbowGreaseCostLabel')
+	if elbowGreasePercent and elbowGreaseAffordable and elbowGreaseCostLabel then
+		local maxed = elbowGreasePercent.value >= ELBOW_GREASE_MAX
+		elbowGreaseAffordable.value = (canAfford and not maxed) and 1 or DIMMED_ALPHA
+		elbowGreaseCostLabel.value = maxed and 'MAX' or tostring(UPGRADE_COST)
 	end
 
 	-- Live inventory total, for the Sell All preview, and whether selling

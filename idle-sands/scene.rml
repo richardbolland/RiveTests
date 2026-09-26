@@ -53,6 +53,9 @@
                     <Shape name="Item" id="0:32">
                         <LayoutParticipant layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
                                            width="80" height="80" name="Item Layout"/>
+                        <DataBindContext sourcePathIds="0:200-0:207" propertyKey="18" converterId="0:302"/>
+                        <DataBindContext sourcePathIds="0:200-0:230" propertyKey="16"/>
+                        <DataBindContext sourcePathIds="0:200-0:230" propertyKey="17"/>
                         <Ellipse width="80" height="80" originX="0.5" originY="0.5" name="Path"/>
                         <Fill name="Fill">
                             <SolidColor colorValue="FFE8785A" name="C">
@@ -96,6 +99,7 @@
                                           paddingRight="16" paddingRightUnitsValue="points"
                                           cornerRadiusTL="10" cornerRadiusTR="10" cornerRadiusBL="10" cornerRadiusBR="10"
                                           name="ItemsPerDigPanel Style" id="0:71"/>
+                    <DataBindContext sourcePathIds="0:200-0:232" propertyKey="18"/>
                     <Fill name="Fill">
                         <SolidColor colorValue="FF4F7062" name="C">
                             <DataBindContext sourcePathIds="0:100-0:108" propertyKey="37"/>
@@ -118,7 +122,9 @@
                         <TextStylePaint fontSize="14" fontAssetId="0:300" name="ItemsPerDigCostStyle" id="0:75">
                             <Fill name="Fill"><SolidColor colorValue="FFE8C27A" name="C"/></Fill>
                         </TextStylePaint>
-                        <TextValueRun styleId="0:75" text="110" name="ItemsPerDigCostRun"/>
+                        <TextValueRun styleId="0:75" text="110" name="ItemsPerDigCostRun">
+                            <DataBindContext sourcePathIds="0:200-0:235" propertyKey="268"/>
+                        </TextValueRun>
                     </Text>
                 </LayoutComponent>
 
@@ -129,6 +135,7 @@
                                           paddingRight="16" paddingRightUnitsValue="points"
                                           cornerRadiusTL="10" cornerRadiusTR="10" cornerRadiusBL="10" cornerRadiusBR="10"
                                           name="DigSpeedPanel Style" id="0:81"/>
+                    <DataBindContext sourcePathIds="0:200-0:233" propertyKey="18"/>
                     <Fill name="Fill">
                         <SolidColor colorValue="FF4F7062" name="C">
                             <DataBindContext sourcePathIds="0:100-0:108" propertyKey="37"/>
@@ -152,7 +159,9 @@
                         <TextStylePaint fontSize="14" fontAssetId="0:300" name="DigSpeedCostStyle" id="0:85">
                             <Fill name="Fill"><SolidColor colorValue="FFE8C27A" name="C"/></Fill>
                         </TextStylePaint>
-                        <TextValueRun styleId="0:85" text="110" name="DigSpeedCostRun"/>
+                        <TextValueRun styleId="0:85" text="110" name="DigSpeedCostRun">
+                            <DataBindContext sourcePathIds="0:200-0:236" propertyKey="268"/>
+                        </TextValueRun>
                     </Text>
                 </LayoutComponent>
 
@@ -163,6 +172,7 @@
                                           paddingRight="16" paddingRightUnitsValue="points"
                                           cornerRadiusTL="10" cornerRadiusTR="10" cornerRadiusBL="10" cornerRadiusBR="10"
                                           name="AutoSellPanel Style" id="0:91"/>
+                    <DataBindContext sourcePathIds="0:200-0:234" propertyKey="18"/>
                     <Fill name="Fill">
                         <SolidColor colorValue="FF4F7062" name="C">
                             <DataBindContext sourcePathIds="0:100-0:108" propertyKey="37"/>
@@ -186,7 +196,9 @@
                         <TextStylePaint fontSize="14" fontAssetId="0:300" name="AutoSellCostStyle" id="0:95">
                             <Fill name="Fill"><SolidColor colorValue="FFE8C27A" name="C"/></Fill>
                         </TextStylePaint>
-                        <TextValueRun styleId="0:95" text="110" name="AutoSellCostRun"/>
+                        <TextValueRun styleId="0:95" text="110" name="AutoSellCostRun">
+                            <DataBindContext sourcePathIds="0:200-0:237" propertyKey="268"/>
+                        </TextValueRun>
                     </Text>
                 </LayoutComponent>
 
@@ -206,7 +218,11 @@
                         <TextStylePaint fontSize="20" fontAssetId="0:300" name="SellStyle" id="0:63">
                             <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
                         </TextStylePaint>
-                        <TextValueRun styleId="0:63" text="Sell All" name="SellRun"/>
+                        <TextValueRun styleId="0:63" text="Sell All ($" name="SellPrefixRun"/>
+                        <TextValueRun styleId="0:63" text="0" name="SellValueRun">
+                            <DataBindContext sourcePathIds="0:200-0:238" propertyKey="268" converterId="0:301"/>
+                        </TextValueRun>
+                        <TextValueRun styleId="0:63" text=")" name="SellSuffixRun"/>
                     </Text>
                 </LayoutComponent>
             </LayoutComponent>
@@ -224,6 +240,17 @@
                     <DataBindContext sourcePathIds="0:100-0:105" propertyKey="37"/>
                 </SolidColor>
             </Fill>
+
+            <Text name="InventoryCount" id="0:53">
+                <LayoutParticipant layoutWidthScaleType="fixed" layoutHeightScaleType="hug" width="70" name="InventoryCount Layout"/>
+                <TextStylePaint fontSize="16" fontAssetId="0:300" name="InventoryCountStyle" id="0:54">
+                    <Fill name="Fill"><SolidColor colorValue="FF1D2B27" name="C"/></Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="0:54" text="0" name="InventoryCountRun">
+                    <DataBindContext sourcePathIds="0:200-0:220" propertyKey="268" converterId="0:304"/>
+                </TextValueRun>
+                <TextValueRun styleId="0:54" text="/12" name="InventoryCountSuffix"/>
+            </Text>
 
             <ArtboardComponentList name="InventoryRows" id="0:52">
                 <DataBindContext sourcePathIds="0:200-0:220" propertyKey="800"/>
@@ -276,6 +303,13 @@
 
     <FontAsset file="Outfit-Bold.ttf" name="Outfit Bold" id="0:300"/>
     <DataConverterToString decimals="0" round="true" name="CurrencyFormat" id="0:301"/>
+    <DataConverterRangeMapper minInput="0" maxInput="1" minOutput="1" maxOutput="0.5"
+                              clampLower="true" clampUpper="true" name="CooldownDim" id="0:302"/>
+    <DataConverterListToLength name="InventoryLength" id="0:303"/>
+    <DataConverterGroup name="InventoryCountLabel" id="0:304">
+        <DataConverterGroupItem converterId="0:303"/>
+        <DataConverterGroupItem converterId="0:301"/>
+    </DataConverterGroup>
     <ScriptAsset file="main.luau" name="main" id="0:310"/>
     <ScriptAsset file="sell.luau" name="sell" id="0:311"/>
     <ScriptAsset file="upgrade.luau" name="upgrade" id="0:312"/>
@@ -313,15 +347,33 @@
         <ViewModelPropertyNumber name="lastDigTime" id="0:206"/>
         <ViewModelPropertyNumber name="digCooldownFraction" id="0:207"/>
         <ViewModelPropertyList name="inventory" id="0:220"/>
+        <ViewModelPropertyNumber name="itemPulseScale" id="0:230"/>
+        <ViewModelPropertyNumber name="lastPulseTime" id="0:231"/>
+        <ViewModelPropertyNumber name="itemsPerDigAffordable" id="0:232"/>
+        <ViewModelPropertyNumber name="digSpeedAffordable" id="0:233"/>
+        <ViewModelPropertyNumber name="autoSellAffordable" id="0:234"/>
+        <ViewModelPropertyString name="itemsPerDigCostLabel" id="0:235"/>
+        <ViewModelPropertyString name="digSpeedCostLabel" id="0:236"/>
+        <ViewModelPropertyString name="autoSellCostLabel" id="0:237"/>
+        <ViewModelPropertyNumber name="inventoryValue" id="0:238"/>
         <ViewModelInstance exports="true" name="Default" id="0:210">
             <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:201"/>
             <ViewModelInstanceNumber propertyValue="3" viewModelPropertyId="0:202"/>
-            <ViewModelInstanceNumber propertyValue="15" viewModelPropertyId="0:203"/>
+            <ViewModelInstanceNumber propertyValue="8" viewModelPropertyId="0:203"/>
             <ViewModelInstanceNumber propertyValue="60" viewModelPropertyId="0:204"/>
             <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:205"/>
             <ViewModelInstanceNumber propertyValue="-100000" viewModelPropertyId="0:206"/>
             <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:207"/>
             <ViewModelInstanceList viewModelPropertyId="0:220"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:230"/>
+            <ViewModelInstanceNumber propertyValue="-100000" viewModelPropertyId="0:231"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:232"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:233"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:234"/>
+            <ViewModelInstanceString propertyValue="110" viewModelPropertyId="0:235"/>
+            <ViewModelInstanceString propertyValue="110" viewModelPropertyId="0:236"/>
+            <ViewModelInstanceString propertyValue="110" viewModelPropertyId="0:237"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:238"/>
         </ViewModelInstance>
     </ViewModel>
 </Rive>

@@ -16,6 +16,7 @@
             <TextStylePaint fontSize="16" fontAssetId="0:300" name="ValueStyle" id="0:407">
                 <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
             </TextStylePaint>
+            <TextValueRun styleId="0:407" text="$" name="ValuePrefixRun"/>
             <TextValueRun styleId="0:407" text="0" name="ValueRun">
                 <DataBindContext sourcePathIds="0:400-0:402" propertyKey="268" converterId="0:301"/>
             </TextValueRun>

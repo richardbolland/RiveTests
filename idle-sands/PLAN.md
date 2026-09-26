@@ -108,6 +108,38 @@ the next. Commit after each.
    main.luau's local state onto `Economy` so the clock script could read
    it). Full dark ring right after a dig, unwinding to nothing as it
    becomes clickable again.
+
+**Design/UX pass** (before milestone 4): a full playtest review turned up
+11 gaps across game design, UI and UX. All fixed in one pass:
+- **Item rarity is now weighted**, not uniform — common items (Bottle Cap,
+  Nail, Tin Can) turn up far more than rare ones (Screw, Key, Coin),
+  via a weighted-random pick in `main.luau`.
+- **Starting dig cooldown lowered 15s → 8s** for snappier early manual
+  play (still upgrades down to the original 5s floor). A deliberate
+  tuning call, not a bug fix — revisit if it doesn't feel right.
+- **Upgrade panels now show real affordability/maxed state**: dimmed
+  (`opacity` bound to a computed 1.0/0.4) when currency < $110, and the
+  cost label swaps to "MAX" when the stat is capped — both computed each
+  frame in `clock.luau` and bound directly, no new listeners needed.
+- **Inventory count ("X/12")** next to the strip, via a native
+  `DataConverterListToLength` → `DataConverterToString` chain — no
+  script needed, and doubles as the "inventory is full" signal.
+- **Sell All previews its payout** ("Sell All ($27)") from a new
+  `Economy.inventoryValue`, summed every frame in `clock.luau`.
+- **Inventory slots show `$` prefix** for consistency with the rest of
+  the UI.
+- **The item now dims while on cooldown** (`opacity` bound to
+  `digCooldownFraction` through a `DataConverterRangeMapper`, 1.0→0.5)
+  and **pops on both digging and becoming ready again** (`scaleX`/`scaleY`
+  bound to a new `Economy.itemPulseScale`, a decay curve `clock.luau`
+  recomputes from a `lastPulseTime` stamped by either event). All fully
+  native binds except the two pulse triggers, which are one line each in
+  the scripts that already existed.
+
+Confirms the "scripts compute, RML/state-machines interact" split still
+holds even for polish: none of this needed a new listener or state
+machine — every visual reacts to a number `clock.luau` already owns.
+
 4. **First bot (Beach Boy)** — purchasable, driver script auto-collects
    Beach Boy's 3 item types into inventory on its own timer, independent of
    clicking.

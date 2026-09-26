@@ -1,13 +1,41 @@
---- Milestone 3 (+cooldown visual): digging respects itemsPerDig and
---- digSpeedSeconds. lastDigTime now lives on Economy (not local script
---- state) so clock.luau can read it too, to drive the cooldown ring.
+--- Digging respects itemsPerDig and digSpeedSeconds, and picks items by
+--- rarity weight rather than uniformly. lastDigTime/lastPulseTime live on
+--- Economy (not local script state) so clock.luau can read and react to
+--- them too (cooldown ring, item pop).
 
 type CollectState = {
 	context: Context?,
 }
 
-local ITEM_NAMES = { 'BottleCap', 'Nail', 'TinCan', 'Screw', 'Key', 'Coin' }
+-- Common items turn up far more than rare ones. Weights are relative, not
+-- percentages; higher-value items are deliberately rarer finds.
+local ITEM_WEIGHTS = {
+	{ name = 'BottleCap', weight = 30 },
+	{ name = 'Nail', weight = 25 },
+	{ name = 'TinCan', weight = 20 },
+	{ name = 'Screw', weight = 12 },
+	{ name = 'Key', weight = 8 },
+	{ name = 'Coin', weight = 5 },
+}
+
+local TOTAL_WEIGHT = 0
+for _, entry in ITEM_WEIGHTS do
+	TOTAL_WEIGHT += entry.weight
+end
+
 local MAX_INVENTORY = 12
+
+local function pickItemName(): string
+	local roll = math.random() * TOTAL_WEIGHT
+	local cumulative = 0
+	for _, entry in ITEM_WEIGHTS do
+		cumulative += entry.weight
+		if roll <= cumulative then
+			return entry.name
+		end
+	end
+	return ITEM_WEIGHTS[1].name
+end
 
 local function init(self: CollectState, context: Context): boolean
 	self.context = context
@@ -53,13 +81,17 @@ local function performAction(self: CollectState, listenerContext: ListenerContex
 		if inventory.length >= MAX_INVENTORY then
 			break
 		end
-		local pick = ITEM_NAMES[math.random(1, #ITEM_NAMES)]
-		inventory:push(Data.Item.new(pick))
+		inventory:push(Data.Item.new(pickItemName()))
 		added += 1
 	end
 
 	if added > 0 then
 		lastDigTime.value = gameTime.value
+
+		local lastPulseTime = economy:getNumber('lastPulseTime')
+		if lastPulseTime then
+			lastPulseTime.value = gameTime.value
+		end
 	end
 end
 

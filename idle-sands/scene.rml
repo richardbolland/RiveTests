@@ -239,7 +239,7 @@
                 <EntryState x="-200" y="-120"/>
             </StateMachineLayer>
 
-            <StateMachineListenerSingle targetId="0:32" listenerTypeValue="click" name="CollectItem" id="0:9">
+            <StateMachineListenerSingle targetId="0:32" listenerTypeValue="click" name="BoostItem" id="0:9">
                 <ScriptedListenerAction scriptAssetId="0:310" id="0:333"/>
             </StateMachineListenerSingle>
 
@@ -315,6 +315,7 @@
         <ViewModelPropertyList name="inventory" id="0:220"/>
         <ViewModelPropertyNumber name="itemPulseScale" id="0:230"/>
         <ViewModelPropertyNumber name="lastPulseTime" id="0:231"/>
+        <ViewModelPropertyNumber name="pulseMagnitude" id="0:243"/>
         <ViewModelPropertyNumber name="itemsPerDigAffordable" id="0:232"/>
         <ViewModelPropertyNumber name="digSpeedAffordable" id="0:233"/>
         <ViewModelPropertyString name="itemsPerDigCostLabel" id="0:235"/>
@@ -344,6 +345,7 @@
             <ViewModelInstanceString propertyValue="" viewModelPropertyId="0:240"/>
             <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:241"/>
             <ViewModelInstanceNumber propertyValue="-100000" viewModelPropertyId="0:242"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:243"/>
         </ViewModelInstance>
     </ViewModel>
 </Rive>

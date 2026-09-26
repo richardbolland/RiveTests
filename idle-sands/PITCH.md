@@ -4,8 +4,11 @@ A whimsical beach idle/clicker. You dig the sand for junk and treasure, sell wha
 you find, and spend the money on upgrades and specialist digger bots that
 automate the collecting for you while you're away from the keyboard.
 
-**Core loop:** Click the beach → collect items → sell for currency → buy
-upgrades/bots → bots auto-collect → repeat, idly, forever.
+**Core loop:** Producers dig on their own, always — clicking one just speeds
+it up. Collect items → sell for currency → buy upgrades/bots → more
+producers, each auto-collecting and each click-boostable → repeat, idly,
+forever. (Revised from an earlier click-to-collect design after milestone 3
+playtesting — see PLAN.md for the reasoning.)
 
 **Genre & tone:** Idle/incremental, browser-playable, humour-heavy writing with
 an environmental-cleanup undercurrent (you're picking junk off a beach). Playful

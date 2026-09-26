@@ -17,10 +17,19 @@ session; keep it current as milestones land or scope changes.
 
 ## Core loop
 
-Click beach → spawn 1 item (upgradeable) at author-chosen values → item lands
-in inventory (12 slots) → sell manually or via auto-sell timer → currency
-increases → spend on upgrades/bots → owned bots auto-collect their specialised
-items on their own timer, no click needed.
+**Revised after milestone 3's playtest** (see the design/UX entries below for
+the full history): the beach item is an **always-on auto-collector**, not a
+click-to-collect spot. It runs its own cycle continuously — collects
+itemsPerDig items and restarts, with no interaction needed at all. Clicking
+it never collects directly; a click just cuts a percentage off whatever time
+is left on the current cycle, speeding it up. Idle play works from second
+one; clicking makes it faster. Beach Boy and Steel Seeker (milestones 4/5)
+are additional producers of the same kind — their own independent cycle,
+their own click-boost, their own item pool — not a separate mechanic.
+
+Items land in inventory (12 slots) → sell manually via Sell All → currency
+increases → spend on upgrades/bots → more producers, each auto-collecting
+and each click-boostable.
 
 ## Rive architecture
 
@@ -157,9 +166,30 @@ machine — every visual reacts to a number `clock.luau` already owns.
   decays over 0.25s). Pulled forward from the planned milestone 8 pass
   since the decay-curve pattern already existed and the win was cheap.
 
-4. **First bot (Beach Boy)** — purchasable, driver script auto-collects
-   Beach Boy's 3 item types into inventory on its own timer, independent of
-   clicking.
+**Core loop change** (still before milestone 4): click-to-collect replaced
+with always-on auto-collect + click-to-boost — see "Core loop" above for
+the reasoning. Mechanically: the actual collect logic (weighted item pick,
+`inventory:push`, popup/pulse stamping) moved from `main.luau`'s click
+handler into `clock.luau`'s `advance()`, firing whenever
+`digSpeed - (gameTime - lastDigTime) <= 0`, then resetting `lastDigTime`
+to restart the cycle. `main.luau` (kept the filename; renaming was more
+churn than it was worth) now only cuts `CLICK_CUT_FRACTION` (20%) off
+whatever time is left — implemented by moving `lastDigTime` *backward*
+by `remaining * 0.2`, which took one sign error to get right (moving it
+forward means less time has "passed" since the last collect, which
+lengthens the remaining time, not shortens it — the opposite of a boost).
+Click and auto-collect now use different pulse magnitudes
+(`Economy.pulseMagnitude`, set alongside `lastPulseTime` by whichever
+event fires) so a boost-click still feels responsive without being
+confused for an actual collection. Verified headlessly: 20s with zero
+clicks yields exactly 9 items (3 auto-collections × 3 items, matching
+the 8s cycle); the same ~8s window with 5 rapid clicks yields 6 items
+instead of 3, confirming the boost genuinely pulls forward a second
+collection.
+
+4. **First bot (Beach Boy)** — purchasable, an additional producer of the
+   same kind as the starter item: its own independent auto-collect cycle
+   over its 3 item types, its own click-boost.
 5. **Second bot (Steel Seeker)** — same pattern, different item pool; verify
    bots never cross-collect each other's items.
 6. **Auto-sell** — driver script sells inventory automatically on the

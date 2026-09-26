@@ -174,6 +174,42 @@
                     </Text>
                 </LayoutComponent>
 
+                <LayoutComponent width="240" height="64" styleId="0:171" name="StorageCapacityPanel" id="0:170">
+                    <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                          flexDirectionValue="row" layoutAlignmentType="spaceBetweenCenter"
+                                          paddingLeft="16" paddingLeftUnitsValue="points"
+                                          paddingRight="16" paddingRightUnitsValue="points"
+                                          cornerRadiusTL="10" cornerRadiusTR="10" cornerRadiusBL="10" cornerRadiusBR="10"
+                                          name="StorageCapacityPanel Style" id="0:171"/>
+                    <DataBindContext sourcePathIds="0:200-0:257" propertyKey="18"/>
+                    <Fill name="Fill">
+                        <SolidColor colorValue="FF4F7062" name="C">
+                            <DataBindContext sourcePathIds="0:100-0:108" propertyKey="37"/>
+                        </SolidColor>
+                    </Fill>
+
+                    <Text name="StorageCapacityLabel" id="0:172">
+                        <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="StorageCapacityLabel Layout"/>
+                        <TextStylePaint fontSize="16" fontAssetId="0:300" name="StorageCapacityStyle" id="0:173">
+                            <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextValueRun styleId="0:173" text="Capacity " name="StorageCapacityPrefix"/>
+                        <TextValueRun styleId="0:173" text="3" name="StorageCapacityValue">
+                            <DataBindContext sourcePathIds="0:200-0:256" propertyKey="268" converterId="0:301"/>
+                        </TextValueRun>
+                    </Text>
+
+                    <Text name="StorageCapacityCost" id="0:174">
+                        <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="StorageCapacityCost Layout"/>
+                        <TextStylePaint fontSize="14" fontAssetId="0:300" name="StorageCapacityCostStyle" id="0:175">
+                            <Fill name="Fill"><SolidColor colorValue="FFE8C27A" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextValueRun styleId="0:175" text="5" name="StorageCapacityCostRun">
+                            <DataBindContext sourcePathIds="0:200-0:258" propertyKey="268"/>
+                        </TextValueRun>
+                    </Text>
+                </LayoutComponent>
+
                 <LayoutComponent width="240" height="64" styleId="0:161" name="BuyBeachBoyPanel" id="0:160">
                     <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
                                           flexDirectionValue="row" layoutAlignmentType="spaceBetweenCenter"
@@ -306,6 +342,17 @@
                 </ScriptedListenerAction>
             </StateMachineListenerSingle>
 
+            <StateMachineListenerSingle targetId="0:170" listenerTypeValue="click" name="BuyStorageCapacity" id="0:176">
+                <ScriptedListenerAction scriptAssetId="0:312" id="0:177">
+                    <ScriptInputString propertyValue="storageCapacity" name="statName"/>
+                    <ScriptInputNumber propertyValue="1" name="step"/>
+                    <ScriptInputNumber propertyValue="3" name="minValue"/>
+                    <ScriptInputNumber propertyValue="8" name="maxValue"/>
+                    <ScriptInputNumber propertyValue="5" name="baseCost"/>
+                    <ScriptInputNumber propertyValue="2.8" name="growth"/>
+                </ScriptedListenerAction>
+            </StateMachineListenerSingle>
+
             <StateMachineListenerSingle targetId="0:160" listenerTypeValue="click" name="BuyBeachBoy" id="0:166">
                 <ScriptedListenerAction scriptAssetId="0:314" id="0:167">
                     <ScriptInputString propertyValue="BeachBoy" name="instanceName"/>
@@ -371,6 +418,9 @@
         <ViewModelPropertyNumber name="beachBoyAffordable" id="0:253"/>
         <ViewModelPropertyString name="beachBoyCostLabel" id="0:254"/>
         <ViewModelPropertyNumber name="storedCount" id="0:255"/>
+        <ViewModelPropertyNumber name="storageCapacity" id="0:256"/>
+        <ViewModelPropertyNumber name="storageCapacityAffordable" id="0:257"/>
+        <ViewModelPropertyString name="storageCapacityCostLabel" id="0:258"/>
         <ViewModelInstance exports="true" name="Default" id="0:210">
             <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:201"/>
             <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:202"/>
@@ -393,6 +443,9 @@
             <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:253"/>
             <ViewModelInstanceString propertyValue="458" viewModelPropertyId="0:254"/>
             <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:255"/>
+            <ViewModelInstanceNumber propertyValue="3" viewModelPropertyId="0:256"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:257"/>
+            <ViewModelInstanceString propertyValue="5" viewModelPropertyId="0:258"/>
         </ViewModelInstance>
     </ViewModel>
 </Rive>

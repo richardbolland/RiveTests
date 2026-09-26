@@ -387,6 +387,23 @@ own storage into currency, and Sell All still sums and clears every
 producer's storage in one pass. `ROAM_SPEED` restored afterward.
 Verified clean, inspected with zero wiring problems.
 
+**Storage capacity upgrade** — a fourth upgrade, "Capacity", buyable
+from the side panel: 3 → 8 in 5 steps (same shared Cost(n) = base *
+growth^n curve, base $5 growth 2.8, as the other three), raising every
+robot's `storageCapacity` at once rather than per-robot. It's a shared
+`Economy.storageCapacity` stat - the same shape as `digSpeedSeconds`,
+`itemsPerDig` and `elbowGreasePercent` - but each `Producer` instance
+still carries its own mirrored `storageCapacity` field too (kept from
+the per-robot-storage work, since `storageLabel` and `main.luau`'s
+full-click check both read it locally off the row). `clock.luau` is
+the sole writer of that mirrored field now, syncing every producer's
+copy from the shared stat every frame, so newly-purchased bots pick up
+whatever level has already been bought with no special-casing in
+`buyBot.luau`. Verified headlessly: bought the upgrade after a Sell
+All (currency was needed first), capacity went 3→4 on the shared stat
+and on the Starter's own mirrored copy in the same frame, and the
+robot's badge read the new "n/4" immediately.
+
 5. **Second bot (Steel Seeker)** — same pattern, different item pool; verify
    bots never cross-collect each other's items.
 6. **Auto-sell** — driver script sells inventory automatically on the

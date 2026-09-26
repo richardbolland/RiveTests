@@ -2,11 +2,15 @@
 --- running the identical auto-collect cycle for each row (the free starter,
 --- then every purchased bot) - same pattern as the inventory list, so
 --- adding a bot later is one more list entry, not more duplicated logic.
---- Each producer owns its own cycle/pulse/popup state; only
---- digSpeedSeconds, itemsPerDig and elbowGreasePercent are shared upgrades
---- applying to every producer alike. Also owns each upgrade panel's and
---- Sell All's affordable state, the live inventory total, and whether
---- Beach Boy is affordable to buy.
+--- Each producer owns its own cycle/pulse/popup state and its own storage
+--- list; only digSpeedSeconds, itemsPerDig, elbowGreasePercent and
+--- storageCapacity are shared upgrades applying to every producer alike -
+--- storageCapacity lives as a mirrored field on each Producer instance
+--- (so storageLabel can be computed locally) but this script is the only
+--- writer of it, syncing it from Economy.storageCapacity every frame, the
+--- same way every other shared upgrade works. Also owns each upgrade
+--- panel's and Sell All's affordable state, the live storage totals, and
+--- whether Beach Boy is affordable to buy.
 
 type ClockState = {
 	context: Context?,
@@ -55,6 +59,10 @@ local DIG_SPEED_MIN = 5
 local ELBOW_GREASE_START = 1
 local ELBOW_GREASE_STEP = 1
 local ELBOW_GREASE_MAX = 6
+
+local STORAGE_CAPACITY_START = 3
+local STORAGE_CAPACITY_STEP = 1
+local STORAGE_CAPACITY_MAX = 8
 
 local BEACH_BOY_COST = 458
 
@@ -129,6 +137,8 @@ local function advance(self: ClockState, seconds: number): boolean
 	local digSpeed = economy:getNumber('digSpeedSeconds')
 	local itemsPerDigProp = economy:getNumber('itemsPerDig')
 	local itemsPerDig = if itemsPerDigProp then math.floor(itemsPerDigProp.value) else 1
+	local storageCapacityProp = economy:getNumber('storageCapacity')
+	local storageCapacityValue = if storageCapacityProp then storageCapacityProp.value else STORAGE_CAPACITY_START
 
 	-- Every producer runs the same cycle: tick down, collect and restart
 	-- when it reaches zero, into its OWN onboard storage. Clicking
@@ -144,6 +154,9 @@ local function advance(self: ClockState, seconds: number): boolean
 			local producer = producers[i]
 			local storage = producer:getList('storage')
 			local storageCapacity = producer:getNumber('storageCapacity')
+			if storageCapacity then
+				storageCapacity.value = storageCapacityValue
+			end
 			local isFull = (storage ~= nil) and (storageCapacity ~= nil) and (storage.length >= storageCapacity.value)
 
 			local lastDigTime = producer:getNumber('lastDigTime')
@@ -278,6 +291,16 @@ local function advance(self: ClockState, seconds: number): boolean
 		local cost = upgradeCost(level)
 		elbowGreaseAffordable.value = (currencyValue >= cost and not maxed) and 1 or DIMMED_ALPHA
 		elbowGreaseCostLabel.value = maxed and 'MAX' or tostring(cost)
+	end
+
+	local storageCapacityAffordable = economy:getNumber('storageCapacityAffordable')
+	local storageCapacityCostLabel = economy:getString('storageCapacityCostLabel')
+	if storageCapacityProp and storageCapacityAffordable and storageCapacityCostLabel then
+		local maxed = storageCapacityProp.value >= STORAGE_CAPACITY_MAX
+		local level = levelsBought(storageCapacityProp.value, STORAGE_CAPACITY_STEP, STORAGE_CAPACITY_START)
+		local cost = upgradeCost(level)
+		storageCapacityAffordable.value = (currencyValue >= cost and not maxed) and 1 or DIMMED_ALPHA
+		storageCapacityCostLabel.value = maxed and 'MAX' or tostring(cost)
 	end
 
 	-- Beach Boy purchase panel: affordable/owned state

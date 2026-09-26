@@ -33,6 +33,11 @@ local ITEM_POOLS: { [string]: { ItemWeight } } = {
 		{ name = 'Nail', weight = 25 },
 		{ name = 'TinCan', weight = 20 },
 	},
+	steelSeeker = {
+		{ name = 'Screw', weight = 40 },
+		{ name = 'Key', weight = 35 },
+		{ name = 'Coin', weight = 25 },
+	},
 }
 
 local PULSE_DURATION = 0.25
@@ -72,6 +77,13 @@ local STORAGE_CAPACITY_MAX = 8
 local BEACH_BOY_BASE_COST = 150
 local BEACH_BOY_GROWTH = 1.6
 
+-- Steel Seeker: same repeatable shape as Beach Boy, pricier entry and a
+-- pool of exclusively mid/high-value items (no BottleCap/Nail/TinCan) to
+-- justify it. Must match the ScriptInput* values on the BuySteelSeeker
+-- listener in scene.rml exactly.
+local STEEL_SEEKER_BASE_COST = 220
+local STEEL_SEEKER_GROWTH = 1.6
+
 local function levelsBought(currentValue: number, step: number, startValue: number): number
 	return math.floor(math.abs(currentValue - startValue) / math.abs(step) + 0.5)
 end
@@ -82,6 +94,10 @@ end
 
 local function beachBoyCost(count: number): number
 	return math.floor(BEACH_BOY_BASE_COST * (BEACH_BOY_GROWTH ^ count) + 0.5)
+end
+
+local function steelSeekerCost(count: number): number
+	return math.floor(STEEL_SEEKER_BASE_COST * (STEEL_SEEKER_GROWTH ^ count) + 0.5)
 end
 
 -- Roaming: each producer drifts toward a random point, then picks a new
@@ -381,6 +397,16 @@ local function advance(self: ClockState, seconds: number): boolean
 		local cost = beachBoyCost(beachBoyCount.value)
 		beachBoyAffordable.value = (currencyValue >= cost) and 1 or DIMMED_ALPHA
 		beachBoyCostLabel.value = tostring(cost)
+	end
+
+	-- Steel Seeker purchase panel: same repeatable shape as Beach Boy
+	local steelSeekerCount = economy:getNumber('steelSeekerCount')
+	local steelSeekerAffordable = economy:getNumber('steelSeekerAffordable')
+	local steelSeekerCostLabel = economy:getString('steelSeekerCostLabel')
+	if steelSeekerCount and steelSeekerAffordable and steelSeekerCostLabel then
+		local cost = steelSeekerCost(steelSeekerCount.value)
+		steelSeekerAffordable.value = (currencyValue >= cost) and 1 or DIMMED_ALPHA
+		steelSeekerCostLabel.value = tostring(cost)
 	end
 
 	-- Live totals across every producer's own storage, for the bottom

@@ -202,5 +202,27 @@
             <ViewModelInstanceNumber propertyValue="400" viewModelPropertyId="0:527"/>
             <ViewModelInstanceNumber propertyValue="150" viewModelPropertyId="0:528"/>
         </ViewModelInstance>
+
+        <ViewModelInstance exports="true" name="SteelSeeker" id="0:533">
+            <ViewModelInstanceColor propertyValue="FF7A8699" viewModelPropertyId="0:510"/>
+            <ViewModelInstanceNumber propertyValue="-100000" viewModelPropertyId="0:511"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:512"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:513"/>
+            <ViewModelInstanceNumber propertyValue="-100000" viewModelPropertyId="0:514"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:515"/>
+            <ViewModelInstanceString propertyValue="" viewModelPropertyId="0:516"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:517"/>
+            <ViewModelInstanceNumber propertyValue="-100000" viewModelPropertyId="0:518"/>
+            <ViewModelInstanceString propertyValue="steelSeeker" viewModelPropertyId="0:519"/>
+            <ViewModelInstanceNumber propertyValue="250" viewModelPropertyId="0:520"/>
+            <ViewModelInstanceNumber propertyValue="250" viewModelPropertyId="0:521"/>
+            <ViewModelInstanceNumber propertyValue="250" viewModelPropertyId="0:522"/>
+            <ViewModelInstanceNumber propertyValue="250" viewModelPropertyId="0:523"/>
+            <ViewModelInstanceNumber propertyValue="3" viewModelPropertyId="0:524"/>
+            <ViewModelInstanceList viewModelPropertyId="0:525"/>
+            <ViewModelInstanceString propertyValue="0/3" viewModelPropertyId="0:526"/>
+            <ViewModelInstanceNumber propertyValue="250" viewModelPropertyId="0:527"/>
+            <ViewModelInstanceNumber propertyValue="250" viewModelPropertyId="0:528"/>
+        </ViewModelInstance>
     </ViewModel>
 </Rive>

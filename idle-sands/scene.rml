@@ -282,6 +282,40 @@
                     </Text>
                 </LayoutComponent>
 
+                <LayoutComponent width="240" height="64" styleId="0:181" name="BuySteelSeekerPanel" id="0:180">
+                    <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                          flexDirectionValue="row" layoutAlignmentType="spaceBetweenCenter"
+                                          paddingLeft="16" paddingLeftUnitsValue="points"
+                                          paddingRight="16" paddingRightUnitsValue="points"
+                                          cornerRadiusTL="10" cornerRadiusTR="10" cornerRadiusBL="10" cornerRadiusBR="10"
+                                          name="BuySteelSeekerPanel Style" id="0:181"/>
+                    <DataBindContext sourcePathIds="0:200-0:281" propertyKey="18"/>
+                    <Fill name="Fill">
+                        <SolidColor colorValue="FF7A8699" name="C"/>
+                    </Fill>
+
+                    <Text name="BuySteelSeekerLabel" id="0:182">
+                        <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="BuySteelSeekerLabel Layout"/>
+                        <TextStylePaint fontSize="16" fontAssetId="0:300" name="BuySteelSeekerStyle" id="0:183">
+                            <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextValueRun styleId="0:183" text="Steel Seeker &#215;" name="BuySteelSeekerPrefix"/>
+                        <TextValueRun styleId="0:183" text="0" name="BuySteelSeekerCount">
+                            <DataBindContext sourcePathIds="0:200-0:280" propertyKey="268" converterId="0:301"/>
+                        </TextValueRun>
+                    </Text>
+
+                    <Text name="BuySteelSeekerCost" id="0:184">
+                        <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="BuySteelSeekerCost Layout"/>
+                        <TextStylePaint fontSize="14" fontAssetId="0:300" name="BuySteelSeekerCostStyle" id="0:185">
+                            <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextValueRun styleId="0:185" text="220" name="BuySteelSeekerCostRun">
+                            <DataBindContext sourcePathIds="0:200-0:282" propertyKey="268"/>
+                        </TextValueRun>
+                    </Text>
+                </LayoutComponent>
+
                 <LayoutComponent width="200" height="56" styleId="0:61" name="SellButton" id="0:60">
                     <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
                                           layoutAlignmentType="center"
@@ -402,6 +436,15 @@
                     <ScriptInputNumber propertyValue="1.6" name="growth"/>
                 </ScriptedListenerAction>
             </StateMachineListenerSingle>
+
+            <StateMachineListenerSingle targetId="0:180" listenerTypeValue="click" name="BuySteelSeeker" id="0:186">
+                <ScriptedListenerAction scriptAssetId="0:314" id="0:187">
+                    <ScriptInputString propertyValue="SteelSeeker" name="instanceName"/>
+                    <ScriptInputString propertyValue="steelSeekerCount" name="countStatName"/>
+                    <ScriptInputNumber propertyValue="220" name="baseCost"/>
+                    <ScriptInputNumber propertyValue="1.6" name="growth"/>
+                </ScriptedListenerAction>
+            </StateMachineListenerSingle>
         </StateMachine>
     </Artboard>
 
@@ -466,6 +509,9 @@
         <ViewModelPropertyNumber name="storageCapacityAffordable" id="0:257"/>
         <ViewModelPropertyString name="storageCapacityCostLabel" id="0:258"/>
         <ViewModelPropertyList name="trail" id="0:259"/>
+        <ViewModelPropertyNumber name="steelSeekerCount" id="0:280"/>
+        <ViewModelPropertyNumber name="steelSeekerAffordable" id="0:281"/>
+        <ViewModelPropertyString name="steelSeekerCostLabel" id="0:282"/>
         <ViewModelInstance exports="true" name="Default" id="0:210">
             <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:201"/>
             <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:202"/>
@@ -492,6 +538,9 @@
             <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:257"/>
             <ViewModelInstanceString propertyValue="5" viewModelPropertyId="0:258"/>
             <ViewModelInstanceList viewModelPropertyId="0:259"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:280"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:281"/>
+            <ViewModelInstanceString propertyValue="220" viewModelPropertyId="0:282"/>
         </ViewModelInstance>
     </ViewModel>
 

@@ -515,8 +515,39 @@ layer. Confirmed the new hover listeners don't interfere with the
 existing click-to-boost listener on the same target. Verified clean,
 inspected with zero wiring problems.
 
-5. **Second bot (Steel Seeker)** — same pattern, different item pool; verify
-   bots never cross-collect each other's items.
+5. **Second bot (Steel Seeker)** ✅ — a third producer type (Starter and
+   Beach Boy came first), proving the Producer/ProducerWidget/buyBot.luau
+   architecture generalizes to N bot types with zero new script logic,
+   exactly as it was built to. Repeatable purchase at $220, growth 1.6
+   (same shape as Beach Boy, pricier entry since its pool skews to
+   higher-value finds), with its own `steelSeekerCount`/
+   `steelSeekerAffordable`/`steelSeekerCostLabel` Economy stats and a
+   `BuySteelSeekerPanel` mirroring `BuyBeachBoyPanel` exactly. Its own
+   `steel-gray` swatch and roam start (250, 250, away from both other
+   spawn points) so three producers don't all launch stacked. New
+   `steelSeeker` item pool in `clock.luau` (`ITEM_POOLS`) - Screw, Key,
+   Coin only, deliberately excluding the cheap BottleCap/Nail/TinCan
+   that both `all` and `beachBoy` draw from, so buying one is a genuine
+   upgrade to average find value, not just more of the same. No new
+   widget, click, tooltip or wheel-track code was needed - Steel Seeker
+   is just another named instance of the existing `Producer` view model
+   and `ProducerWidget` component, rendered through the same
+   `ArtboardComponentList` the other two already use.
+
+   Verified headlessly: bought one after grinding currency via repeated
+   Sell-All cycles (confirmed cost climbed $220→$352, matching
+   `220*1.6` exactly); screenshot showed the new steel-gray robot on
+   stage with its own storage badge and the panel reading
+   "Steel Seeker ×1"; a 600s `--data-dump-every` trace of both
+   producers' `storage` lists confirmed Steel Seeker collected only
+   Screw/Key/Coin and the Starter (on the `all` pool) collected the
+   full six-item spread including Key/Coin/Screw but also
+   BottleCap/Nail/TinCan - no cross-contamination in either direction.
+   Confirmed hovering a Steel Seeker also raises the shared tooltip
+   (proving the universal tooltip and the Producer architecture compose
+   for free, with no bot-specific wiring). Verified clean, inspected
+   with zero wiring problems.
+
 6. **Auto-sell** — driver script sells inventory automatically on the
    upgradeable timer; visible countdown in UI.
 7. **Persistence** — host page saves/loads `Economy` to `localStorage`;

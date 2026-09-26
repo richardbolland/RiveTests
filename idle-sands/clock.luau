@@ -31,7 +31,6 @@ local ITEM_POOLS: { [string]: { ItemWeight } } = {
 	},
 }
 
-local MAX_INVENTORY = 12
 local PULSE_DURATION = 0.25
 local COLLECT_PULSE_MAGNITUDE = 0.15
 local DIMMED_ALPHA = 0.4
@@ -130,56 +129,76 @@ local function advance(self: ClockState, seconds: number): boolean
 	local digSpeed = economy:getNumber('digSpeedSeconds')
 	local itemsPerDigProp = economy:getNumber('itemsPerDig')
 	local itemsPerDig = if itemsPerDigProp then math.floor(itemsPerDigProp.value) else 1
-	local inventory = economy:getList('inventory')
 
 	-- Every producer runs the same cycle: tick down, collect and restart
-	-- when it reaches zero. Clicking (main.luau, inside the row) only
-	-- pulls a producer's own lastDigTime forward to shorten what's left;
-	-- it never collects.
+	-- when it reaches zero, into its OWN onboard storage. Clicking
+	-- (main.luau, inside the row) either pulls a producer's own
+	-- lastDigTime forward to shorten what's left, or - once that
+	-- producer's storage is full - sells it on the spot; it never
+	-- collects directly either way. A full producer simply stops
+	-- collecting (the cycle freezes rather than resets) until its owner
+	-- empties it.
 	local producers = economy:getList('producers')
-	if producers and digSpeed and digSpeed.value > 0 and inventory then
+	if producers and digSpeed and digSpeed.value > 0 then
 		for i = 1, producers.length do
 			local producer = producers[i]
+			local storage = producer:getList('storage')
+			local storageCapacity = producer:getNumber('storageCapacity')
+			local isFull = (storage ~= nil) and (storageCapacity ~= nil) and (storage.length >= storageCapacity.value)
+
 			local lastDigTime = producer:getNumber('lastDigTime')
 			local cooldownFraction = producer:getNumber('digCooldownFraction')
 			if lastDigTime and cooldownFraction then
-				local remaining = digSpeed.value - (gameTime - lastDigTime.value)
-				if remaining <= 0 then
-					local itemPoolNameProp = producer:getString('itemPoolName')
-					local poolName = if itemPoolNameProp then itemPoolNameProp.value else 'all'
+				if isFull then
+					cooldownFraction.value = 0
+				elseif storage then
+					local remaining = digSpeed.value - (gameTime - lastDigTime.value)
+					if remaining <= 0 then
+						local itemPoolNameProp = producer:getString('itemPoolName')
+						local poolName = if itemPoolNameProp then itemPoolNameProp.value else 'all'
 
-					local collectedTotal = 0
-					for _ = 1, itemsPerDig do
-						if inventory.length >= MAX_INVENTORY then
-							break
+						local collectedTotal = 0
+						for _ = 1, itemsPerDig do
+							if storageCapacity and storage.length >= storageCapacity.value then
+								break
+							end
+							local item = Data.Item.new(pickItemName(poolName))
+							storage:push(item)
+							local value = item:getNumber('value')
+							if value then
+								collectedTotal += value.value
+							end
 						end
-						local item = Data.Item.new(pickItemName(poolName))
-						inventory:push(item)
-						local value = item:getNumber('value')
-						if value then
-							collectedTotal += value.value
+
+						lastDigTime.value = gameTime
+						remaining = digSpeed.value
+
+						local lastPulseTime = producer:getNumber('lastPulseTime')
+						local pulseMagnitude = producer:getNumber('pulseMagnitude')
+						if lastPulseTime and pulseMagnitude then
+							lastPulseTime.value = gameTime
+							pulseMagnitude.value = COLLECT_PULSE_MAGNITUDE
+						end
+
+						local lastDigPopupTime = producer:getNumber('lastDigPopupTime')
+						local digPopupText = producer:getString('digPopupText')
+						if lastDigPopupTime and digPopupText and collectedTotal > 0 then
+							lastDigPopupTime.value = gameTime
+							digPopupText.value = '+$' .. tostring(collectedTotal)
 						end
 					end
 
-					lastDigTime.value = gameTime
-					remaining = digSpeed.value
-
-					local lastPulseTime = producer:getNumber('lastPulseTime')
-					local pulseMagnitude = producer:getNumber('pulseMagnitude')
-					if lastPulseTime and pulseMagnitude then
-						lastPulseTime.value = gameTime
-						pulseMagnitude.value = COLLECT_PULSE_MAGNITUDE
-					end
-
-					local lastDigPopupTime = producer:getNumber('lastDigPopupTime')
-					local digPopupText = producer:getString('digPopupText')
-					if lastDigPopupTime and digPopupText and collectedTotal > 0 then
-						lastDigPopupTime.value = gameTime
-						digPopupText.value = '+$' .. tostring(collectedTotal)
-					end
+					cooldownFraction.value = clamp01(remaining / digSpeed.value)
 				end
+			end
 
-				cooldownFraction.value = clamp01(remaining / digSpeed.value)
+			local storageLabel = producer:getString('storageLabel')
+			if storageLabel and storage and storageCapacity then
+				if isFull then
+					storageLabel.value = '!'
+				else
+					storageLabel.value = tostring(storage.length) .. '/' .. tostring(math.floor(storageCapacity.value))
+				end
 			end
 
 			-- Pulse scale (collect vs. click-boost use different magnitudes)
@@ -272,19 +291,33 @@ local function advance(self: ClockState, seconds: number): boolean
 		beachBoyCostLabel.value = owned and 'Owned' or tostring(BEACH_BOY_COST)
 	end
 
-	-- Live inventory total, for the Sell All preview, and whether selling
-	-- would do anything right now
+	-- Live totals across every producer's own storage, for the bottom
+	-- strip's fleet-wide summary, the Sell All preview, and whether
+	-- selling would do anything right now
 	local inventoryValue = economy:getNumber('inventoryValue')
+	local storedCount = economy:getNumber('storedCount')
 	local total = 0
-	if inventory and inventoryValue then
-		for i = 1, inventory.length do
-			local item = inventory[i]
-			local value = item:getNumber('value')
-			if value then
-				total = total + value.value
+	local count = 0
+	if producers then
+		for i = 1, producers.length do
+			local storage = producers[i]:getList('storage')
+			if storage then
+				count += storage.length
+				for j = 1, storage.length do
+					local item = storage[j]
+					local value = item:getNumber('value')
+					if value then
+						total = total + value.value
+					end
+				end
 			end
 		end
+	end
+	if inventoryValue then
 		inventoryValue.value = total
+	end
+	if storedCount then
+		storedCount.value = count
 	end
 
 	local sellAffordable = economy:getNumber('sellAffordable')

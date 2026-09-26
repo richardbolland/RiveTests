@@ -327,6 +327,66 @@ cost landing at a coherent ~12.5 min in the same trajectory.
 
 Verified clean, inspected with zero wiring problems.
 
+**Per-robot onboard storage** — a thematic-alignment pass. The player's
+stated vision: robots suck items into their *own* onboard storage; the
+player empties and sells that storage; upgrades make them collect more,
+faster, and (via a manual click) harder. The shared `Economy.inventory`
+list didn't fit that — it made "inventory" an abstract account-wide
+pool with no visible connection to which robot dug up what, and gave
+no reason for a robot to ever stop. Replaced with:
+
+- Each `Producer` instance now owns `storageCapacity` (3, for both
+  bots), its own `storage` list (was `Economy.inventory`, shared), and
+  a computed `storageLabel` string.
+- `clock.luau`'s auto-collect loop checks `storage.length <
+  storageCapacity` before collecting; once full, the cycle freezes
+  (`digCooldownFraction` pinned at 0, `lastDigTime` left untouched)
+  rather than resetting, so a full robot visibly stops instead of
+  silently discarding what it finds. Reusing `lastDigTime` this way
+  means the moment the robot is emptied it resumes exactly where the
+  cycle would have been, immediate collection included if a cycle had
+  already elapsed while blocked.
+- A small on-stage badge (a dark pill in the widget's corner, bound to
+  `storageLabel`) shows `"n/3"` while there's room and switches to
+  `"!"` at capacity — the "needs attention" signal the player asked
+  for, with no separate UI to toggle between robots.
+- `main.luau`'s click handler now branches on that same fill check:
+  room left still boosts (Elbow Grease, unchanged); full instead sums
+  and clears *that robot's own* storage into currency on the spot —
+  "clicking a full robot sells it" was the player's own proposed
+  resolution to "how do you tell robots apart in the UI," and needs no
+  additional listener or state, since the widget already owns a click
+  handler.
+- `sell.luau` (Sell All) generalizes the same way: iterates every
+  producer's storage and sums+clears each into currency in one pass,
+  so it stays a fleet-wide convenience layered on top of, not a
+  replacement for, the per-robot mechanic.
+- The bottom strip stopped being "the" inventory (it rendered
+  `ItemSlot` rows off one shared list) and became a fleet-wide
+  aggregate instead: "Stored: `<n>` (`$<value>`)", summed each frame
+  across every producer's storage. The now-unused `ItemSlot` artboard
+  and its `ComponentAsset` (items.rml) were dead code once nothing
+  rendered per-item icons any more, so removed; `Item` (the view model
+  + its 6 named instances) stayed, since `Data.Item.new(...)` still
+  creates them every collect.
+
+Building the badge surfaced a genuine gotcha, not a design bug: **the
+first sibling in markup draws on top** (`rive docs transforms`) — the
+opposite of HTML/SVG stacking. The badge's label text was invisible
+behind its own background pill until reordered (label declared first,
+pill second); every other stack in this project (the digging circle
+itself) happened to already read correctly-if-accidentally because its
+top layer (`DigPopup`) is translucent enough to blend through even
+when technically behind. Verified via a temporary `ROAM_SPEED = 0`
+edit (roaming uses real, unseeded randomness, so a screenshot's pixel
+coordinates for a wandering bot can't be replayed against a second
+headless run) to click a known, fixed position: confirmed storage
+fills to 3 and freezes (`digCooldownFraction` pinned at 0,
+`storageLabel` reading `"!"`), a click on a full robot clears just its
+own storage into currency, and Sell All still sums and clears every
+producer's storage in one pass. `ROAM_SPEED` restored afterward.
+Verified clean, inspected with zero wiring problems.
+
 5. **Second bot (Steel Seeker)** — same pattern, different item pool; verify
    bots never cross-collect each other's items.
 6. **Auto-sell** — driver script sells inventory automatically on the

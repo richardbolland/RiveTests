@@ -5,10 +5,15 @@ you find, and spend the money on upgrades and specialist digger bots that
 automate the collecting for you while you're away from the keyboard.
 
 **Core loop:** Producers dig on their own, always — clicking one just speeds
-it up. Collect items → sell for currency → buy upgrades/bots → more
-producers, each auto-collecting and each click-boostable → repeat, idly,
+it up, unless it's full, in which case clicking sells its own onboard
+storage on the spot. Collect items into a robot's own storage → sell (per
+robot, by clicking it when full, or all at once with Sell All) → buy
+upgrades/bots → more producers, each auto-collecting, each click-boostable
+until full, and each visibly stopping (with an on-stage badge showing
+`n/capacity`, or `!` at capacity) when it needs emptying → repeat, idly,
 forever. (Revised from an earlier click-to-collect design after milestone 3
-playtesting — see PLAN.md for the reasoning.)
+playtesting, then again to give each robot its own storage instead of one
+shared pool — see PLAN.md for the reasoning.)
 
 **Genre & tone:** Idle/incremental, browser-playable, humour-heavy writing with
 an environmental-cleanup undercurrent (you're picking junk off a beach). Playful

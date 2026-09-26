@@ -59,6 +59,36 @@
             </Text>
         </LayoutComponent>
 
+        <LayoutComponent width="32" height="32" styleId="0:561" name="BadgeAnchor" id="0:560">
+            <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                  layoutTypeValue="stack" layoutAlignmentType="center"
+                                  positionTypeValue="absolute"
+                                  positionRight="-6" positionRightUnitsValue="points"
+                                  positionTop="-6" positionTopUnitsValue="points"
+                                  name="BadgeAnchor Style" id="0:561"/>
+
+            <!-- Declaration order is front-to-back (first sibling draws on
+                 top), so the label comes before its background pill. -->
+            <Text name="BadgeLabel" id="0:563">
+                <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="BadgeLabel Layout"/>
+                <TextStylePaint fontSize="13" fontAssetId="0:300" name="BadgeStyle" id="0:564">
+                    <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="0:564" text="0/3" name="BadgeRun">
+                    <DataBindContext sourcePathIds="0:500-0:526" propertyKey="268"/>
+                </TextValueRun>
+            </Text>
+
+            <Shape name="BadgeBg" id="0:562">
+                <LayoutParticipant layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                   width="32" height="32" name="BadgeBg Layout"/>
+                <Ellipse width="32" height="32" originX="0.5" originY="0.5" name="Path"/>
+                <Fill name="Fill">
+                    <SolidColor colorValue="FF1D2B27" name="C"/>
+                </Fill>
+            </Shape>
+        </LayoutComponent>
+
         <StateMachine name="Main" id="0:550">
             <StateMachineLayer name="Layer 1" id="0:551">
                 <AnyState x="0" y="-120"/>
@@ -89,6 +119,9 @@
         <ViewModelPropertyNumber name="roamY" id="0:521"/>
         <ViewModelPropertyNumber name="roamTargetX" id="0:522"/>
         <ViewModelPropertyNumber name="roamTargetY" id="0:523"/>
+        <ViewModelPropertyNumber name="storageCapacity" id="0:524"/>
+        <ViewModelPropertyList name="storage" id="0:525"/>
+        <ViewModelPropertyString name="storageLabel" id="0:526"/>
 
         <ViewModelInstance exports="true" name="Default" id="0:530">
             <ViewModelInstanceColor propertyValue="FFE8785A" viewModelPropertyId="0:510"/>
@@ -105,6 +138,9 @@
             <ViewModelInstanceNumber propertyValue="100" viewModelPropertyId="0:521"/>
             <ViewModelInstanceNumber propertyValue="100" viewModelPropertyId="0:522"/>
             <ViewModelInstanceNumber propertyValue="100" viewModelPropertyId="0:523"/>
+            <ViewModelInstanceNumber propertyValue="3" viewModelPropertyId="0:524"/>
+            <ViewModelInstanceList viewModelPropertyId="0:525"/>
+            <ViewModelInstanceString propertyValue="0/3" viewModelPropertyId="0:526"/>
         </ViewModelInstance>
 
         <ViewModelInstance exports="true" name="Starter" id="0:531">
@@ -122,6 +158,9 @@
             <ViewModelInstanceNumber propertyValue="150" viewModelPropertyId="0:521"/>
             <ViewModelInstanceNumber propertyValue="120" viewModelPropertyId="0:522"/>
             <ViewModelInstanceNumber propertyValue="150" viewModelPropertyId="0:523"/>
+            <ViewModelInstanceNumber propertyValue="3" viewModelPropertyId="0:524"/>
+            <ViewModelInstanceList viewModelPropertyId="0:525"/>
+            <ViewModelInstanceString propertyValue="0/3" viewModelPropertyId="0:526"/>
         </ViewModelInstance>
 
         <ViewModelInstance exports="true" name="BeachBoy" id="0:532">
@@ -139,6 +178,9 @@
             <ViewModelInstanceNumber propertyValue="150" viewModelPropertyId="0:521"/>
             <ViewModelInstanceNumber propertyValue="400" viewModelPropertyId="0:522"/>
             <ViewModelInstanceNumber propertyValue="150" viewModelPropertyId="0:523"/>
+            <ViewModelInstanceNumber propertyValue="3" viewModelPropertyId="0:524"/>
+            <ViewModelInstanceList viewModelPropertyId="0:525"/>
+            <ViewModelInstanceString propertyValue="0/3" viewModelPropertyId="0:526"/>
         </ViewModelInstance>
     </ViewModel>
 </Rive>

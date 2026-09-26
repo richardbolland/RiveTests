@@ -1,20 +1,27 @@
 --- Lives inside ProducerWidget (producers.rml), so one copy of this script
 --- backs every producer row - the free starter and every purchased bot
 --- alike. The row is always auto-collecting on its own (clock.luau owns
---- that, iterating Economy.producers). Clicking it never collects directly
---- - it's Elbow Grease: pitching in yourself cuts elbowGreasePercent (a
---- shared, upgradeable stat) off the FULL cycle length, so every click is
---- worth the same amount regardless of when in the cycle it lands (a
---- percentage of what's *remaining* would front-load all the value into
---- the first click or two and make late-cycle clicks feel like nothing).
---- It also means the boost automatically scales down if digSpeedSeconds
---- is upgraded to a shorter cycle, with no rebalancing needed.
+--- that, iterating Economy.producers), and stops collecting once its own
+--- onboard storage is full. What a click does depends on that fill state:
+---
+--- - Storage has room: it's Elbow Grease - pitching in yourself cuts
+---   elbowGreasePercent (a shared, upgradeable stat) off the FULL cycle
+---   length, so every click is worth the same amount regardless of when
+---   in the cycle it lands (a percentage of what's *remaining* would
+---   front-load all the value into the first click or two and make
+---   late-cycle clicks feel like nothing). It also means the boost
+---   automatically scales down if digSpeedSeconds is upgraded to a
+---   shorter cycle, with no rebalancing needed.
+--- - Storage is full: the robot can't collect anything more, so a click
+---   empties and sells THIS robot's own storage on the spot, instead.
+---   Sell All (sell.luau) does the same thing across every robot at once.
 
 type BoostState = {
 	context: Context?,
 }
 
 local CLICK_PULSE_MAGNITUDE = 0.06
+local SELL_PULSE_MAGNITUDE = 0.15
 
 local function init(self: BoostState, context: Context): boolean
 	self.context = context
@@ -39,6 +46,42 @@ local function performAction(self: BoostState, listenerContext: ListenerContext)
 
 	local economy = context:globalViewModel('Economy')
 	if not economy then
+		return
+	end
+
+	local storage = producer:getList('storage')
+	local storageCapacity = producer:getNumber('storageCapacity')
+	if storage and storageCapacity and storage.length >= storageCapacity.value then
+		-- Full: clicking sells this robot's own storage instead of boosting.
+		local currency = economy:getNumber('currency')
+		local gameTime = economy:getNumber('gameTime')
+		if not currency then
+			return
+		end
+
+		local total = 0
+		for i = 1, storage.length do
+			local item = storage[i]
+			local value = item:getNumber('value')
+			if value then
+				total += value.value
+			end
+		end
+		currency.value += total
+		storage:clear()
+
+		local lastPulseTime = producer:getNumber('lastPulseTime')
+		local pulseMagnitude = producer:getNumber('pulseMagnitude')
+		local lastDigPopupTime = producer:getNumber('lastDigPopupTime')
+		local digPopupText = producer:getString('digPopupText')
+		if gameTime and lastPulseTime and pulseMagnitude then
+			lastPulseTime.value = gameTime.value
+			pulseMagnitude.value = SELL_PULSE_MAGNITUDE
+		end
+		if gameTime and lastDigPopupTime and digPopupText and total > 0 then
+			lastDigPopupTime.value = gameTime.value
+			digPopupText.value = 'SOLD +$' .. tostring(total)
+		end
 		return
 	end
 

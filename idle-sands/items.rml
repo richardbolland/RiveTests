@@ -1,30 +1,4 @@
 <Rive version="1" kind="fragment">
-    <!-- Reusable inventory row: one instance per collected item -->
-    <Artboard isComponent="true" viewModelId="0:400" styleId="0:405" x="1500" y="0" width="70" height="70" name="ItemSlot" id="0:401">
-        <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
-                              layoutAlignmentType="center"
-                              cornerRadiusTL="10" cornerRadiusTR="10" cornerRadiusBL="10" cornerRadiusBR="10"
-                              name="ItemSlot Style" id="0:405"/>
-        <Fill name="Fill">
-            <SolidColor colorValue="FFFFFFFF" name="C">
-                <DataBindContext sourcePathIds="0:400-0:403" propertyKey="37"/>
-            </SolidColor>
-        </Fill>
-
-        <Text name="ValueLabel" id="0:406">
-            <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="ValueLabel Layout"/>
-            <TextStylePaint fontSize="16" fontAssetId="0:300" name="ValueStyle" id="0:407">
-                <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
-            </TextStylePaint>
-            <TextValueRun styleId="0:407" text="$" name="ValuePrefixRun"/>
-            <TextValueRun styleId="0:407" text="0" name="ValueRun">
-                <DataBindContext sourcePathIds="0:400-0:402" propertyKey="268" converterId="0:301"/>
-            </TextValueRun>
-        </Text>
-    </Artboard>
-
-    <ComponentAsset artboardId="0:401" name="ItemSlot"/>
-
     <!-- Item catalogue: one template view model, one instance per item type -->
     <ViewModel defaultInstanceId="0:410" name="Item" id="0:400">
         <ViewModelPropertyString name="itemName" id="0:408"/>

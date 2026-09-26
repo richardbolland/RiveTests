@@ -245,20 +245,21 @@
                 </SolidColor>
             </Fill>
 
-            <Text name="InventoryCount" id="0:53">
-                <LayoutParticipant layoutWidthScaleType="fixed" layoutHeightScaleType="hug" width="70" name="InventoryCount Layout"/>
-                <TextStylePaint fontSize="16" fontAssetId="0:300" name="InventoryCountStyle" id="0:54">
+            <Text name="StoredSummary" id="0:53">
+                <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="StoredSummary Layout"/>
+                <TextStylePaint fontSize="18" fontAssetId="0:300" name="StoredSummaryStyle" id="0:54">
                     <Fill name="Fill"><SolidColor colorValue="FF1D2B27" name="C"/></Fill>
                 </TextStylePaint>
-                <TextValueRun styleId="0:54" text="0" name="InventoryCountRun">
-                    <DataBindContext sourcePathIds="0:200-0:220" propertyKey="268" converterId="0:304"/>
+                <TextValueRun styleId="0:54" text="Stored: " name="StoredSummaryPrefix"/>
+                <TextValueRun styleId="0:54" text="0" name="StoredSummaryCount">
+                    <DataBindContext sourcePathIds="0:200-0:255" propertyKey="268" converterId="0:301"/>
                 </TextValueRun>
-                <TextValueRun styleId="0:54" text="/12" name="InventoryCountSuffix"/>
+                <TextValueRun styleId="0:54" text=" ($" name="StoredSummaryMid"/>
+                <TextValueRun styleId="0:54" text="0" name="StoredSummaryValue">
+                    <DataBindContext sourcePathIds="0:200-0:238" propertyKey="268" converterId="0:301"/>
+                </TextValueRun>
+                <TextValueRun styleId="0:54" text=")" name="StoredSummarySuffix"/>
             </Text>
-
-            <ArtboardComponentList name="InventoryRows" id="0:52">
-                <DataBindContext sourcePathIds="0:200-0:220" propertyKey="800"/>
-            </ArtboardComponentList>
         </LayoutComponent>
 
         <StateMachine name="Main" id="0:7">
@@ -319,11 +320,6 @@
     <DataConverterToString decimals="0" round="true" name="CurrencyFormat" id="0:301"/>
     <DataConverterRangeMapper minInput="0" maxInput="1" minOutput="1" maxOutput="0.5"
                               clampLower="true" clampUpper="true" name="CooldownDim" id="0:302"/>
-    <DataConverterListToLength name="InventoryLength" id="0:303"/>
-    <DataConverterGroup name="InventoryCountLabel" id="0:304">
-        <DataConverterGroupItem converterId="0:303"/>
-        <DataConverterGroupItem converterId="0:301"/>
-    </DataConverterGroup>
     <ScriptAsset file="main.luau" name="main" id="0:310"/>
     <ScriptAsset file="sell.luau" name="sell" id="0:311"/>
     <ScriptAsset file="upgrade.luau" name="upgrade" id="0:312"/>
@@ -361,7 +357,6 @@
         <ViewModelPropertyNumber name="digSpeedSeconds" id="0:203"/>
         <ViewModelPropertyNumber name="autoSellSeconds" id="0:204"/>
         <ViewModelPropertyNumber name="gameTime" id="0:205"/>
-        <ViewModelPropertyList name="inventory" id="0:220"/>
         <ViewModelPropertyNumber name="itemsPerDigAffordable" id="0:232"/>
         <ViewModelPropertyNumber name="digSpeedAffordable" id="0:233"/>
         <ViewModelPropertyString name="itemsPerDigCostLabel" id="0:235"/>
@@ -375,13 +370,13 @@
         <ViewModelPropertyNumber name="beachBoyOwned" id="0:252"/>
         <ViewModelPropertyNumber name="beachBoyAffordable" id="0:253"/>
         <ViewModelPropertyString name="beachBoyCostLabel" id="0:254"/>
+        <ViewModelPropertyNumber name="storedCount" id="0:255"/>
         <ViewModelInstance exports="true" name="Default" id="0:210">
             <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:201"/>
             <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:202"/>
             <ViewModelInstanceNumber propertyValue="60" viewModelPropertyId="0:203"/>
             <ViewModelInstanceNumber propertyValue="60" viewModelPropertyId="0:204"/>
             <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:205"/>
-            <ViewModelInstanceList viewModelPropertyId="0:220"/>
             <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:232"/>
             <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:233"/>
             <ViewModelInstanceString propertyValue="5" viewModelPropertyId="0:235"/>
@@ -397,6 +392,7 @@
             <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:252"/>
             <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:253"/>
             <ViewModelInstanceString propertyValue="458" viewModelPropertyId="0:254"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:255"/>
         </ViewModelInstance>
     </ViewModel>
 </Rive>

@@ -1,7 +1,15 @@
 --- One shared upgrade-purchase script for all three upgrade panels.
---- Which stat, and by how much, comes from RML via ScriptInput* children,
---- so the same script backs items-per-dig, dig speed and auto-sell timer
---- without three near-identical files.
+--- Which stat, by how much, and at what price comes from RML via
+--- ScriptInput* children, so the same script backs items-per-dig, dig
+--- speed and Elbow Grease without three near-identical files.
+---
+--- Cost follows the standard incremental-game curve, Cost(n) = base *
+--- growth^n where n is how many levels of THIS upgrade have already been
+--- bought - cheap first purchase, exponentially pricier from there. n is
+--- derived from the stat's current value rather than stored separately,
+--- since every upgrade here takes uniform steps from a known start:
+--- n = |current - startValue| / |step|, where startValue is minValue for
+--- an increasing stat (step > 0) or maxValue for a decreasing one.
 
 type UpgradeState = {
 	context: Context?,
@@ -9,13 +17,18 @@ type UpgradeState = {
 	step: Input<number>?,
 	minValue: Input<number>?,
 	maxValue: Input<number>?,
+	baseCost: Input<number>?,
+	growth: Input<number>?,
 }
-
-local COST = 110
 
 local function init(self: UpgradeState, context: Context): boolean
 	self.context = context
 	return true
+end
+
+local function levelsBought(currentValue: number, step: number, minValue: number, maxValue: number): number
+	local startValue = if step > 0 then minValue else maxValue
+	return math.floor(math.abs(currentValue - startValue) / math.abs(step) + 0.5)
 end
 
 local function performAction(self: UpgradeState, listenerContext: ListenerContext)
@@ -28,7 +41,9 @@ local function performAction(self: UpgradeState, listenerContext: ListenerContex
 	local step = self.step
 	local minValue = self.minValue
 	local maxValue = self.maxValue
-	if not context or not statName or not step or not minValue or not maxValue then
+	local baseCost = self.baseCost
+	local growth = self.growth
+	if not context or not statName or not step or not minValue or not maxValue or not baseCost or not growth then
 		return
 	end
 
@@ -43,19 +58,23 @@ local function performAction(self: UpgradeState, listenerContext: ListenerContex
 		return
 	end
 
-	if currency.value < COST then
-		return
-	end
-
 	local lower = math.min(minValue, maxValue)
 	local upper = math.max(minValue, maxValue)
 	local newValue = math.min(upper, math.max(lower, stat.value + step))
 
 	if newValue == stat.value then
+		-- Already at the cap for this stat.
 		return
 	end
 
-	currency.value = currency.value - COST
+	local level = levelsBought(stat.value, step, minValue, maxValue)
+	local cost = math.floor(baseCost * (growth ^ level) + 0.5)
+
+	if currency.value < cost then
+		return
+	end
+
+	currency.value = currency.value - cost
 	stat.value = newValue
 end
 

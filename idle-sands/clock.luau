@@ -32,17 +32,40 @@ local ITEM_POOLS: { [string]: { ItemWeight } } = {
 }
 
 local MAX_INVENTORY = 12
-local UPGRADE_COST = 110
 local PULSE_DURATION = 0.25
 local COLLECT_PULSE_MAGNITUDE = 0.15
 local DIMMED_ALPHA = 0.4
 local POPUP_DURATION = 1.0
 
+-- Upgrade shape: all three take 5 uniform steps from start to cap, so a
+-- shared Cost(n) = base * growth^n curve behaves the same way for each.
+-- These must match the ScriptInput* values on the matching Buy* listener
+-- in scene.rml exactly, or the displayed price will disagree with what
+-- upgrade.luau actually charges.
+local UPGRADE_BASE_COST = 5
+local UPGRADE_GROWTH = 2.8
+
+local ITEMS_PER_DIG_START = 1
+local ITEMS_PER_DIG_STEP = 1
 local ITEMS_PER_DIG_MAX = 6
+
+local DIG_SPEED_START = 60
+local DIG_SPEED_STEP = -11
 local DIG_SPEED_MIN = 5
-local ELBOW_GREASE_MAX = 10
+
+local ELBOW_GREASE_START = 1
+local ELBOW_GREASE_STEP = 1
+local ELBOW_GREASE_MAX = 6
 
 local BEACH_BOY_COST = 458
+
+local function levelsBought(currentValue: number, step: number, startValue: number): number
+	return math.floor(math.abs(currentValue - startValue) / math.abs(step) + 0.5)
+end
+
+local function upgradeCost(level: number): number
+	return math.floor(UPGRADE_BASE_COST * (UPGRADE_GROWTH ^ level) + 0.5)
+end
 
 -- Roaming: each producer drifts toward a random point, then picks a new
 -- one on arrival. Bounds are a conservative box that fits inside the
@@ -202,24 +225,29 @@ local function advance(self: ClockState, seconds: number): boolean
 		end
 	end
 
-	-- Upgrade panels: affordable/maxed state
+	-- Upgrade panels: affordable/maxed state, each priced on its own
+	-- Cost(n) = base * growth^n curve rather than one shared flat price
 	local currency = economy:getNumber('currency')
-	local canAfford = currency ~= nil and currency.value >= UPGRADE_COST
+	local currencyValue = if currency then currency.value else 0
 
 	local itemsPerDigAffordable = economy:getNumber('itemsPerDigAffordable')
 	local itemsPerDigCostLabel = economy:getString('itemsPerDigCostLabel')
 	if itemsPerDigProp and itemsPerDigAffordable and itemsPerDigCostLabel then
 		local maxed = itemsPerDigProp.value >= ITEMS_PER_DIG_MAX
-		itemsPerDigAffordable.value = (canAfford and not maxed) and 1 or DIMMED_ALPHA
-		itemsPerDigCostLabel.value = maxed and 'MAX' or tostring(UPGRADE_COST)
+		local level = levelsBought(itemsPerDigProp.value, ITEMS_PER_DIG_STEP, ITEMS_PER_DIG_START)
+		local cost = upgradeCost(level)
+		itemsPerDigAffordable.value = (currencyValue >= cost and not maxed) and 1 or DIMMED_ALPHA
+		itemsPerDigCostLabel.value = maxed and 'MAX' or tostring(cost)
 	end
 
 	local digSpeedAffordable = economy:getNumber('digSpeedAffordable')
 	local digSpeedCostLabel = economy:getString('digSpeedCostLabel')
 	if digSpeed and digSpeedAffordable and digSpeedCostLabel then
 		local maxed = digSpeed.value <= DIG_SPEED_MIN
-		digSpeedAffordable.value = (canAfford and not maxed) and 1 or DIMMED_ALPHA
-		digSpeedCostLabel.value = maxed and 'MAX' or tostring(UPGRADE_COST)
+		local level = levelsBought(digSpeed.value, DIG_SPEED_STEP, DIG_SPEED_START)
+		local cost = upgradeCost(level)
+		digSpeedAffordable.value = (currencyValue >= cost and not maxed) and 1 or DIMMED_ALPHA
+		digSpeedCostLabel.value = maxed and 'MAX' or tostring(cost)
 	end
 
 	local elbowGreasePercent = economy:getNumber('elbowGreasePercent')
@@ -227,8 +255,10 @@ local function advance(self: ClockState, seconds: number): boolean
 	local elbowGreaseCostLabel = economy:getString('elbowGreaseCostLabel')
 	if elbowGreasePercent and elbowGreaseAffordable and elbowGreaseCostLabel then
 		local maxed = elbowGreasePercent.value >= ELBOW_GREASE_MAX
-		elbowGreaseAffordable.value = (canAfford and not maxed) and 1 or DIMMED_ALPHA
-		elbowGreaseCostLabel.value = maxed and 'MAX' or tostring(UPGRADE_COST)
+		local level = levelsBought(elbowGreasePercent.value, ELBOW_GREASE_STEP, ELBOW_GREASE_START)
+		local cost = upgradeCost(level)
+		elbowGreaseAffordable.value = (currencyValue >= cost and not maxed) and 1 or DIMMED_ALPHA
+		elbowGreaseCostLabel.value = maxed and 'MAX' or tostring(cost)
 	end
 
 	-- Beach Boy purchase panel: affordable/owned state
@@ -237,7 +267,7 @@ local function advance(self: ClockState, seconds: number): boolean
 	local beachBoyCostLabel = economy:getString('beachBoyCostLabel')
 	if beachBoyOwned and beachBoyAffordable and beachBoyCostLabel then
 		local owned = beachBoyOwned.value >= 1
-		local afford = currency ~= nil and currency.value >= BEACH_BOY_COST
+		local afford = currencyValue >= BEACH_BOY_COST
 		beachBoyAffordable.value = (afford and not owned) and 1 or DIMMED_ALPHA
 		beachBoyCostLabel.value = owned and 'Owned' or tostring(BEACH_BOY_COST)
 	end

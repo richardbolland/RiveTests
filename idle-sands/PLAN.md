@@ -285,6 +285,48 @@ tracks the live rendered position, not an authored one. Confirmed two
 owned producers roam independently without converging or overlapping
 persistently.
 
+**Balancing pass** (still before milestone 5): replaced the flat $110-per-
+level upgrade cost with the standard incremental-game curve,
+`Cost(n) = base × growth^n` (Cookie Clicker uses growth≈1.15 for frequent
+small purchases; ours needed to be much steeper since each upgrade only
+has 5 levels total, not dozens). Also re-leveled all three upgrades to
+the same 5 uniform steps each, since they'd drifted wildly uneven
+(Items/Dig 5 levels, Elbow Grease 9, Dig Speed **28** — which would have
+made "all three maxed" an incoherent target):
+- Items/Dig: 1→2→3→4→5→6 (unchanged shape)
+- Dig Speed: 60→49→38→27→16→5 (step widened from −2 to −11)
+- Elbow Grease: 1→2→3→4→5→6% (cap lowered from 10 to 6)
+
+`upgrade.luau` derives which level you're buying from the stat's current
+value rather than storing it separately (`n = |current − start| / |step|`,
+where `start` is `minValue` for an increasing stat or `maxValue` for a
+decreasing one) — one fewer piece of state to keep in sync.
+`clock.luau`'s cost-label/affordability logic mirrors the identical
+formula for display, reading the same constants.
+
+Landed on **base $5, growth 2.8** after empirically simulating real
+play rather than solving for it on paper — the compounding feedback
+loop (buying an upgrade increases income, which changes how fast you
+afford the *next* one) makes closed-form timing genuinely hard to get
+right by hand. Simulated via the same `--advance`/`--pointer`/
+`--data-dump-every` harness used throughout this build: a script
+auto-clicks Sell All and all four purchase buttons every 10 simulated
+seconds (a "light passive" playstyle, deliberately not chasing the
+roaming item, since that's the harder-to-automate and less essential
+income source) and samples the full state every 2s. Iterated growth
+from 1.8 up through 3.5 before landing on 2.8, which across three
+independent trials gave: first upgrade purchase at 12s (when the first
+item rolled is worth ≥$5, roughly 70% of outcomes) or 64s (on the 30%
+chance the first roll is a $1 Bottle Cap, which needs a second
+collection cycle to clear even a $5 cost — a hard floor from the item
+value distribution itself, not something cost-tuning alone can fix) —
+both a reasonable reading of "starts out quick." All three upgrades
+maxed at 660–732s (11–12.2 min) across the three trials, comfortably
+inside the 10–15 minute target, with Beach Boy's unrelated flat $458
+cost landing at a coherent ~12.5 min in the same trajectory.
+
+Verified clean, inspected with zero wiring problems.
+
 5. **Second bot (Steel Seeker)** — same pattern, different item pool; verify
    bots never cross-collect each other's items.
 6. **Auto-sell** — driver script sells inventory automatically on the

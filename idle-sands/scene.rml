@@ -94,7 +94,7 @@
                         <TextStylePaint fontSize="14" fontAssetId="0:300" name="ItemsPerDigCostStyle" id="0:75">
                             <Fill name="Fill"><SolidColor colorValue="FFE8C27A" name="C"/></Fill>
                         </TextStylePaint>
-                        <TextValueRun styleId="0:75" text="110" name="ItemsPerDigCostRun">
+                        <TextValueRun styleId="0:75" text="5" name="ItemsPerDigCostRun">
                             <DataBindContext sourcePathIds="0:200-0:235" propertyKey="268"/>
                         </TextValueRun>
                     </Text>
@@ -131,7 +131,7 @@
                         <TextStylePaint fontSize="14" fontAssetId="0:300" name="DigSpeedCostStyle" id="0:85">
                             <Fill name="Fill"><SolidColor colorValue="FFE8C27A" name="C"/></Fill>
                         </TextStylePaint>
-                        <TextValueRun styleId="0:85" text="110" name="DigSpeedCostRun">
+                        <TextValueRun styleId="0:85" text="5" name="DigSpeedCostRun">
                             <DataBindContext sourcePathIds="0:200-0:236" propertyKey="268"/>
                         </TextValueRun>
                     </Text>
@@ -168,7 +168,7 @@
                         <TextStylePaint fontSize="14" fontAssetId="0:300" name="ElbowGreaseCostStyle" id="0:155">
                             <Fill name="Fill"><SolidColor colorValue="FFE8C27A" name="C"/></Fill>
                         </TextStylePaint>
-                        <TextValueRun styleId="0:155" text="110" name="ElbowGreaseCostRun">
+                        <TextValueRun styleId="0:155" text="5" name="ElbowGreaseCostRun">
                             <DataBindContext sourcePathIds="0:200-0:246" propertyKey="268"/>
                         </TextValueRun>
                     </Text>
@@ -278,15 +278,19 @@
                     <ScriptInputNumber propertyValue="1" name="step"/>
                     <ScriptInputNumber propertyValue="1" name="minValue"/>
                     <ScriptInputNumber propertyValue="6" name="maxValue"/>
+                    <ScriptInputNumber propertyValue="5" name="baseCost"/>
+                    <ScriptInputNumber propertyValue="2.8" name="growth"/>
                 </ScriptedListenerAction>
             </StateMachineListenerSingle>
 
             <StateMachineListenerSingle targetId="0:80" listenerTypeValue="click" name="BuyDigSpeed" id="0:86">
                 <ScriptedListenerAction scriptAssetId="0:312" id="0:87">
                     <ScriptInputString propertyValue="digSpeedSeconds" name="statName"/>
-                    <ScriptInputNumber propertyValue="-2" name="step"/>
+                    <ScriptInputNumber propertyValue="-11" name="step"/>
                     <ScriptInputNumber propertyValue="5" name="minValue"/>
                     <ScriptInputNumber propertyValue="60" name="maxValue"/>
+                    <ScriptInputNumber propertyValue="5" name="baseCost"/>
+                    <ScriptInputNumber propertyValue="2.8" name="growth"/>
                 </ScriptedListenerAction>
             </StateMachineListenerSingle>
 
@@ -295,7 +299,9 @@
                     <ScriptInputString propertyValue="elbowGreasePercent" name="statName"/>
                     <ScriptInputNumber propertyValue="1" name="step"/>
                     <ScriptInputNumber propertyValue="1" name="minValue"/>
-                    <ScriptInputNumber propertyValue="10" name="maxValue"/>
+                    <ScriptInputNumber propertyValue="6" name="maxValue"/>
+                    <ScriptInputNumber propertyValue="5" name="baseCost"/>
+                    <ScriptInputNumber propertyValue="2.8" name="growth"/>
                 </ScriptedListenerAction>
             </StateMachineListenerSingle>
 
@@ -378,13 +384,13 @@
             <ViewModelInstanceList viewModelPropertyId="0:220"/>
             <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:232"/>
             <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:233"/>
-            <ViewModelInstanceString propertyValue="110" viewModelPropertyId="0:235"/>
-            <ViewModelInstanceString propertyValue="110" viewModelPropertyId="0:236"/>
+            <ViewModelInstanceString propertyValue="5" viewModelPropertyId="0:235"/>
+            <ViewModelInstanceString propertyValue="5" viewModelPropertyId="0:236"/>
             <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:238"/>
             <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:239"/>
             <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:244"/>
             <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:245"/>
-            <ViewModelInstanceString propertyValue="110" viewModelPropertyId="0:246"/>
+            <ViewModelInstanceString propertyValue="5" viewModelPropertyId="0:246"/>
             <ViewModelInstanceList viewModelPropertyId="0:250">
                 <ViewModelInstanceListItem viewModelId="0:500" viewModelInstanceId="0:531"/>
             </ViewModelInstanceList>

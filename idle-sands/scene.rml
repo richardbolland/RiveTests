@@ -3,24 +3,53 @@
         <LayoutComponentStyle flexDirectionValue="column" name="Artboard Style" id="0:5"/>
 
         <LayoutComponent width="1280" height="64" styleId="0:11" name="TopBar" id="0:10">
-            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fixed" name="TopBar Style" id="0:11"/>
+            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fixed"
+                                  flexDirectionValue="row" layoutAlignmentType="centerLeft"
+                                  paddingLeft="24" paddingLeftUnitsValue="points"
+                                  paddingRight="24" paddingRightUnitsValue="points"
+                                  name="TopBar Style" id="0:11"/>
             <Fill name="Fill">
                 <SolidColor colorValue="FF2E7D8C" name="C">
                     <DataBindContext sourcePathIds="0:100-0:102" propertyKey="37"/>
                 </SolidColor>
             </Fill>
+
+            <Text name="CurrencyLabel" id="0:15">
+                <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="CurrencyLabel Layout"/>
+                <TextStylePaint fontSize="28" fontAssetId="0:300" name="CurrencyStyle" id="0:16">
+                    <Fill name="Fill">
+                        <SolidColor colorValue="FFFFFFFF" name="C"/>
+                    </Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="0:16" text="$" name="CurrencyPrefix"/>
+                <TextValueRun styleId="0:16" text="0" name="CurrencyValue">
+                    <DataBindContext sourcePathIds="0:200-0:201" propertyKey="268" converterId="0:301"/>
+                </TextValueRun>
+            </Text>
         </LayoutComponent>
 
         <LayoutComponent width="1280" height="556" styleId="0:21" name="MiddleRow" id="0:20">
             <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" flexDirectionValue="row" name="MiddleRow Style" id="0:21"/>
 
             <LayoutComponent width="1000" height="556" styleId="0:31" name="BeachArea" id="0:30">
-                <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="BeachArea Style" id="0:31"/>
+                <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill"
+                                      layoutAlignmentType="center" name="BeachArea Style" id="0:31"/>
                 <Fill name="Fill">
                     <SolidColor colorValue="FFE8C27A" name="C">
                         <DataBindContext sourcePathIds="0:100-0:103" propertyKey="37"/>
                     </SolidColor>
                 </Fill>
+
+                <Shape name="Item" id="0:32">
+                    <LayoutParticipant layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                       width="80" height="80" name="Item Layout"/>
+                    <Ellipse width="80" height="80" originX="0.5" originY="0.5" name="Path"/>
+                    <Fill name="Fill">
+                        <SolidColor colorValue="FFE8785A" name="C">
+                            <DataBindContext sourcePathIds="0:100-0:106" propertyKey="37"/>
+                        </SolidColor>
+                    </Fill>
+                </Shape>
             </LayoutComponent>
 
             <LayoutComponent width="280" height="556" styleId="0:41" name="SidePanel" id="0:40">
@@ -48,8 +77,16 @@
                 <ExitState x="200" y="-120"/>
                 <EntryState x="-200" y="-120"/>
             </StateMachineLayer>
+
+            <StateMachineListenerSingle targetId="0:32" listenerTypeValue="click" name="CollectItem" id="0:9">
+                <ScriptedListenerAction scriptAssetId="0:310" id="0:333"/>
+            </StateMachineListenerSingle>
         </StateMachine>
     </Artboard>
+
+    <FontAsset file="Outfit-Bold.ttf" name="Outfit Bold" id="0:300"/>
+    <DataConverterToString decimals="0" round="true" name="CurrencyFormat" id="0:301"/>
+    <ScriptAsset file="main.luau" name="main" id="0:310"/>
 
     <!-- Design tokens: one global palette, swap these to re-theme the whole game -->
     <ViewModel viewModelType="global" defaultInstanceId="0:110" name="Theme" id="0:100">

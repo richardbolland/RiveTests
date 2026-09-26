@@ -429,6 +429,44 @@ position jittered off the template's fixed spawn point, and screenshot
 -confirmed two producers on stage with the panel reading "Beach Boy
 ×1" at the new $240 price.
 
+**Wheel tracks** — a small fading mark now drops behind every roaming
+producer, the "nice to have" from the vision-alignment pass ("some
+robot wheel tracks so we can see where the robot has driven"). New
+file `trails.rml` holds a `TrackPoint` view model (`x`, `y`, `alpha`,
+`spawnTime`) and a `TrackDot` component artboard (a small flattened
+oval, absolute-positioned by `x`/`y` the same way `ProducerWidget`
+positions itself by `roamX`/`roamY`, opacity bound to `alpha`) - one
+shared `Economy.trail` list rather than a list-per-producer, since a
+dropped mark doesn't need to remember which robot left it, just where
+it is; a second `ArtboardComponentList` ("TrailDots") renders it,
+declared *after* `ProducerRows` in `scene.rml` so tracks draw behind
+the robots (draw order is front-to-back by declaration - the first
+sibling is on top - the reverse of HTML/SVG, per `rive docs
+transforms`, and already a gotcha once this build over the storage
+badge).
+
+Each `Producer` gained `lastTrailX`/`lastTrailY`, the position its
+last mark was dropped at; `clock.luau` compares that to the producer's
+current `roamX`/`roamY` every frame and, once the distance clears
+`TRAIL_DROP_DISTANCE` (18pt), pushes a new `TrackPoint` and moves
+`lastTrailX`/`Y` up to the current position - distance-based rather
+than time-based, so marks space out evenly along the path regardless
+of how fast the producer happens to be moving. A separate pass fades
+every point in the shared list linearly over `TRAIL_FADE_DURATION` (3s)
+from its own `spawnTime`, and the list is capped at `TRAIL_MAX_COUNT`
+(40, shared across every producer) by dropping the oldest
+(`:shift()`) whenever a push goes over - the cap, not the fade, is
+what actually bounds memory over a long idle session, since a
+fully-faded mark is invisible but still sitting in the list until
+something newer pushes it out.
+
+Verified headlessly: screenshotted a producer mid-roam at both 20s and
+60s of simulated time and saw a short trail of shrinking-opacity dots
+following it in both; `--data-dump` on the `trail` list after 60s
+confirmed it holds exactly 40 items, proving the cap engages rather
+than growing unbounded. Verified clean, inspected with zero wiring
+problems.
+
 5. **Second bot (Steel Seeker)** — same pattern, different item pool; verify
    bots never cross-collect each other's items.
 6. **Auto-sell** — driver script sells inventory automatically on the

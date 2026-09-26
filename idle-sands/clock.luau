@@ -95,6 +95,18 @@ local ROAM_MIN_Y = 20
 local ROAM_MAX_Y = 320
 local ROAM_ARRIVE_THRESHOLD = 4
 
+-- Wheel tracks: a mark drops every TRAIL_DROP_DISTANCE points a producer
+-- travels, fades out linearly over TRAIL_FADE_DURATION seconds, and the
+-- shared list is capped at TRAIL_MAX_COUNT (oldest dropped first) so it
+-- can't grow without bound over a long idle session. Offsets convert a
+-- producer's own roamX/roamY (its widget's top-left) into a mark centred
+-- under the widget's middle, where the digging circle actually sits.
+local TRAIL_DROP_DISTANCE = 18
+local TRAIL_FADE_DURATION = 3
+local TRAIL_MAX_COUNT = 40
+local PRODUCER_WIDGET_CENTER = 55 -- half of ProducerWidget's 110x110
+local TRACK_DOT_HALF = 7 -- half of TrackDot's 14x14
+
 local function init(self: ClockState, context: Context): boolean
 	self.context = context
 	return true
@@ -262,6 +274,53 @@ local function advance(self: ClockState, seconds: number): boolean
 					local step = math.min(ROAM_SPEED * seconds, dist)
 					roamX.value += (dx / dist) * step
 					roamY.value += (dy / dist) * step
+				end
+
+				-- Wheel tracks: drop a mark once this producer has moved
+				-- far enough since its last one.
+				local lastTrailX = producer:getNumber('lastTrailX')
+				local lastTrailY = producer:getNumber('lastTrailY')
+				if lastTrailX and lastTrailY then
+					local tdx = roamX.value - lastTrailX.value
+					local tdy = roamY.value - lastTrailY.value
+					local traveled = math.sqrt(tdx * tdx + tdy * tdy)
+					if traveled >= TRAIL_DROP_DISTANCE then
+						local trail = economy:getList('trail')
+						if trail then
+							local point = Data.TrackPoint.new('Default')
+							local px = point:getNumber('x')
+							local py = point:getNumber('y')
+							local spawnTime = point:getNumber('spawnTime')
+							if px and py and spawnTime then
+								px.value = roamX.value + PRODUCER_WIDGET_CENTER - TRACK_DOT_HALF
+								py.value = roamY.value + PRODUCER_WIDGET_CENTER - TRACK_DOT_HALF
+								spawnTime.value = gameTime
+							end
+							trail:push(point)
+							if trail.length > TRAIL_MAX_COUNT then
+								trail:shift()
+							end
+						end
+						lastTrailX.value = roamX.value
+						lastTrailY.value = roamY.value
+					end
+				end
+			end
+		end
+
+		-- Fade every dropped wheel track linearly over TRAIL_FADE_DURATION
+		-- seconds; the cap above (not this) is what keeps the list from
+		-- growing forever, so a fully-faded mark just sits invisible until
+		-- newer ones eventually shift it out.
+		local trail = economy:getList('trail')
+		if trail then
+			for i = 1, trail.length do
+				local point = trail[i]
+				local spawnTime = point:getNumber('spawnTime')
+				local alpha = point:getNumber('alpha')
+				if spawnTime and alpha then
+					local age = gameTime - spawnTime.value
+					alpha.value = clamp01(1 - (age / TRAIL_FADE_DURATION))
 				end
 			end
 		end

@@ -122,6 +122,8 @@
         <ViewModelPropertyNumber name="storageCapacity" id="0:524"/>
         <ViewModelPropertyList name="storage" id="0:525"/>
         <ViewModelPropertyString name="storageLabel" id="0:526"/>
+        <ViewModelPropertyNumber name="lastTrailX" id="0:527"/>
+        <ViewModelPropertyNumber name="lastTrailY" id="0:528"/>
 
         <ViewModelInstance exports="true" name="Default" id="0:530">
             <ViewModelInstanceColor propertyValue="FFE8785A" viewModelPropertyId="0:510"/>
@@ -141,6 +143,8 @@
             <ViewModelInstanceNumber propertyValue="3" viewModelPropertyId="0:524"/>
             <ViewModelInstanceList viewModelPropertyId="0:525"/>
             <ViewModelInstanceString propertyValue="0/3" viewModelPropertyId="0:526"/>
+            <ViewModelInstanceNumber propertyValue="100" viewModelPropertyId="0:527"/>
+            <ViewModelInstanceNumber propertyValue="100" viewModelPropertyId="0:528"/>
         </ViewModelInstance>
 
         <ViewModelInstance exports="true" name="Starter" id="0:531">
@@ -161,6 +165,8 @@
             <ViewModelInstanceNumber propertyValue="3" viewModelPropertyId="0:524"/>
             <ViewModelInstanceList viewModelPropertyId="0:525"/>
             <ViewModelInstanceString propertyValue="0/3" viewModelPropertyId="0:526"/>
+            <ViewModelInstanceNumber propertyValue="120" viewModelPropertyId="0:527"/>
+            <ViewModelInstanceNumber propertyValue="150" viewModelPropertyId="0:528"/>
         </ViewModelInstance>
 
         <ViewModelInstance exports="true" name="BeachBoy" id="0:532">
@@ -181,6 +187,8 @@
             <ViewModelInstanceNumber propertyValue="3" viewModelPropertyId="0:524"/>
             <ViewModelInstanceList viewModelPropertyId="0:525"/>
             <ViewModelInstanceString propertyValue="0/3" viewModelPropertyId="0:526"/>
+            <ViewModelInstanceNumber propertyValue="400" viewModelPropertyId="0:527"/>
+            <ViewModelInstanceNumber propertyValue="150" viewModelPropertyId="0:528"/>
         </ViewModelInstance>
     </ViewModel>
 </Rive>

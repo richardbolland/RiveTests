@@ -50,6 +50,13 @@
                 <ArtboardComponentList name="ProducerRows" id="0:33">
                     <DataBindContext sourcePathIds="0:200-0:250" propertyKey="800"/>
                 </ArtboardComponentList>
+
+                <!-- Declared after ProducerRows so tracks draw behind the
+                     robots (first sibling draws on top - rive docs
+                     transforms). -->
+                <ArtboardComponentList name="TrailDots" id="0:34">
+                    <DataBindContext sourcePathIds="0:200-0:259" propertyKey="800"/>
+                </ArtboardComponentList>
             </LayoutComponent>
 
             <LayoutComponent width="280" height="556" styleId="0:41" name="SidePanel" id="0:40">
@@ -425,6 +432,7 @@
         <ViewModelPropertyNumber name="storageCapacity" id="0:256"/>
         <ViewModelPropertyNumber name="storageCapacityAffordable" id="0:257"/>
         <ViewModelPropertyString name="storageCapacityCostLabel" id="0:258"/>
+        <ViewModelPropertyList name="trail" id="0:259"/>
         <ViewModelInstance exports="true" name="Default" id="0:210">
             <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:201"/>
             <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:202"/>
@@ -450,6 +458,7 @@
             <ViewModelInstanceNumber propertyValue="3" viewModelPropertyId="0:256"/>
             <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:257"/>
             <ViewModelInstanceString propertyValue="5" viewModelPropertyId="0:258"/>
+            <ViewModelInstanceList viewModelPropertyId="0:259"/>
         </ViewModelInstance>
     </ViewModel>
 </Rive>

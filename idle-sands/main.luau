@@ -1,11 +1,9 @@
---- Milestone 3: digging now respects the itemsPerDig and digSpeedSeconds
---- upgrades. itemsPerDig items are added per successful dig (capped by the
---- 12-slot inventory); a dig within digSpeedSeconds of the last one is
---- ignored, reading Economy.gameTime (ticked by clock.luau) as the clock.
+--- Milestone 3 (+cooldown visual): digging respects itemsPerDig and
+--- digSpeedSeconds. lastDigTime now lives on Economy (not local script
+--- state) so clock.luau can read it too, to drive the cooldown ring.
 
 type CollectState = {
 	context: Context?,
-	lastDigTime: number?,
 }
 
 local ITEM_NAMES = { 'BottleCap', 'Nail', 'TinCan', 'Screw', 'Key', 'Coin' }
@@ -32,12 +30,13 @@ local function performAction(self: CollectState, listenerContext: ListenerContex
 	end
 
 	local digSpeed = economy:getNumber('digSpeedSeconds')
-	local cooldown = if digSpeed then digSpeed.value else 0
-
 	local gameTime = economy:getNumber('gameTime')
-	local now = if gameTime then gameTime.value else 0
-	local lastDigTime = self.lastDigTime
-	if lastDigTime and (now - lastDigTime) < cooldown then
+	local lastDigTime = economy:getNumber('lastDigTime')
+	if not digSpeed or not gameTime or not lastDigTime then
+		return
+	end
+
+	if (gameTime.value - lastDigTime.value) < digSpeed.value then
 		return
 	end
 
@@ -60,7 +59,7 @@ local function performAction(self: CollectState, listenerContext: ListenerContex
 	end
 
 	if added > 0 then
-		self.lastDigTime = now
+		lastDigTime.value = gameTime.value
 	end
 end
 

@@ -45,16 +45,36 @@
                     </SolidColor>
                 </Fill>
 
-                <Shape name="Item" id="0:32">
-                    <LayoutParticipant layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
-                                       width="80" height="80" name="Item Layout"/>
-                    <Ellipse width="80" height="80" originX="0.5" originY="0.5" name="Path"/>
-                    <Fill name="Fill">
-                        <SolidColor colorValue="FFE8785A" name="C">
-                            <DataBindContext sourcePathIds="0:100-0:106" propertyKey="37"/>
-                        </SolidColor>
-                    </Fill>
-                </Shape>
+                <LayoutComponent width="110" height="110" styleId="0:35" name="ItemStack" id="0:34">
+                    <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                          layoutTypeValue="stack" layoutAlignmentType="center"
+                                          name="ItemStack Style" id="0:35"/>
+
+                    <Shape name="Item" id="0:32">
+                        <LayoutParticipant layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                           width="80" height="80" name="Item Layout"/>
+                        <Ellipse width="80" height="80" originX="0.5" originY="0.5" name="Path"/>
+                        <Fill name="Fill">
+                            <SolidColor colorValue="FFE8785A" name="C">
+                                <DataBindContext sourcePathIds="0:100-0:106" propertyKey="37"/>
+                            </SolidColor>
+                        </Fill>
+                    </Shape>
+
+                    <Shape name="CooldownRing" id="0:36">
+                        <LayoutParticipant layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                           width="110" height="110" name="CooldownRing Layout"/>
+                        <Ellipse width="100" height="100" originX="0.5" originY="0.5" name="Path"/>
+                        <Stroke thickness="6" name="Stroke">
+                            <SolidColor colorValue="FF1D2B27" name="Color">
+                                <DataBindContext sourcePathIds="0:100-0:107" propertyKey="37"/>
+                            </SolidColor>
+                            <TrimPath start="0" end="0" name="Trim" id="0:37">
+                                <DataBindContext sourcePathIds="0:200-0:207" propertyKey="115"/>
+                            </TrimPath>
+                        </Stroke>
+                    </Shape>
+                </LayoutComponent>
             </LayoutComponent>
 
             <LayoutComponent width="280" height="556" styleId="0:41" name="SidePanel" id="0:40">
@@ -290,6 +310,8 @@
         <ViewModelPropertyNumber name="digSpeedSeconds" id="0:203"/>
         <ViewModelPropertyNumber name="autoSellSeconds" id="0:204"/>
         <ViewModelPropertyNumber name="gameTime" id="0:205"/>
+        <ViewModelPropertyNumber name="lastDigTime" id="0:206"/>
+        <ViewModelPropertyNumber name="digCooldownFraction" id="0:207"/>
         <ViewModelPropertyList name="inventory" id="0:220"/>
         <ViewModelInstance exports="true" name="Default" id="0:210">
             <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:201"/>
@@ -297,6 +319,8 @@
             <ViewModelInstanceNumber propertyValue="15" viewModelPropertyId="0:203"/>
             <ViewModelInstanceNumber propertyValue="60" viewModelPropertyId="0:204"/>
             <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:205"/>
+            <ViewModelInstanceNumber propertyValue="-100000" viewModelPropertyId="0:206"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:207"/>
             <ViewModelInstanceList viewModelPropertyId="0:220"/>
         </ViewModelInstance>
     </ViewModel>

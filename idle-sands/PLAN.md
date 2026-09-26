@@ -99,6 +99,15 @@ the next. Commit after each.
    architecture section below, arriving a few milestones earlier than
    planned because the dig cooldown needed a reliable clock to be
    headlessly testable at all.
+   **Follow-up:** the cooldown had no visible feedback, so an on-cooldown
+   click looked identical to a broken button. Added a cooldown ring: the
+   item now sits in a `layoutTypeValue="stack"` box with a `CooldownRing`
+   sibling whose stroke `TrimPath.end` binds to a new
+   `Economy.digCooldownFraction` (computed each frame in `clock.luau` from
+   `gameTime`/`lastDigTime`/`digSpeedSeconds`, which also moved from
+   main.luau's local state onto `Economy` so the clock script could read
+   it). Full dark ring right after a dig, unwinding to nothing as it
+   becomes clickable again.
 4. **First bot (Beach Boy)** — purchasable, driver script auto-collects
    Beach Boy's 3 item types into inventory on its own timer, independent of
    clicking.

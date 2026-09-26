@@ -176,6 +176,43 @@
                     </Text>
                 </LayoutComponent>
 
+                <LayoutComponent width="240" height="64" styleId="0:151" name="PepTalkPanel" id="0:150">
+                    <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                          flexDirectionValue="row" layoutAlignmentType="spaceBetweenCenter"
+                                          paddingLeft="16" paddingLeftUnitsValue="points"
+                                          paddingRight="16" paddingRightUnitsValue="points"
+                                          cornerRadiusTL="10" cornerRadiusTR="10" cornerRadiusBL="10" cornerRadiusBR="10"
+                                          name="PepTalkPanel Style" id="0:151"/>
+                    <DataBindContext sourcePathIds="0:200-0:245" propertyKey="18"/>
+                    <Fill name="Fill">
+                        <SolidColor colorValue="FF4F7062" name="C">
+                            <DataBindContext sourcePathIds="0:100-0:108" propertyKey="37"/>
+                        </SolidColor>
+                    </Fill>
+
+                    <Text name="PepTalkLabel" id="0:152">
+                        <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="PepTalkLabel Layout"/>
+                        <TextStylePaint fontSize="16" fontAssetId="0:300" name="PepTalkStyle" id="0:153">
+                            <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextValueRun styleId="0:153" text="Pep Talk " name="PepTalkPrefix"/>
+                        <TextValueRun styleId="0:153" text="1" name="PepTalkValue">
+                            <DataBindContext sourcePathIds="0:200-0:244" propertyKey="268" converterId="0:301"/>
+                        </TextValueRun>
+                        <TextValueRun styleId="0:153" text="%" name="PepTalkSuffix"/>
+                    </Text>
+
+                    <Text name="PepTalkCost" id="0:154">
+                        <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="PepTalkCost Layout"/>
+                        <TextStylePaint fontSize="14" fontAssetId="0:300" name="PepTalkCostStyle" id="0:155">
+                            <Fill name="Fill"><SolidColor colorValue="FFE8C27A" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextValueRun styleId="0:155" text="110" name="PepTalkCostRun">
+                            <DataBindContext sourcePathIds="0:200-0:246" propertyKey="268"/>
+                        </TextValueRun>
+                    </Text>
+                </LayoutComponent>
+
                 <LayoutComponent width="200" height="56" styleId="0:61" name="SellButton" id="0:60">
                     <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
                                           layoutAlignmentType="center"
@@ -264,6 +301,15 @@
                     <ScriptInputNumber propertyValue="60" name="maxValue"/>
                 </ScriptedListenerAction>
             </StateMachineListenerSingle>
+
+            <StateMachineListenerSingle targetId="0:150" listenerTypeValue="click" name="BuyPepTalk" id="0:156">
+                <ScriptedListenerAction scriptAssetId="0:312" id="0:157">
+                    <ScriptInputString propertyValue="pepTalkPercent" name="statName"/>
+                    <ScriptInputNumber propertyValue="1" name="step"/>
+                    <ScriptInputNumber propertyValue="1" name="minValue"/>
+                    <ScriptInputNumber propertyValue="10" name="maxValue"/>
+                </ScriptedListenerAction>
+            </StateMachineListenerSingle>
         </StateMachine>
     </Artboard>
 
@@ -325,6 +371,9 @@
         <ViewModelPropertyString name="digPopupText" id="0:240"/>
         <ViewModelPropertyNumber name="digPopupAlpha" id="0:241"/>
         <ViewModelPropertyNumber name="lastDigPopupTime" id="0:242"/>
+        <ViewModelPropertyNumber name="pepTalkPercent" id="0:244"/>
+        <ViewModelPropertyNumber name="pepTalkAffordable" id="0:245"/>
+        <ViewModelPropertyString name="pepTalkCostLabel" id="0:246"/>
         <ViewModelInstance exports="true" name="Default" id="0:210">
             <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:201"/>
             <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:202"/>
@@ -346,6 +395,9 @@
             <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:241"/>
             <ViewModelInstanceNumber propertyValue="-100000" viewModelPropertyId="0:242"/>
             <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:243"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:244"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:245"/>
+            <ViewModelInstanceString propertyValue="110" viewModelPropertyId="0:246"/>
         </ViewModelInstance>
     </ViewModel>
 </Rive>

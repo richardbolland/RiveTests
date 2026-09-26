@@ -1,17 +1,17 @@
 --- The item is always auto-collecting on its own (clock.luau owns that).
---- Clicking it never collects directly - it cuts a fixed percentage of the
---- FULL cycle length off whatever time is left, so every click is worth
---- the same amount regardless of when in the cycle it lands (a percentage
---- of what's *remaining* would front-load all the value into the first
---- click or two and make late-cycle clicks feel like nothing). It also
---- means the boost automatically scales down if digSpeedSeconds is
---- upgraded to a shorter cycle, with no rebalancing needed.
+--- Clicking it never collects directly - it's a "Pep Talk": cheering the
+--- digger on cuts Economy.pepTalkPercent (an upgradeable stat, stored as
+--- whole percentage points) off the FULL cycle length, so every click is
+--- worth the same amount regardless of when in the cycle it lands (a
+--- percentage of what's *remaining* would front-load all the value into
+--- the first click or two and make late-cycle clicks feel like nothing).
+--- It also means the boost automatically scales down if digSpeedSeconds
+--- is upgraded to a shorter cycle, with no rebalancing needed.
 
 type BoostState = {
 	context: Context?,
 }
 
-local CLICK_CUT_FRACTION = 0.2
 local CLICK_PULSE_MAGNITUDE = 0.06
 
 local function init(self: BoostState, context: Context): boolean
@@ -37,7 +37,8 @@ local function performAction(self: BoostState, listenerContext: ListenerContext)
 	local digSpeed = economy:getNumber('digSpeedSeconds')
 	local gameTime = economy:getNumber('gameTime')
 	local lastDigTime = economy:getNumber('lastDigTime')
-	if not digSpeed or not gameTime or not lastDigTime then
+	local pepTalkPercent = economy:getNumber('pepTalkPercent')
+	if not digSpeed or not gameTime or not lastDigTime or not pepTalkPercent then
 		return
 	end
 
@@ -52,7 +53,7 @@ local function performAction(self: BoostState, listenerContext: ListenerContext)
 	-- last collect) by that same amount, since
 	-- remaining = digSpeed - (gameTime - lastDigTime). Clamp so a click
 	-- near the very end of a cycle can't push remaining negative.
-	local cut = math.min(remaining, digSpeed.value * CLICK_CUT_FRACTION)
+	local cut = math.min(remaining, digSpeed.value * (pepTalkPercent.value / 100))
 	lastDigTime.value -= cut
 
 	local lastPulseTime = economy:getNumber('lastPulseTime')

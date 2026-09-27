@@ -78,17 +78,15 @@
                     </SolidColor>
                 </Fill>
 
-                <!-- Declared before ProducerRows so tracks draw behind the
-                     robots. NOTE: for ArtboardComponentList-generated rows,
-                     draw order came out the OPPOSITE of the usual "first
-                     sibling draws on top" rule for plain shapes - verified
-                     empirically by screenshot, not assumed from the docs. -->
-                <ArtboardComponentList name="TrailDots" id="0:34">
-                    <DataBindContext sourcePathIds="0:200-0:259" propertyKey="800"/>
-                </ArtboardComponentList>
-
+                <!-- Declared before TrailDots so robots draw on top of the
+                     tracks (first sibling draws on top - confirmed by
+                     screenshot for this pair; see gotchas note below). -->
                 <ArtboardComponentList name="ProducerRows" id="0:33">
                     <DataBindContext sourcePathIds="0:200-0:250" propertyKey="800"/>
+                </ArtboardComponentList>
+
+                <ArtboardComponentList name="TrailDots" id="0:34">
+                    <DataBindContext sourcePathIds="0:200-0:259" propertyKey="800"/>
                 </ArtboardComponentList>
 
                 <!-- The dock: fixed at the bottom-center of the beach area

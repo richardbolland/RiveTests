@@ -51,10 +51,19 @@ local function performAction(self: BoostState, listenerContext: ListenerContext)
 
 	-- First-ever click on any robot: the player now knows clicking does
 	-- something, so the auto-shown tutorial tooltip (clock.luau) can stop
-	-- teaching it. One flag for the whole fleet, not per-robot.
+	-- teaching it. One flag for the whole fleet, not per-robot. Also hide
+	-- the tooltip immediately rather than leaving clock.luau's last forced
+	-- "visible=1" in place: without this, the tooltip stays on screen
+	-- until the player's pointer happens to leave the robot afterward,
+	-- since nothing else would tell it to close on the click itself.
 	local elbowGreaseTaught = economy:getNumber('elbowGreaseTaught')
 	if elbowGreaseTaught and elbowGreaseTaught.value <= 0 then
 		elbowGreaseTaught.value = 1
+		local tooltip = context:globalViewModel('Tooltip')
+		local tooltipVisible = if tooltip then tooltip:getNumber('visible') else nil
+		if tooltipVisible then
+			tooltipVisible.value = 0
+		end
 	end
 
 	local storage = producer:getList('storage')

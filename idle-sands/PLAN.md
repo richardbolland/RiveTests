@@ -720,6 +720,37 @@ built before it.
   discovery) - each shows its own text on hover with no clipping or
   panel overlap, and hides again on pointer exit.
 
+**Bug fixes (playtesting round 3):**
+- **Trail still drawing over the robot.** The round-2 fix (declaring
+  `TrailDots` before `ProducerRows`, on the theory that
+  `ArtboardComponentList` siblings draw in the OPPOSITE order from plain
+  shapes) turned out to be wrong for this pair - re-verified by
+  screenshot, zoomed on the overlap, and the dots were still rendering on
+  top of the robot body. Swapped the declaration back to `ProducerRows`
+  before `TrailDots`, i.e. the ordinary "first sibling draws on top" rule
+  after all; confirmed via the same zoomed-crop screenshot technique that
+  the trail now sits cleanly behind the robot except where it extends
+  past it. (The "reversed rule" claim from round 2 is retracted - it was
+  never re-checked after other changes landed, and shouldn't be trusted
+  elsewhere without its own screenshot.)
+- **Tutorial tooltip staying open after the teaching click.**
+  `clock.luau` force-shows the shared `Tooltip` every frame until
+  `Economy.elbowGreaseTaught` flips, then simply stops touching it - but
+  nothing ever set `Tooltip.visible` back to `0` at that moment, so the
+  last forced `visible=1` just sat there until the player's pointer
+  happened to physically leave the robot afterward (triggering the
+  ordinary `hideTooltip.luau` exit listener). Since a click leaves the
+  pointer sitting right on the robot, in practice the tooltip never
+  closed on its own. Fixed in `main.luau`: the same block that flips
+  `elbowGreaseTaught` on the first-ever robot click now also zeroes
+  `Tooltip.visible` directly, so it disappears the instant the click
+  teaches the mechanic rather than waiting on an unrelated mouse-exit.
+  Verified headlessly: tooltip visible at frame 1 with no hover; a click
+  hides it immediately even 60 simulated frames later with the pointer
+  never having moved off the robot; a fresh hover after being taught
+  (pointer exit then re-enter) still shows it normally, confirming the
+  opt-in reminder path is untouched.
+
 Still to come from this same playtesting round, not yet started:
 - **Bento-style stats dashboard** - a later, larger view of full
   lifetime/fleet statistics once unlocked. Explicitly scoped as a

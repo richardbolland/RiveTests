@@ -26,6 +26,11 @@ local function performAction(self: SellState, listenerContext: ListenerContext)
 		return
 	end
 
+	local runComplete = economy:getNumber('runComplete')
+	if runComplete and runComplete.value > 0 then
+		return
+	end
+
 	local producers = economy:getList('producers')
 	local currency = economy:getNumber('currency')
 	if not producers or not currency then
@@ -51,6 +56,10 @@ local function performAction(self: SellState, listenerContext: ListenerContext)
 	local lifetimeCurrencyEarned = economy:getNumber('lifetimeCurrencyEarned')
 	if lifetimeCurrencyEarned then
 		lifetimeCurrencyEarned.value = lifetimeCurrencyEarned.value + total
+	end
+	local runEarnings = economy:getNumber('runEarnings')
+	if runEarnings then
+		runEarnings.value = runEarnings.value + total
 	end
 end
 

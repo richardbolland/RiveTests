@@ -79,6 +79,11 @@ local function performAction(self: UpgradeState, listenerContext: ListenerContex
 		return
 	end
 
+	local runComplete = economy:getNumber('runComplete')
+	if runComplete and runComplete.value > 0 then
+		return
+	end
+
 	local target = economy
 	local classScoped = self.classScoped
 	if classScoped and classScoped > 0 then

@@ -2,10 +2,117 @@
     <Artboard defaultStateMachineId="0:7" styleId="0:5" width="1280" height="720" name="IdleSands" id="0:2">
         <LayoutComponentStyle flexDirectionValue="column" name="Artboard Style" id="0:5"/>
 
-        <!-- Universal tooltip overlay, declared first so it draws on top
-             of everything else (first sibling draws on top - rive docs
-             transforms). Shown/hidden and positioned by showTooltip.luau
-             / hideTooltip.luau, never edited directly by any one feature. -->
+        <!-- End-of-beach recap, declared before even the tooltip so it
+             draws on top of literally everything else once shown (first
+             sibling draws on top). Hidden by default (endScreenDisplay
+             starts at "none"); clock.luau flips it to "flex" the moment
+             runComplete latches on, and freezes the whole beach
+             underneath at the same time so the recap's numbers hold
+             still until Start New Beach (startNewBeach.luau) is clicked. -->
+        <LayoutComponent width="1280" height="720" styleId="0:941" name="EndScreenOverlay" id="0:940">
+            <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                  positionTypeValue="absolute"
+                                  positionLeft="0" positionTop="0"
+                                  positionLeftUnitsValue="points" positionTopUnitsValue="points"
+                                  flexDirectionValue="column" layoutAlignmentType="center"
+                                  displayValue="none"
+                                  name="EndScreenOverlay Style" id="0:941">
+                <DataBindContext sourcePathIds="0:200-0:909" propertyKey="596"/>
+            </LayoutComponentStyle>
+            <Fill name="Fill"><SolidColor colorValue="E61D2B27" name="C"/></Fill>
+
+            <LayoutComponent width="420" height="10" styleId="0:943" name="EndScreenCard" id="0:942">
+                <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="hug"
+                                      flexDirectionValue="column" layoutAlignmentType="topCenter"
+                                      paddingTop="32" paddingTopUnitsValue="points"
+                                      paddingBottom="32" paddingBottomUnitsValue="points"
+                                      paddingLeft="32" paddingLeftUnitsValue="points"
+                                      paddingRight="32" paddingRightUnitsValue="points"
+                                      gapVertical="10" gapVerticalUnitsValue="points"
+                                      cornerRadiusTL="16" cornerRadiusTR="16" cornerRadiusBL="16" cornerRadiusBR="16"
+                                      name="EndScreenCard Style" id="0:943"/>
+                <Fill name="Fill"><SolidColor colorValue="FF3E5C50" name="C"/></Fill>
+
+                <Text name="EndHeadline" id="0:944">
+                    <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="EndHeadline Layout"/>
+                    <TextStylePaint fontSize="26" fontAssetId="0:300" name="EndHeadlineStyle" id="0:945">
+                        <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                    </TextStylePaint>
+                    <TextValueRun styleId="0:945" text="Beach " name="EndHeadlinePrefix"/>
+                    <TextValueRun styleId="0:945" text="1" name="EndHeadlineNumber">
+                        <DataBindContext sourcePathIds="0:200-0:900" propertyKey="268" converterId="0:301"/>
+                    </TextValueRun>
+                    <TextValueRun styleId="0:945" text=" Complete!" name="EndHeadlineSuffix"/>
+                </Text>
+
+                <Text name="EndItemsLabel" id="0:949">
+                    <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="EndItemsLabel Layout"/>
+                    <TextStylePaint fontSize="16" fontAssetId="0:300" name="EndItemsStyle" id="0:950">
+                        <Fill name="Fill"><SolidColor colorValue="FFE8C27A" name="C"/></Fill>
+                    </TextStylePaint>
+                    <TextValueRun styleId="0:950" text="Items collected: " name="EndItemsPrefix"/>
+                    <TextValueRun styleId="0:950" text="0" name="EndItemsValue">
+                        <DataBindContext sourcePathIds="0:200-0:905" propertyKey="268" converterId="0:301"/>
+                    </TextValueRun>
+                </Text>
+
+                <Text name="EndCurrencyLabel" id="0:953">
+                    <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="EndCurrencyLabel Layout"/>
+                    <TextStylePaint fontSize="16" fontAssetId="0:300" name="EndCurrencyStyle" id="0:954">
+                        <Fill name="Fill"><SolidColor colorValue="FFE8C27A" name="C"/></Fill>
+                    </TextStylePaint>
+                    <TextValueRun styleId="0:954" text="Currency earned: $" name="EndCurrencyPrefix"/>
+                    <TextValueRun styleId="0:954" text="0" name="EndCurrencyValue">
+                        <DataBindContext sourcePathIds="0:200-0:902" propertyKey="268" converterId="0:301"/>
+                    </TextValueRun>
+                </Text>
+
+                <Text name="EndTimeLabel" id="0:957">
+                    <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="EndTimeLabel Layout"/>
+                    <TextStylePaint fontSize="16" fontAssetId="0:300" name="EndTimeStyle" id="0:958">
+                        <Fill name="Fill"><SolidColor colorValue="FFE8C27A" name="C"/></Fill>
+                    </TextStylePaint>
+                    <TextValueRun styleId="0:958" text="Time: " name="EndTimePrefix"/>
+                    <TextValueRun styleId="0:958" text="0:00" name="EndTimeValue">
+                        <DataBindContext sourcePathIds="0:200-0:907" propertyKey="268"/>
+                    </TextValueRun>
+                </Text>
+
+                <Text name="EndBotsLabel" id="0:961">
+                    <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="EndBotsLabel Layout"/>
+                    <TextStylePaint fontSize="16" fontAssetId="0:300" name="EndBotsStyle" id="0:962">
+                        <Fill name="Fill"><SolidColor colorValue="FFE8C27A" name="C"/></Fill>
+                    </TextStylePaint>
+                    <TextValueRun styleId="0:962" text="Robots owned: " name="EndBotsPrefix"/>
+                    <TextValueRun styleId="0:962" text="1" name="EndBotsValue">
+                        <DataBindContext sourcePathIds="0:200-0:910" propertyKey="268" converterId="0:301"/>
+                    </TextValueRun>
+                </Text>
+
+                <LayoutComponent width="240" height="52" styleId="0:966" name="StartNewBeachButton" id="0:965">
+                    <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                          layoutAlignmentType="center"
+                                          marginTop="12" marginTopUnitsValue="points"
+                                          cornerRadiusTL="12" cornerRadiusTR="12" cornerRadiusBL="12" cornerRadiusBR="12"
+                                          name="StartNewBeachButton Style" id="0:966"/>
+                    <Fill name="Fill"><SolidColor colorValue="FFE8785A" name="C"/></Fill>
+
+                    <Text name="StartNewBeachLabel" id="0:967">
+                        <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="StartNewBeachLabel Layout"/>
+                        <TextStylePaint fontSize="18" fontAssetId="0:300" name="StartNewBeachStyle" id="0:968">
+                            <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextValueRun styleId="0:968" text="Start New Beach" name="StartNewBeachRun"/>
+                    </Text>
+                </LayoutComponent>
+            </LayoutComponent>
+        </LayoutComponent>
+
+        <!-- Universal tooltip overlay, declared right after the end
+             screen so it draws on top of everything else EXCEPT that
+             recap (first sibling draws on top - rive docs transforms).
+             Shown/hidden and positioned by showTooltip.luau /
+             hideTooltip.luau, never edited directly by any one feature. -->
         <LayoutComponent width="10" height="10" styleId="0:261" name="Tooltip" id="0:260">
             <LayoutComponentStyle layoutWidthScaleType="hug" layoutHeightScaleType="hug"
                                   positionTypeValue="absolute"
@@ -62,6 +169,61 @@
                     <DataBindContext sourcePathIds="0:200-0:201" propertyKey="268" converterId="0:301"/>
                 </TextValueRun>
             </Text>
+        </LayoutComponent>
+
+        <!-- Prestige-loop progress bar: how close this beach is to
+             runGoal. The label is one script-computed string
+             (runStatusLabel, clock.luau) rather than several bound runs,
+             since "Beach N - $X / $Y" needs three live numbers stitched
+             together. The bar itself is native: runProgressFraction
+             (0-1, also computed in clock.luau, since a DataConverter's
+             own min/max are fixed at author time and can't track a goal
+             that changes every beach) drives a Rectangle's width through
+             a fixed 0-500px range mapper, same shape as the meter example
+             in the data-binding docs. -->
+        <LayoutComponent width="1280" height="32" styleId="0:921" name="ProgressBarRow" id="0:920">
+            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fixed"
+                                  flexDirectionValue="row" layoutAlignmentType="centerLeft"
+                                  paddingLeft="24" paddingLeftUnitsValue="points"
+                                  paddingRight="24" paddingRightUnitsValue="points"
+                                  gapHorizontal="16" gapHorizontalUnitsValue="points"
+                                  name="ProgressBarRow Style" id="0:921"/>
+            <Fill name="Fill"><SolidColor colorValue="FF234139" name="C"/></Fill>
+
+            <Text name="RunStatusLabel" id="0:922">
+                <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="RunStatusLabel Layout"/>
+                <TextStylePaint fontSize="14" fontAssetId="0:300" name="RunStatusStyle" id="0:923">
+                    <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="0:923" text="Beach 1 - $0 / $1000" name="RunStatusRun">
+                    <DataBindContext sourcePathIds="0:200-0:904" propertyKey="268"/>
+                </TextValueRun>
+            </Text>
+
+            <LayoutComponent width="500" height="10" styleId="0:926" name="ProgressTrack" id="0:925">
+                <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                      layoutTypeValue="stack" layoutAlignmentType="centerLeft"
+                                      cornerRadiusTL="5" cornerRadiusTR="5" cornerRadiusBL="5" cornerRadiusBR="5"
+                                      name="ProgressTrack Style" id="0:926"/>
+                <Fill name="Fill"><SolidColor colorValue="FF1D2B27" name="C"/></Fill>
+
+                <Shape name="ProgressFill" id="0:927">
+                    <!-- hug, not fixed: a fixed-size participant SCALES the
+                         Rectangle's path to fill its box regardless of the
+                         Rectangle's own bound width (layout docs - "fixed
+                         and fill scale every path in the shape together
+                         into the slot"), which would always render this at
+                         the full 500px track width. hug instead sizes the
+                         participant off the Rectangle's own live bounds, so
+                         the bound width actually draws at that literal
+                         pixel size and the bar visibly grows from the left. -->
+                    <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="fixed" height="10" name="ProgressFill Layout"/>
+                    <Rectangle width="0" height="10" originX="0" originY="0.5" name="Path" id="0:928">
+                        <DataBindContext sourcePathIds="0:200-0:903" propertyKey="20" converterId="0:302"/>
+                    </Rectangle>
+                    <Fill name="Fill"><SolidColor colorValue="FFE8785A" name="C"/></Fill>
+                </Shape>
+            </LayoutComponent>
         </LayoutComponent>
 
         <LayoutComponent width="1280" height="556" styleId="0:21" name="MiddleRow" id="0:20">
@@ -573,6 +735,10 @@
                 <ScriptedListenerAction scriptAssetId="0:311" id="0:65"/>
             </StateMachineListenerSingle>
 
+            <StateMachineListenerSingle targetId="0:965" listenerTypeValue="click" name="StartNewBeach" id="0:970">
+                <ScriptedListenerAction scriptAssetId="0:318" id="0:971"/>
+            </StateMachineListenerSingle>
+
             <StateMachineListenerSingle targetId="0:70" listenerTypeValue="click" name="BuyItemsPerDig" id="0:76">
                 <ScriptedListenerAction scriptAssetId="0:312" id="0:77">
                     <ScriptInputString propertyValue="itemsPerDig" name="statName"/>
@@ -740,6 +906,8 @@
 
     <FontAsset file="Outfit-Bold.ttf" name="Outfit Bold" id="0:300"/>
     <DataConverterToString decimals="0" round="true" name="CurrencyFormat" id="0:301"/>
+    <DataConverterRangeMapper minInput="0" maxInput="1" minOutput="0" maxOutput="500"
+                              clampLower="true" clampUpper="true" name="ProgressToPixels" id="0:302"/>
     <ScriptAsset file="main.luau" name="main" id="0:310"/>
     <ScriptAsset file="sell.luau" name="sell" id="0:311"/>
     <ScriptAsset file="upgrade.luau" name="upgrade" id="0:312"/>
@@ -748,6 +916,7 @@
     <ScriptAsset file="showTooltip.luau" name="showTooltip" id="0:315"/>
     <ScriptAsset file="hideTooltip.luau" name="hideTooltip" id="0:316"/>
     <ScriptAsset file="selectTab.luau" name="selectTab" id="0:317"/>
+    <ScriptAsset file="startNewBeach.luau" name="startNewBeach" id="0:318"/>
 
     <!-- Design tokens: one global palette, swap these to re-theme the whole game -->
     <ViewModel viewModelType="global" defaultInstanceId="0:110" name="Theme" id="0:100">
@@ -818,6 +987,23 @@
         <ViewModelPropertyNumber name="robotsPanelsDisplay" id="0:297"/>
         <ViewModelPropertyNumber name="steelSeekerTabDisplay" id="0:298"/>
         <ViewModelPropertyNumber name="steelSeekerBuyPanelDisplay" id="0:299"/>
+        <!-- Prestige loop ("beach" in player-facing text, "run" in field
+             names to avoid clashing with the unrelated beachBoy* fields
+             above). One run = play until runEarnings reaches runGoal,
+             recap on the end screen, Start New Beach resets currency/
+             items/timer and raises the goal - everything else (bots,
+             upgrades, Steel Seeker's unlock) carries over. -->
+        <ViewModelPropertyNumber name="runNumber" id="0:900"/>
+        <ViewModelPropertyNumber name="runGoal" id="0:901"/>
+        <ViewModelPropertyNumber name="runEarnings" id="0:902"/>
+        <ViewModelPropertyNumber name="runProgressFraction" id="0:903"/>
+        <ViewModelPropertyString name="runStatusLabel" id="0:904"/>
+        <ViewModelPropertyNumber name="runItemsCollected" id="0:905"/>
+        <ViewModelPropertyNumber name="runStartTime" id="0:906"/>
+        <ViewModelPropertyString name="runElapsedLabel" id="0:907"/>
+        <ViewModelPropertyNumber name="runComplete" id="0:908"/>
+        <ViewModelPropertyNumber name="endScreenDisplay" id="0:909"/>
+        <ViewModelPropertyNumber name="totalBotsOwned" id="0:910"/>
         <ViewModelInstance exports="true" name="Default" id="0:210">
             <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:201"/>
             <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:202"/>
@@ -867,6 +1053,17 @@
             <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:297"/>
             <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:298"/>
             <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:299"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:900"/>
+            <ViewModelInstanceNumber propertyValue="1000" viewModelPropertyId="0:901"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:902"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:903"/>
+            <ViewModelInstanceString propertyValue="Beach 1 &#8212; $0 / $1000" viewModelPropertyId="0:904"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:905"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:906"/>
+            <ViewModelInstanceString propertyValue="0:00" viewModelPropertyId="0:907"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:908"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:909"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:910"/>
         </ViewModelInstance>
     </ViewModel>
 

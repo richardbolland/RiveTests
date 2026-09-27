@@ -788,13 +788,82 @@ Still to come from this same playtesting round, not yet started:
   future milestone, not part of this pass - added here as a placeholder
   only, no design work done yet.
 
-7. **Persistence** — host page saves/loads `Economy` to `localStorage`;
+7. **Prestige loop: beach progress bar + end screen** ✅ — a top-bar
+   progress bar tracks earnings toward the current beach's goal; reaching
+   it freezes the beach and shows a brand-new end screen with a recap,
+   then a Start New Beach button resets for another round with a steeper
+   goal. Also how Steel Seeker now gets unlocked, replacing the old
+   $500-lifetime-earnings threshold from the round-2/3 UI pass.
+
+   Three decisions, asked up front since they touch existing systems:
+   what resets between beaches (**only currency** - every bot and
+   upgrade already bought stays bought, matching the player's answer over
+   "reset bots too" or "reset nothing"), whether the goal is one-time or
+   repeating (**repeats, doubling each beach** - 1000, 2000, 4000, ... -
+   over a one-time-only or same-goal-every-time option), and whether this
+   replaces or coexists with the old Steel Seeker threshold (**replaces
+   it** - Steel Seeker now stays hidden until the player finishes their
+   first beach, not a mid-run currency milestone).
+
+   New Economy fields, named `run*` internally (`runNumber`, `runGoal`,
+   `runEarnings`, `runProgressFraction`, `runStatusLabel`,
+   `runItemsCollected`, `runStartTime`, `runElapsedLabel`, `runComplete`,
+   `endScreenDisplay`, `totalBotsOwned`) to avoid clashing with the
+   unrelated `beachBoy*` fields, though all player-facing text still says
+   "Beach" (thematically apt for a beach-cleaning game - "start a new
+   beach" is literal, not just a euphemism for "run"). `runGoal` doubles
+   each beach (`1000 * 2^(runNumber-1)`); `runEarnings` mirrors
+   `lifetimeCurrencyEarned`'s existing "increment alongside every sell,
+   never decreases" pattern but resets to 0 in `startNewBeach.luau`
+   instead of living forever. Crossing the goal latches `runComplete` on
+   (one-way, like every other unlock in this project) which does three
+   things at once in `clock.luau`: freezes the entire producers loop (no
+   more digging, roaming or dock sales - the beach visibly stops in
+   place), flips `endScreenDisplay` to reveal the overlay, and unlocks
+   `steelSeekerDiscovered` for good. `main.luau`, `sell.luau`,
+   `upgrade.luau` and `buyBot.luau` all also check `runComplete` directly
+   and bail if set, as a second guard in case a click reaches through
+   whatever the end-screen overlay is covering.
+
+   The progress bar is a native data bind, not a script-drawn shape: a
+   `DataConverterRangeMapper` maps `runProgressFraction` (0-1, computed in
+   `clock.luau` since a converter's own min/max are fixed at author time
+   and can't track a goal that changes every beach) onto a `Rectangle`'s
+   `width` (0-500px), the same shape as the meter example in the
+   data-binding docs. Hit one real gotcha getting there: the fill
+   `Rectangle` sat inside a `Shape` with a `fixed`-sized
+   `LayoutParticipant`, which - per the layout docs - **scales every path
+   in the shape to fill its box** rather than drawing them at literal
+   size, so the bar rendered at full width regardless of the actual
+   fraction. Fixed by switching that participant to `hug` (sizes off the
+   shape's own content instead of stretching it), confirmed via a zoomed
+   screenshot crop showing a thin sliver at ~3% instead of a full bar.
+
+   The end screen itself is a brand-new full-canvas overlay (declared
+   first in the artboard so it draws above even the tooltip), shown via
+   the same `displayValue` flex/none trick the tab bar already uses,
+   with a centered card recapping items collected, currency earned, time
+   played (a computed `M:SS` string, frozen the instant `runComplete`
+   latches so it doesn't keep ticking up while the recap is on screen)
+   and robots owned, plus the Start New Beach button
+   (`startNewBeach.luau`) that resets currency/items/timer, bumps
+   `runNumber`, and turns `runComplete` back off.
+
+   Verified headlessly end to end (temporarily lowering `RUN_GOAL_BASE`
+   for a fast repro, reverted after each check): the progress bar fills
+   correctly frame by frame; crossing the goal freezes the beach in place
+   and reveals the end screen with correct stats; clicking a robot,
+   Sell All, an upgrade panel and a bot-purchase panel all confirmed
+   no-ops while frozen; Start New Beach resets currency/items/elapsed
+   time to zero, doubles the next goal, and leaves every bot, upgrade and
+   the now-permanent Steel Seeker unlock untouched.
+8. **Persistence** — host page saves/loads `Economy` to `localStorage`;
    reload the page mid-game and confirm state survives.
-8. **Visual feedback pass** — floating "+N" numbers on collect/sell, button
+9. **Visual feedback pass** — floating "+N" numbers on collect/sell, button
    press feedback, bot-purchase feedback animation.
-9. **Responsive layout pass** — verify the layout holds up from narrow
-   laptop width to ultra-wide, horizontally only.
-10. **Ship** — HTML host page using the Rive web runtime pointed at the
+10. **Responsive layout pass** — verify the layout holds up from narrow
+    laptop width to ultra-wide, horizontally only.
+11. **Ship** — HTML host page using the Rive web runtime pointed at the
     signed build, published both via `rive --publish=web` and to GitHub
     Pages from this repo.
 

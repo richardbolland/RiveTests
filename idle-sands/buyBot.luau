@@ -45,6 +45,11 @@ local function performAction(self: BuyBotState, listenerContext: ListenerContext
 		return
 	end
 
+	local runComplete = economy:getNumber('runComplete')
+	if runComplete and runComplete.value > 0 then
+		return
+	end
+
 	local count = economy:getNumber(countStatName)
 	local currency = economy:getNumber('currency')
 	local producers = economy:getList('producers')

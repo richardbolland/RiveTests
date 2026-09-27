@@ -23,8 +23,10 @@
 --- Also owns: each upgrade panel's and Sell All's affordable state,
 --- the live storage totals, whether Beach Boy/Steel Seeker are affordable
 --- to buy, routing a full producer to the dock once dockSpeed is unlocked,
---- the tab bar's active/locked visual state, and unlocking Steel Seeker
---- once lifetime earnings cross a threshold.
+--- the tab bar's active/locked visual state, and the prestige loop - each
+--- beach's progress bar, freezing the beach and showing the end screen
+--- once its goal is reached, and unlocking Steel Seeker for good the
+--- first time that happens.
 
 type ClockState = {
 	context: Context?,
@@ -107,13 +109,21 @@ local BEACH_BOY_GROWTH = 1.6
 -- pool of exclusively mid/high-value items (no BottleCap/Nail/TinCan) to
 -- justify it. Must match the ScriptInput* values on the BuySteelSeeker
 -- listener in scene.rml exactly. Also stays undiscovered - hidden from
--- the tab bar and the Robots tab's purchase panel - until
--- lifetimeCurrencyEarned crosses STEEL_SEEKER_DISCOVERY_THRESHOLD: a
--- mid-game milestone meant to land a little after a player has settled
--- into Beach Crew upgrades and a first Beach Boy, not as a distant goal.
+-- the tab bar and the Robots tab's purchase panel - until the player
+-- finishes their first beach (runComplete, below): the prestige loop's
+-- reward, not a mid-game currency threshold.
 local STEEL_SEEKER_BASE_COST = 220
 local STEEL_SEEKER_GROWTH = 1.6
-local STEEL_SEEKER_DISCOVERY_THRESHOLD = 500
+
+-- Prestige loop: play a "beach" (a run) until runEarnings reaches
+-- runGoal, see a recap on the end screen, then Start New Beach
+-- (startNewBeach.luau) resets currency/items/timer for a fresh run with a
+-- steeper goal - everything else (bots, upgrades, Steel Seeker's unlock)
+-- carries over untouched. Doubling was the simplest escalating curve that
+-- still keeps early beaches short; revisit if runs start feeling too long
+-- or too short once played end to end.
+local RUN_GOAL_BASE = 1000
+local RUN_GOAL_GROWTH = 2
 
 local function levelsBought(currentValue: number, step: number, startValue: number): number
 	return math.floor(math.abs(currentValue - startValue) / math.abs(step) + 0.5)
@@ -281,6 +291,10 @@ local function advance(self: ClockState, seconds: number): boolean
 	local currency = economy:getNumber('currency')
 	local currencyValue = if currency then currency.value else 0
 	local lifetimeCurrencyEarned = economy:getNumber('lifetimeCurrencyEarned')
+	local runEarnings = economy:getNumber('runEarnings')
+	local runItemsCollected = economy:getNumber('runItemsCollected')
+	local runCompleteProp = economy:getNumber('runComplete')
+	local runIsComplete = (runCompleteProp ~= nil) and (runCompleteProp.value > 0)
 
 	-- Every producer runs the same cycle: tick down, collect and restart
 	-- when it reaches zero, into its OWN onboard storage, using its OWN
@@ -290,9 +304,11 @@ local function advance(self: ClockState, seconds: number): boolean
 	-- producer's storage is full - sells it on the spot; it never
 	-- collects directly either way. A full producer simply stops
 	-- collecting (the cycle freezes rather than resets) until its owner
-	-- empties it.
+	-- empties it. Once the current beach is complete, the whole loop
+	-- freezes in place (no digging, no roaming, no dock sales) so the end
+	-- screen's recap stays put until Start New Beach resets things.
 	local producers = economy:getList('producers')
-	if producers then
+	if producers and not runIsComplete then
 		for i = 1, producers.length do
 			local producer = producers[i]
 			local classNameProp = producer:getString('robotClass')
@@ -330,6 +346,9 @@ local function advance(self: ClockState, seconds: number): boolean
 							end
 							local item = Data.Item.new(pickItemName(poolName))
 							storage:push(item)
+							if runItemsCollected then
+								runItemsCollected.value += 1
+							end
 							local value = item:getNumber('value')
 							if value then
 								collectedTotal += value.value
@@ -445,6 +464,9 @@ local function advance(self: ClockState, seconds: number): boolean
 					end
 					if lifetimeCurrencyEarned then
 						lifetimeCurrencyEarned.value += dockTotal
+					end
+					if runEarnings then
+						runEarnings.value += dockTotal
 					end
 
 					local dockPulseTime = producer:getNumber('lastPulseTime')
@@ -578,12 +600,63 @@ local function advance(self: ClockState, seconds: number): boolean
 		steelSeekerCostLabel.value = tostring(cost)
 	end
 
-	-- Steel Seeker discovery: a one-way unlock once lifetime earnings
-	-- cross the threshold (lifetimeCurrencyEarned only ever grows, so
-	-- this naturally stays unlocked once true - no separate latch needed).
+	-- Prestige loop: this beach's goal escalates with runNumber (1000,
+	-- 2000, 4000, ...), runProgressFraction drives the top-bar progress
+	-- bar's fill width, and crossing the goal latches runComplete on for
+	-- good (only Start New Beach, via startNewBeach.luau, turns it back
+	-- off) - which is also what freezes the producers loop above and
+	-- reveals the end screen below. Frozen once complete: runNumber and
+	-- runGoal don't need updating again until the reset, and
+	-- runStatusLabel/runElapsedLabel stop refreshing so the top bar and
+	-- end screen show the numbers as of the moment the goal was hit,
+	-- rather than drifting while gameTime keeps ticking behind the recap.
+	local runNumber = economy:getNumber('runNumber')
+	local runGoal = economy:getNumber('runGoal')
+	if runNumber and runGoal and not runIsComplete then
+		runGoal.value = RUN_GOAL_BASE * (RUN_GOAL_GROWTH ^ (runNumber.value - 1))
+	end
+
+	local runProgressFraction = economy:getNumber('runProgressFraction')
+	if runProgressFraction and runEarnings and runGoal and not runIsComplete then
+		runProgressFraction.value = clamp01(runEarnings.value / runGoal.value)
+	end
+
+	local runStatusLabel = economy:getString('runStatusLabel')
+	if runStatusLabel and runNumber and runEarnings and runGoal and not runIsComplete then
+		runStatusLabel.value = 'Beach ' .. tostring(math.floor(runNumber.value)) .. ' - $'
+			.. tostring(math.floor(runEarnings.value)) .. ' / $' .. tostring(math.floor(runGoal.value))
+	end
+
+	local runElapsedLabel = economy:getString('runElapsedLabel')
+	local runStartTime = economy:getNumber('runStartTime')
+	if runElapsedLabel and runStartTime and not runIsComplete then
+		local elapsed = math.max(0, gameTime - runStartTime.value)
+		local mins = math.floor(elapsed / 60)
+		local secs = math.floor(elapsed % 60)
+		runElapsedLabel.value = tostring(mins) .. ':' .. (if secs < 10 then '0' else '') .. tostring(secs)
+	end
+
+	local totalBotsOwned = economy:getNumber('totalBotsOwned')
+	if totalBotsOwned and producers then
+		totalBotsOwned.value = producers.length
+	end
+
+	if runCompleteProp and runEarnings and runGoal and runEarnings.value >= runGoal.value then
+		runCompleteProp.value = 1
+	end
+
+	local endScreenDisplay = economy:getNumber('endScreenDisplay')
+	if endScreenDisplay and runCompleteProp then
+		endScreenDisplay.value = (runCompleteProp.value > 0) and 0 or 1
+	end
+
+	-- Steel Seeker discovery: unlocked for good the first time a beach is
+	-- ever completed (this only ever turns it on - startNewBeach.luau
+	-- never turns it back off, so it stays unlocked across every future
+	-- beach reset).
 	local steelSeekerDiscovered = economy:getNumber('steelSeekerDiscovered')
-	if steelSeekerDiscovered and lifetimeCurrencyEarned then
-		steelSeekerDiscovered.value = (lifetimeCurrencyEarned.value >= STEEL_SEEKER_DISCOVERY_THRESHOLD) and 1 or 0
+	if steelSeekerDiscovered and runCompleteProp and runCompleteProp.value > 0 then
+		steelSeekerDiscovered.value = 1
 	end
 
 	-- Tab bar: which tab is highlighted, which panel group is shown

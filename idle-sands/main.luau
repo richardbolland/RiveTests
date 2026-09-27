@@ -49,6 +49,15 @@ local function performAction(self: BoostState, listenerContext: ListenerContext)
 		return
 	end
 
+	-- The current beach is frozen once its goal is reached (clock.luau
+	-- stops advancing it) until Start New Beach resets things - block
+	-- clicks here too, as a second guard in case the end screen overlay
+	-- doesn't catch a click on whatever it's covering.
+	local runComplete = economy:getNumber('runComplete')
+	if runComplete and runComplete.value > 0 then
+		return
+	end
+
 	-- First-ever click on any robot: the player now knows clicking does
 	-- something, so the auto-shown tutorial tooltip (clock.luau) can stop
 	-- teaching it. One flag for the whole fleet, not per-robot. Also hide
@@ -88,6 +97,10 @@ local function performAction(self: BoostState, listenerContext: ListenerContext)
 		local lifetimeCurrencyEarned = economy:getNumber('lifetimeCurrencyEarned')
 		if lifetimeCurrencyEarned then
 			lifetimeCurrencyEarned.value += total
+		end
+		local runEarnings = economy:getNumber('runEarnings')
+		if runEarnings then
+			runEarnings.value += total
 		end
 		storage:clear()
 

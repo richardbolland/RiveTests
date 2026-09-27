@@ -1,0 +1,55 @@
+<Rive version="1" kind="fragment">
+    <!-- Per-class upgrade state: itemsPerDig/digSpeedSeconds/
+         elbowGreasePercent/storageCapacity used to be one shared set of
+         Economy stats applying to every producer alike. They're now scoped
+         per robot CLASS instead - each Producer carries a robotClass name
+         (producers.rml) and clock.luau resolves the matching RobotClass
+         instance here every frame, the same list-of-named-instances
+         pattern Producer itself already uses. "Beach Crew" covers both the
+         free Starter and purchased Beach Boys (their item pools differ,
+         but they share one upgrade track); Steel Seeker is fully
+         independent, and stays undiscovered/hidden until
+         Economy.steelSeekerDiscovered (clock.luau, driven by
+         lifetimeCurrencyEarned) flips on.
+
+         The four existing upgrade panels in scene.rml are unchanged: they
+         keep reading Economy.itemsPerDig/digSpeedSeconds/
+         elbowGreasePercent/storageCapacity (+ their *Affordable/*CostLabel
+         pairs) exactly as before. Those Economy fields are now a MIRROR of
+         whichever class is selected (Economy.selectedClassName),
+         refreshed by clock.luau every frame; the authoritative values live
+         here. upgrade.luau writes to the selected RobotClass instance
+         directly, never to the mirror (a write to the mirror would just
+         be overwritten by the next frame's refresh). -->
+    <ViewModel defaultInstanceId="0:710" name="RobotClass" id="0:700">
+        <ViewModelPropertyString name="className" id="0:701"/>
+        <ViewModelPropertyNumber name="itemsPerDig" id="0:702"/>
+        <ViewModelPropertyNumber name="digSpeedSeconds" id="0:703"/>
+        <ViewModelPropertyNumber name="elbowGreasePercent" id="0:704"/>
+        <ViewModelPropertyNumber name="storageCapacity" id="0:705"/>
+
+        <ViewModelInstance exports="true" name="Default" id="0:710">
+            <ViewModelInstanceString propertyValue="" viewModelPropertyId="0:701"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:702"/>
+            <ViewModelInstanceNumber propertyValue="60" viewModelPropertyId="0:703"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:704"/>
+            <ViewModelInstanceNumber propertyValue="3" viewModelPropertyId="0:705"/>
+        </ViewModelInstance>
+
+        <ViewModelInstance exports="true" name="BeachCrew" id="0:711">
+            <ViewModelInstanceString propertyValue="beachCrew" viewModelPropertyId="0:701"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:702"/>
+            <ViewModelInstanceNumber propertyValue="60" viewModelPropertyId="0:703"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:704"/>
+            <ViewModelInstanceNumber propertyValue="3" viewModelPropertyId="0:705"/>
+        </ViewModelInstance>
+
+        <ViewModelInstance exports="true" name="SteelSeekerClass" id="0:712">
+            <ViewModelInstanceString propertyValue="steelSeeker" viewModelPropertyId="0:701"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:702"/>
+            <ViewModelInstanceNumber propertyValue="60" viewModelPropertyId="0:703"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:704"/>
+            <ViewModelInstanceNumber propertyValue="3" viewModelPropertyId="0:705"/>
+        </ViewModelInstance>
+    </ViewModel>
+</Rive>

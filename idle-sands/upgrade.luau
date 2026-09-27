@@ -1,7 +1,7 @@
---- One shared upgrade-purchase script for all three upgrade panels.
---- Which stat, by how much, and at what price comes from RML via
---- ScriptInput* children, so the same script backs items-per-dig, dig
---- speed and Elbow Grease without three near-identical files.
+--- One shared upgrade-purchase script for all upgrade panels. Which stat,
+--- by how much, and at what price comes from RML via ScriptInput*
+--- children, so the same script backs items-per-dig, dig speed, Elbow
+--- Grease, storage capacity and dock speed without near-identical files.
 ---
 --- Cost follows the standard incremental-game curve, Cost(n) = base *
 --- growth^n where n is how many levels of THIS upgrade have already been
@@ -10,6 +10,17 @@
 --- since every upgrade here takes uniform steps from a known start:
 --- n = |current - startValue| / |step|, where startValue is minValue for
 --- an increasing stat (step > 0) or maxValue for a decreasing one.
+---
+--- classScoped (optional, truthy = 1) marks a stat that belongs to
+--- whichever robot class is currently selected (Economy.selectedClassName)
+--- rather than to Economy directly - itemsPerDig, digSpeedSeconds,
+--- elbowGreasePercent and storageCapacity all vary per class now
+--- (robotClasses.rml), while dockSpeed stays fleet-wide and omits this
+--- input. A classScoped purchase reads/writes the matching RobotClass
+--- instance's own field: writing to Economy's copy would just be
+--- overwritten by clock.luau's next-frame mirror refresh, since that
+--- mirror only ever flows outward (selected class -> Economy display),
+--- never back.
 
 type UpgradeState = {
 	context: Context?,
@@ -19,7 +30,23 @@ type UpgradeState = {
 	maxValue: Input<number>?,
 	baseCost: Input<number>?,
 	growth: Input<number>?,
+	classScoped: Input<number>?,
 }
+
+local function findRobotClass(economy: ViewModel, className: string): ViewModel?
+	local robotClasses = economy:getList('robotClasses')
+	if not robotClasses then
+		return nil
+	end
+	for i = 1, robotClasses.length do
+		local candidate = robotClasses[i]
+		local candidateName = candidate:getString('className')
+		if candidateName and candidateName.value == className then
+			return candidate
+		end
+	end
+	return nil
+end
 
 local function init(self: UpgradeState, context: Context): boolean
 	self.context = context
@@ -52,8 +79,22 @@ local function performAction(self: UpgradeState, listenerContext: ListenerContex
 		return
 	end
 
+	local target = economy
+	local classScoped = self.classScoped
+	if classScoped and classScoped > 0 then
+		local selectedClassName = economy:getString('selectedClassName')
+		if not selectedClassName then
+			return
+		end
+		local robotClass = findRobotClass(economy, selectedClassName.value)
+		if not robotClass then
+			return
+		end
+		target = robotClass
+	end
+
 	local currency = economy:getNumber('currency')
-	local stat = economy:getNumber(statName)
+	local stat = target:getNumber(statName)
 	if not currency or not stat then
 		return
 	end

@@ -48,6 +48,10 @@ local function performAction(self: SellState, listenerContext: ListenerContext)
 	end
 
 	currency.value = currency.value + total
+	local lifetimeCurrencyEarned = economy:getNumber('lifetimeCurrencyEarned')
+	if lifetimeCurrencyEarned then
+		lifetimeCurrencyEarned.value = lifetimeCurrencyEarned.value + total
+	end
 end
 
 return function(): ListenerAction<SellState>

@@ -76,6 +76,10 @@ local function performAction(self: BoostState, listenerContext: ListenerContext)
 			end
 		end
 		currency.value += total
+		local lifetimeCurrencyEarned = economy:getNumber('lifetimeCurrencyEarned')
+		if lifetimeCurrencyEarned then
+			lifetimeCurrencyEarned.value += total
+		end
 		storage:clear()
 
 		local lastPulseTime = producer:getNumber('lastPulseTime')
@@ -93,8 +97,25 @@ local function performAction(self: BoostState, listenerContext: ListenerContext)
 		return
 	end
 
-	local digSpeed = economy:getNumber('digSpeedSeconds')
-	local elbowGreasePercent = economy:getNumber('elbowGreasePercent')
+	-- This robot's own class stats, not the Economy mirror (which reflects
+	-- whichever tab is currently selected, not necessarily this robot's
+	-- class - clicking a Steel Seeker while viewing the Beach Crew tab
+	-- must still use Steel Seeker's own digSpeed/elbowGrease).
+	local robotClassName = producer:getString('robotClass')
+	local robotClasses = economy:getList('robotClasses')
+	local robotClass = nil
+	if robotClassName and robotClasses then
+		for i = 1, robotClasses.length do
+			local candidate = robotClasses[i]
+			local candidateName = candidate:getString('className')
+			if candidateName and candidateName.value == robotClassName.value then
+				robotClass = candidate
+				break
+			end
+		end
+	end
+	local digSpeed = if robotClass then robotClass:getNumber('digSpeedSeconds') else economy:getNumber('digSpeedSeconds')
+	local elbowGreasePercent = if robotClass then robotClass:getNumber('elbowGreasePercent') else economy:getNumber('elbowGreasePercent')
 	local gameTime = economy:getNumber('gameTime')
 	local lastDigTime = producer:getNumber('lastDigTime')
 	if not digSpeed or not elbowGreasePercent or not gameTime or not lastDigTime then

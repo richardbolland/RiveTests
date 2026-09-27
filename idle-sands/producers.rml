@@ -3,8 +3,10 @@
          One instance per owned producer - the free starter, then purchased
          bots - rendered via the ArtboardComponentList bound to
          Economy.producers. Each row owns its own cycle/pulse/popup state;
-         only digSpeedSeconds, itemsPerDig and elbowGreasePercent are shared
-         (Economy) upgrades applying to every producer alike. -->
+         digSpeedSeconds, itemsPerDig, elbowGreasePercent and
+         storageCapacity are upgraded per robotClass (robotClasses.rml),
+         not shared fleet-wide - a producer's own robotClass name picks
+         which RobotClass instance clock.luau reads those from each frame. -->
     <Artboard isComponent="true" viewModelId="0:500" styleId="0:502" x="1600" y="0" width="110" height="110" name="ProducerWidget" id="0:501">
         <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
                               positionTypeValue="absolute"
@@ -140,6 +142,7 @@
         <ViewModelPropertyString name="storageLabel" id="0:526"/>
         <ViewModelPropertyNumber name="lastTrailX" id="0:527"/>
         <ViewModelPropertyNumber name="lastTrailY" id="0:528"/>
+        <ViewModelPropertyString name="robotClass" id="0:529"/>
 
         <ViewModelInstance exports="true" name="Default" id="0:530">
             <ViewModelInstanceColor propertyValue="FFE8785A" viewModelPropertyId="0:510"/>
@@ -161,6 +164,7 @@
             <ViewModelInstanceString propertyValue="0/3" viewModelPropertyId="0:526"/>
             <ViewModelInstanceNumber propertyValue="100" viewModelPropertyId="0:527"/>
             <ViewModelInstanceNumber propertyValue="100" viewModelPropertyId="0:528"/>
+            <ViewModelInstanceString propertyValue="beachCrew" viewModelPropertyId="0:529"/>
         </ViewModelInstance>
 
         <ViewModelInstance exports="true" name="Starter" id="0:531">
@@ -183,6 +187,7 @@
             <ViewModelInstanceString propertyValue="0/3" viewModelPropertyId="0:526"/>
             <ViewModelInstanceNumber propertyValue="120" viewModelPropertyId="0:527"/>
             <ViewModelInstanceNumber propertyValue="150" viewModelPropertyId="0:528"/>
+            <ViewModelInstanceString propertyValue="beachCrew" viewModelPropertyId="0:529"/>
         </ViewModelInstance>
 
         <ViewModelInstance exports="true" name="BeachBoy" id="0:532">
@@ -205,6 +210,7 @@
             <ViewModelInstanceString propertyValue="0/3" viewModelPropertyId="0:526"/>
             <ViewModelInstanceNumber propertyValue="400" viewModelPropertyId="0:527"/>
             <ViewModelInstanceNumber propertyValue="150" viewModelPropertyId="0:528"/>
+            <ViewModelInstanceString propertyValue="beachCrew" viewModelPropertyId="0:529"/>
         </ViewModelInstance>
 
         <ViewModelInstance exports="true" name="SteelSeeker" id="0:533">
@@ -227,6 +233,7 @@
             <ViewModelInstanceString propertyValue="0/3" viewModelPropertyId="0:526"/>
             <ViewModelInstanceNumber propertyValue="250" viewModelPropertyId="0:527"/>
             <ViewModelInstanceNumber propertyValue="250" viewModelPropertyId="0:528"/>
+            <ViewModelInstanceString propertyValue="steelSeeker" viewModelPropertyId="0:529"/>
         </ViewModelInstance>
     </ViewModel>
 </Rive>

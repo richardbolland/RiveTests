@@ -3,16 +3,28 @@
 --- then every purchased bot) - same pattern as the inventory list, so
 --- adding a bot later is one more list entry, not more duplicated logic.
 --- Each producer owns its own cycle/pulse/popup state and its own storage
---- list; only digSpeedSeconds, itemsPerDig, elbowGreasePercent and
---- storageCapacity are shared upgrades applying to every producer alike -
---- storageCapacity lives as a mirrored field on each Producer instance
---- (so storageLabel can be computed locally) but this script is the only
---- writer of it, syncing it from Economy.storageCapacity every frame, the
---- same way every other shared upgrade works. Also owns each upgrade
---- panel's and Sell All's affordable state, the live storage totals,
---- whether Beach Boy/Steel Seeker are affordable to buy, and - once
---- dockSpeed is unlocked - routing a full producer to the dock and
---- selling it there on arrival instead of leaving it frozen.
+--- list. digSpeedSeconds, itemsPerDig, elbowGreasePercent and
+--- storageCapacity are upgraded per robot CLASS (robotClasses.rml) rather
+--- than shared fleet-wide - each producer carries a robotClass name
+--- (producers.rml) that picks which RobotClass instance this script reads
+--- those four stats from every frame. dockSpeed (the dock-walking upgrade)
+--- stays the one fleet-wide exception, since there's only one physical
+--- dock every class shares.
+---
+--- The four upgrade panels in scene.rml are unchanged from before this
+--- restructuring: they still read Economy.itemsPerDig/digSpeedSeconds/
+--- elbowGreasePercent/storageCapacity (+ their *Affordable/*CostLabel
+--- pairs). Those Economy fields are now a MIRROR of whichever class is
+--- selected (Economy.selectedClassName) - refreshed here every frame from
+--- the matching RobotClass instance - not the authoritative values
+--- themselves. upgrade.luau writes to the selected RobotClass instance
+--- directly when classScoped is set, never to the mirror.
+---
+--- Also owns: each upgrade panel's and Sell All's affordable state,
+--- the live storage totals, whether Beach Boy/Steel Seeker are affordable
+--- to buy, routing a full producer to the dock once dockSpeed is unlocked,
+--- the tab bar's active/locked visual state, and unlocking Steel Seeker
+--- once lifetime earnings cross a threshold.
 
 type ClockState = {
 	context: Context?,
@@ -47,11 +59,11 @@ local COLLECT_PULSE_MAGNITUDE = 0.15
 local DIMMED_ALPHA = 0.4
 local POPUP_DURATION = 1.0
 
--- Upgrade shape: all three take 5 uniform steps from start to cap, so a
--- shared Cost(n) = base * growth^n curve behaves the same way for each.
--- These must match the ScriptInput* values on the matching Buy* listener
--- in scene.rml exactly, or the displayed price will disagree with what
--- upgrade.luau actually charges.
+-- Upgrade shape: all four take 5 uniform steps from start to cap, so a
+-- shared Cost(n) = base * growth^n curve behaves the same way for each,
+-- independently per robot class. These must match the ScriptInput* values
+-- on the matching Buy* listener in scene.rml exactly, or the displayed
+-- price will disagree with what upgrade.luau actually charges.
 local UPGRADE_BASE_COST = 5
 local UPGRADE_GROWTH = 2.8
 
@@ -77,7 +89,8 @@ local STORAGE_CAPACITY_MAX = 8
 -- unlocks docking and sets its initial speed; further purchases only
 -- make the dock-seeking trip faster. Ambient wandering is unaffected -
 -- it always uses the fixed ROAM_SPEED below, so robots never stand
--- still just because docking hasn't been bought yet.
+-- still just because docking hasn't been bought yet. Fleet-wide (not
+-- per-class): there's only one physical dock.
 local MOVE_SPEED_START = 0
 local MOVE_SPEED_STEP = 20
 local MOVE_SPEED_MAX = 100
@@ -93,9 +106,14 @@ local BEACH_BOY_GROWTH = 1.6
 -- Steel Seeker: same repeatable shape as Beach Boy, pricier entry and a
 -- pool of exclusively mid/high-value items (no BottleCap/Nail/TinCan) to
 -- justify it. Must match the ScriptInput* values on the BuySteelSeeker
--- listener in scene.rml exactly.
+-- listener in scene.rml exactly. Also stays undiscovered - hidden from
+-- the tab bar and the Robots tab's purchase panel - until
+-- lifetimeCurrencyEarned crosses STEEL_SEEKER_DISCOVERY_THRESHOLD: a
+-- mid-game milestone meant to land a little after a player has settled
+-- into Beach Crew upgrades and a first Beach Boy, not as a distant goal.
 local STEEL_SEEKER_BASE_COST = 220
 local STEEL_SEEKER_GROWTH = 1.6
+local STEEL_SEEKER_DISCOVERY_THRESHOLD = 500
 
 local function levelsBought(currentValue: number, step: number, startValue: number): number
 	return math.floor(math.abs(currentValue - startValue) / math.abs(step) + 0.5)
@@ -111,6 +129,45 @@ end
 
 local function steelSeekerCost(count: number): number
 	return math.floor(STEEL_SEEKER_BASE_COST * (STEEL_SEEKER_GROWTH ^ count) + 0.5)
+end
+
+-- Mirrors one stat from the currently-selected RobotClass instance onto
+-- the (unchanged since before per-class upgrades) Economy display field
+-- of the same name, and computes that stat's affordable/cost-label pair
+-- the same way every upgrade panel always has. Collapses what would
+-- otherwise be four near-identical ~12-line blocks (one per stat) into
+-- one function and four call sites.
+local function mirrorAndPriceStat(
+	economy: ViewModel,
+	selectedClass: ViewModel,
+	statName: string,
+	affordableName: string,
+	costLabelName: string,
+	step: number,
+	startValue: number,
+	cap: number,
+	decreasing: boolean,
+	currencyValue: number
+)
+	local srcProp = selectedClass:getNumber(statName)
+	if not srcProp then
+		return
+	end
+
+	local destProp = economy:getNumber(statName)
+	if destProp then
+		destProp.value = srcProp.value
+	end
+
+	local affordable = economy:getNumber(affordableName)
+	local costLabel = economy:getString(costLabelName)
+	if affordable and costLabel then
+		local maxed = if decreasing then srcProp.value <= cap else srcProp.value >= cap
+		local level = levelsBought(srcProp.value, step, startValue)
+		local cost = upgradeCost(level)
+		affordable.value = (currencyValue >= cost and not maxed) and 1 or DIMMED_ALPHA
+		costLabel.value = maxed and 'MAX' or tostring(cost)
+	end
 end
 
 -- Roaming: each producer drifts toward a random point, then picks a new
@@ -205,17 +262,29 @@ local function advance(self: ClockState, seconds: number): boolean
 	end
 	local gameTime = if gameTimeProp then gameTimeProp.value else 0
 
-	local digSpeed = economy:getNumber('digSpeedSeconds')
-	local itemsPerDigProp = economy:getNumber('itemsPerDig')
-	local itemsPerDig = if itemsPerDigProp then math.floor(itemsPerDigProp.value) else 1
-	local storageCapacityProp = economy:getNumber('storageCapacity')
-	local storageCapacityValue = if storageCapacityProp then storageCapacityProp.value else STORAGE_CAPACITY_START
+	local robotClasses = economy:getList('robotClasses')
+	local function findRobotClass(className: string): ViewModel?
+		if not robotClasses then
+			return nil
+		end
+		for i = 1, robotClasses.length do
+			local rc = robotClasses[i]
+			local cn = rc:getString('className')
+			if cn and cn.value == className then
+				return rc
+			end
+		end
+		return nil
+	end
+
 	local dockSpeedProp = economy:getNumber('dockSpeed')
 	local currency = economy:getNumber('currency')
 	local currencyValue = if currency then currency.value else 0
+	local lifetimeCurrencyEarned = economy:getNumber('lifetimeCurrencyEarned')
 
 	-- Every producer runs the same cycle: tick down, collect and restart
-	-- when it reaches zero, into its OWN onboard storage. Clicking
+	-- when it reaches zero, into its OWN onboard storage, using its OWN
+	-- class's digSpeedSeconds/itemsPerDig/storageCapacity. Clicking
 	-- (main.luau, inside the row) either pulls a producer's own
 	-- lastDigTime forward to shorten what's left, or - once that
 	-- producer's storage is full - sells it on the spot; it never
@@ -223,9 +292,19 @@ local function advance(self: ClockState, seconds: number): boolean
 	-- collecting (the cycle freezes rather than resets) until its owner
 	-- empties it.
 	local producers = economy:getList('producers')
-	if producers and digSpeed and digSpeed.value > 0 then
+	if producers then
 		for i = 1, producers.length do
 			local producer = producers[i]
+			local classNameProp = producer:getString('robotClass')
+			local className = if classNameProp then classNameProp.value else 'beachCrew'
+			local robotClass = findRobotClass(className)
+
+			local digSpeed = if robotClass then robotClass:getNumber('digSpeedSeconds') else nil
+			local itemsPerDigProp = if robotClass then robotClass:getNumber('itemsPerDig') else nil
+			local itemsPerDig = if itemsPerDigProp then math.floor(itemsPerDigProp.value) else 1
+			local classStorageCapacityProp = if robotClass then robotClass:getNumber('storageCapacity') else nil
+			local storageCapacityValue = if classStorageCapacityProp then classStorageCapacityProp.value else STORAGE_CAPACITY_START
+
 			local storage = producer:getList('storage')
 			local storageCapacity = producer:getNumber('storageCapacity')
 			if storageCapacity then
@@ -235,7 +314,7 @@ local function advance(self: ClockState, seconds: number): boolean
 
 			local lastDigTime = producer:getNumber('lastDigTime')
 			local cooldownFraction = producer:getNumber('digCooldownFraction')
-			if lastDigTime and cooldownFraction then
+			if lastDigTime and cooldownFraction and digSpeed and digSpeed.value > 0 then
 				if isFull then
 					cooldownFraction.value = 0
 				elseif storage then
@@ -364,6 +443,9 @@ local function advance(self: ClockState, seconds: number): boolean
 					if currency then
 						currency.value += dockTotal
 					end
+					if lifetimeCurrencyEarned then
+						lifetimeCurrencyEarned.value += dockTotal
+					end
 
 					local dockPulseTime = producer:getNumber('lastPulseTime')
 					local dockPulseMagnitude = producer:getNumber('pulseMagnitude')
@@ -420,72 +502,41 @@ local function advance(self: ClockState, seconds: number): boolean
 				end
 			end
 		end
+	end
 
-		-- Fade every dropped wheel track linearly over TRAIL_FADE_DURATION
-		-- seconds; the cap above (not this) is what keeps the list from
-		-- growing forever, so a fully-faded mark just sits invisible until
-		-- newer ones eventually shift it out.
-		local trail = economy:getList('trail')
-		if trail then
-			for i = 1, trail.length do
-				local point = trail[i]
-				local spawnTime = point:getNumber('spawnTime')
-				local alpha = point:getNumber('alpha')
-				if spawnTime and alpha then
-					local age = gameTime - spawnTime.value
-					alpha.value = clamp01(1 - (age / TRAIL_FADE_DURATION))
-				end
+	-- Fade every dropped wheel track linearly over TRAIL_FADE_DURATION
+	-- seconds; the cap above (not this) is what keeps the list from
+	-- growing forever, so a fully-faded mark just sits invisible until
+	-- newer ones eventually shift it out.
+	local trail = economy:getList('trail')
+	if trail then
+		for i = 1, trail.length do
+			local point = trail[i]
+			local spawnTime = point:getNumber('spawnTime')
+			local alpha = point:getNumber('alpha')
+			if spawnTime and alpha then
+				local age = gameTime - spawnTime.value
+				alpha.value = clamp01(1 - (age / TRAIL_FADE_DURATION))
 			end
 		end
 	end
 
-	-- Upgrade panels: affordable/maxed state, each priced on its own
-	-- Cost(n) = base * growth^n curve rather than one shared flat price
-	local itemsPerDigAffordable = economy:getNumber('itemsPerDigAffordable')
-	local itemsPerDigCostLabel = economy:getString('itemsPerDigCostLabel')
-	if itemsPerDigProp and itemsPerDigAffordable and itemsPerDigCostLabel then
-		local maxed = itemsPerDigProp.value >= ITEMS_PER_DIG_MAX
-		local level = levelsBought(itemsPerDigProp.value, ITEMS_PER_DIG_STEP, ITEMS_PER_DIG_START)
-		local cost = upgradeCost(level)
-		itemsPerDigAffordable.value = (currencyValue >= cost and not maxed) and 1 or DIMMED_ALPHA
-		itemsPerDigCostLabel.value = maxed and 'MAX' or tostring(cost)
-	end
-
-	local digSpeedAffordable = economy:getNumber('digSpeedAffordable')
-	local digSpeedCostLabel = economy:getString('digSpeedCostLabel')
-	if digSpeed and digSpeedAffordable and digSpeedCostLabel then
-		local maxed = digSpeed.value <= DIG_SPEED_MIN
-		local level = levelsBought(digSpeed.value, DIG_SPEED_STEP, DIG_SPEED_START)
-		local cost = upgradeCost(level)
-		digSpeedAffordable.value = (currencyValue >= cost and not maxed) and 1 or DIMMED_ALPHA
-		digSpeedCostLabel.value = maxed and 'MAX' or tostring(cost)
-	end
-
-	local elbowGreasePercent = economy:getNumber('elbowGreasePercent')
-	local elbowGreaseAffordable = economy:getNumber('elbowGreaseAffordable')
-	local elbowGreaseCostLabel = economy:getString('elbowGreaseCostLabel')
-	if elbowGreasePercent and elbowGreaseAffordable and elbowGreaseCostLabel then
-		local maxed = elbowGreasePercent.value >= ELBOW_GREASE_MAX
-		local level = levelsBought(elbowGreasePercent.value, ELBOW_GREASE_STEP, ELBOW_GREASE_START)
-		local cost = upgradeCost(level)
-		elbowGreaseAffordable.value = (currencyValue >= cost and not maxed) and 1 or DIMMED_ALPHA
-		elbowGreaseCostLabel.value = maxed and 'MAX' or tostring(cost)
-	end
-
-	local storageCapacityAffordable = economy:getNumber('storageCapacityAffordable')
-	local storageCapacityCostLabel = economy:getString('storageCapacityCostLabel')
-	if storageCapacityProp and storageCapacityAffordable and storageCapacityCostLabel then
-		local maxed = storageCapacityProp.value >= STORAGE_CAPACITY_MAX
-		local level = levelsBought(storageCapacityProp.value, STORAGE_CAPACITY_STEP, STORAGE_CAPACITY_START)
-		local cost = upgradeCost(level)
-		storageCapacityAffordable.value = (currencyValue >= cost and not maxed) and 1 or DIMMED_ALPHA
-		storageCapacityCostLabel.value = maxed and 'MAX' or tostring(cost)
+	-- Upgrade panels: mirror whichever class is selected onto the (still
+	-- Economy-level, unchanged) display fields the panels already bind
+	-- to, and price each stat independently on its own Cost(n) curve.
+	local selectedClassName = economy:getString('selectedClassName')
+	local selectedClass = if selectedClassName then findRobotClass(selectedClassName.value) else nil
+	if selectedClass then
+		mirrorAndPriceStat(economy, selectedClass, 'itemsPerDig', 'itemsPerDigAffordable', 'itemsPerDigCostLabel', ITEMS_PER_DIG_STEP, ITEMS_PER_DIG_START, ITEMS_PER_DIG_MAX, false, currencyValue)
+		mirrorAndPriceStat(economy, selectedClass, 'digSpeedSeconds', 'digSpeedAffordable', 'digSpeedCostLabel', DIG_SPEED_STEP, DIG_SPEED_START, DIG_SPEED_MIN, true, currencyValue)
+		mirrorAndPriceStat(economy, selectedClass, 'elbowGreasePercent', 'elbowGreaseAffordable', 'elbowGreaseCostLabel', ELBOW_GREASE_STEP, ELBOW_GREASE_START, ELBOW_GREASE_MAX, false, currencyValue)
+		mirrorAndPriceStat(economy, selectedClass, 'storageCapacity', 'storageCapacityAffordable', 'storageCapacityCostLabel', STORAGE_CAPACITY_STEP, STORAGE_CAPACITY_START, STORAGE_CAPACITY_MAX, false, currencyValue)
 	end
 
 	-- Dock speed panel: reads "Auto-Sell" (a locked/unlock purchase) while
 	-- dockSpeed is still 0, then becomes the repeatable "Robot Speed"
 	-- upgrade once bought. dockActiveAlpha dims the dock box itself the
-	-- same way until then.
+	-- same way until then. Fleet-wide, so this stays a flat Economy stat.
 	local dockSpeedAffordable = economy:getNumber('dockSpeedAffordable')
 	local dockSpeedCostLabel = economy:getString('dockSpeedCostLabel')
 	local dockSpeedLabel = economy:getString('dockSpeedLabel')
@@ -525,6 +576,54 @@ local function advance(self: ClockState, seconds: number): boolean
 		local cost = steelSeekerCost(steelSeekerCount.value)
 		steelSeekerAffordable.value = (currencyValue >= cost) and 1 or DIMMED_ALPHA
 		steelSeekerCostLabel.value = tostring(cost)
+	end
+
+	-- Steel Seeker discovery: a one-way unlock once lifetime earnings
+	-- cross the threshold (lifetimeCurrencyEarned only ever grows, so
+	-- this naturally stays unlocked once true - no separate latch needed).
+	local steelSeekerDiscovered = economy:getNumber('steelSeekerDiscovered')
+	if steelSeekerDiscovered and lifetimeCurrencyEarned then
+		steelSeekerDiscovered.value = (lifetimeCurrencyEarned.value >= STEEL_SEEKER_DISCOVERY_THRESHOLD) and 1 or 0
+	end
+
+	-- Tab bar: which tab is highlighted, which panel group is shown
+	-- (displayValue flex/none - takes the group fully out of layout,
+	-- unlike opacity, so hidden tabs leave no gap), and whether the
+	-- Steel Seeker tab/purchase panel exist in the layout at all yet.
+	local activeTabIsRobots = economy:getNumber('activeTabIsRobots')
+	local onRobotsTab = (activeTabIsRobots ~= nil) and (activeTabIsRobots.value > 0)
+	local onBeachCrew = (selectedClassName ~= nil) and (selectedClassName.value == 'beachCrew')
+
+	local beachCrewTabAlpha = economy:getNumber('beachCrewTabAlpha')
+	if beachCrewTabAlpha then
+		beachCrewTabAlpha.value = (not onRobotsTab and onBeachCrew) and 1 or DIMMED_ALPHA
+	end
+	local steelSeekerTabAlpha = economy:getNumber('steelSeekerTabAlpha')
+	if steelSeekerTabAlpha then
+		steelSeekerTabAlpha.value = (not onRobotsTab and not onBeachCrew) and 1 or DIMMED_ALPHA
+	end
+	local robotsTabAlpha = economy:getNumber('robotsTabAlpha')
+	if robotsTabAlpha then
+		robotsTabAlpha.value = onRobotsTab and 1 or DIMMED_ALPHA
+	end
+
+	local classPanelsDisplay = economy:getNumber('classPanelsDisplay')
+	if classPanelsDisplay then
+		classPanelsDisplay.value = onRobotsTab and 1 or 0
+	end
+	local robotsPanelsDisplay = economy:getNumber('robotsPanelsDisplay')
+	if robotsPanelsDisplay then
+		robotsPanelsDisplay.value = onRobotsTab and 0 or 1
+	end
+
+	local discovered = (steelSeekerDiscovered ~= nil) and (steelSeekerDiscovered.value > 0)
+	local steelSeekerTabDisplay = economy:getNumber('steelSeekerTabDisplay')
+	if steelSeekerTabDisplay then
+		steelSeekerTabDisplay.value = discovered and 0 or 1
+	end
+	local steelSeekerBuyPanelDisplay = economy:getNumber('steelSeekerBuyPanelDisplay')
+	if steelSeekerBuyPanelDisplay then
+		steelSeekerBuyPanelDisplay.value = discovered and 0 or 1
 	end
 
 	-- Live totals across every producer's own storage, for the bottom

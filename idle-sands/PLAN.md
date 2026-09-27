@@ -657,21 +657,57 @@ built before it.
   simulated seconds later even off-hover; hovering the robot again after
   being taught still shows it normally (opt-in, not forced).
 
+- **Per-class upgrades + tabbed UI + Steel Seeker discovery.** Each robot
+  class now has its own independent `itemsPerDig`/`digSpeedSeconds`/
+  `elbowGreasePercent`/`storageCapacity` instead of one shared set: a new
+  `RobotClass` view model (`robotClasses.rml`), mirroring the existing
+  `Producer` list-of-named-instances pattern, with two instances -
+  `BeachCrew` (shared by Starter and Beach Boy - they answered "shares
+  Beach Boy's tab/stats" when asked) and `SteelSeekerClass`. Each
+  `Producer` gained a `robotClass` string field naming which class it
+  belongs to; `clock.luau` resolves it per-producer every frame
+  (`findRobotClass`).
+  The four existing upgrade panels were left alone - they still read
+  Economy's flat `itemsPerDig`/etc. fields exactly as before. Those
+  fields are now a **mirror** of whichever class is selected
+  (`Economy.selectedClassName`), refreshed every frame
+  (`mirrorAndPriceStat` in `clock.luau`); `upgrade.luau` gained an
+  optional `classScoped` input that, when set, writes the purchase
+  straight to the selected `RobotClass` instance instead of the mirror
+  (writing the mirror would just be overwritten next frame). Robot Speed
+  (dock upgrade) stayed fleet-wide per instruction and omits this input.
+  A tab bar (Beach Crew / Steel Seeker / Robots) sits above the panels;
+  switching tabs sets `selectedClassName` + `activeTabIsRobots`
+  (`selectTab.luau`), which drives which panel group shows via
+  `LayoutComponentStyle.displayValue` (flex/none - fully removes the
+  hidden group from layout, no gap left behind) and which tab is
+  highlighted via opacity. Steel Seeker starts undiscovered: its tab and
+  purchase panel both stay `display: none` until
+  `Economy.lifetimeCurrencyEarned` (a cumulative, never-decreasing
+  counter distinct from spendable `currency`, incremented alongside
+  every sell in `main.luau`/`sell.luau`) crosses a threshold, at which
+  point `Economy.steelSeekerDiscovered` flips on permanently and both
+  unhide; `selectTab.luau` also refuses a click on the Steel Seeker tab
+  before that flag is set, as a second guard against a hidden target
+  still receiving input.
+  Verified headlessly end to end: screenshots confirm the tab bar and
+  panel-swapping (Beach Crew shown by default, Steel Seeker tab/panel
+  hidden pre-discovery, Robots tab showing Auto-Sell + Beach
+  Boy + a correctly-still-hidden Steel Seeker purchase panel); a
+  class-scoped purchase (`itemsPerDig` 1 -> 2 on Beach Crew) persists
+  across the next frame instead of being reverted by the mirror refresh;
+  `--data-dump` on the `robotClasses` list confirms Beach Crew's
+  `itemsPerDig` reads 2 while Steel Seeker's independently still reads
+  1; crossing the discovery threshold (verified with the threshold
+  temporarily lowered for a fast repro, then reverted) flips
+  `steelSeekerDiscovered`/`steelSeekerTabDisplay`/
+  `steelSeekerBuyPanelDisplay` together and the tab/panel appear.
+
 Still to come from this same playtesting round, not yet started:
 - **Upgrade-panel tooltips** - hover explanations on all seven side-panel
-  buttons, deliberately sequenced *after* the tabbed restructure below so
-  they're wired onto the final panel layout, not thrown away.
-- **Per-class upgrades + tabbed UI + Steel Seeker discovery** - the big
-  one. Each robot class (Starter/Beach Boy/Steel Seeker) gets its own
-  independent `itemsPerDig`/`digSpeedSeconds`/`elbowGreasePercent`/
-  `storageCapacity` instead of one shared set (a new `RobotClass` view
-  model, mirroring how `Producer` already works, with `Producer` gaining
-  a class reference); a tab bar per class plus a "Robots" tab for
-  purchases; Steel Seeker starts hidden until some unlock condition
-  (still to be decided) fires. Blocked on three open questions before
-  starting: whether Starter gets its own tab or shares Beach Boy's,
-  what specifically unlocks Steel Seeker, and whether Robot Speed
-  (the dock upgrade) stays one fleet-wide stat or also goes per-class.
+  buttons. Deliberately sequenced after the tabbed restructure above so
+  they're wired onto the final panel layout instead of being thrown away;
+  now unblocked.
 - **Bento-style stats dashboard** - a later, larger view of full
   lifetime/fleet statistics once unlocked. Explicitly scoped as a
   future milestone, not part of this pass - added here as a placeholder

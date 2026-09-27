@@ -599,6 +599,27 @@ inspected with zero wiring problems.
    locked/dimmed dock vs. "Robot Speed 20" with the dock at full
    opacity). Verified clean, inspected with zero wiring problems.
 
+   **Bug fix (playtesting):** emptying a robot mid-walk correctly
+   cleared its storage, but left `roamTargetX`/`roamTargetY` still
+   pointing at the dock - so it kept walking there anyway, just at
+   ordinary `ROAM_SPEED` instead of `dockSpeed`, since nothing had told
+   it to pick a new direction. The original verification checked that
+   the *sale* happened, not that the *target* changed, so this slipped
+   through. Fixed in `clock.luau`'s roaming block: when a producer
+   isn't docking (no longer full) but its current roam target still
+   exactly equals the dock's fixed coordinates, it immediately rerolls
+   a fresh random target rather than waiting to arrive - this covers
+   emptying it any way (a manual click, or Sell All), since the check
+   is purely "target == dock, but not full" rather than tied to which
+   script did the selling. Verified headlessly (with the same
+   temporary seeded-PRNG technique used for the demo GIF, reverted
+   after): traced a producer's exact walk to the dock, clicked it
+   mid-route to sell manually, and confirmed in the same tick its
+   `roamTargetX`/`Y` jumped away from the dock's coordinates to a new
+   random point, then confirmed five simulated seconds later it had
+   moved toward that new point rather than back toward the dock.
+   Verified clean, inspected with zero wiring problems.
+
 7. **Persistence** — host page saves/loads `Economy` to `localStorage`;
    reload the page mid-game and confirm state survives.
 8. **Visual feedback pass** — floating "+N" numbers on collect/sell, button

@@ -314,11 +314,20 @@ local function advance(self: ClockState, seconds: number): boolean
 				local dockSpeedValue = if dockSpeedProp then dockSpeedProp.value else 0
 				local docking = isFull and dockSpeedValue > 0
 				local speed = ROAM_SPEED
+				local dockTargetX = DOCK_CENTER_X - PRODUCER_WIDGET_CENTER
+				local dockTargetY = DOCK_CENTER_Y - PRODUCER_WIDGET_CENTER
 
 				if docking then
-					roamTargetX.value = DOCK_CENTER_X - PRODUCER_WIDGET_CENTER
-					roamTargetY.value = DOCK_CENTER_Y - PRODUCER_WIDGET_CENTER
+					roamTargetX.value = dockTargetX
+					roamTargetY.value = dockTargetY
 					speed = dockSpeedValue
+				elseif roamTargetX.value == dockTargetX and roamTargetY.value == dockTargetY then
+					-- Was heading for the dock, but got emptied before
+					-- arriving (a manual click-sell, or Sell All) - drop
+					-- the dock as a destination right away instead of
+					-- finishing that walk at ordinary roam speed.
+					roamTargetX.value = ROAM_MIN_X + math.random() * (ROAM_MAX_X - ROAM_MIN_X)
+					roamTargetY.value = ROAM_MIN_Y + math.random() * (ROAM_MAX_Y - ROAM_MIN_Y)
 				end
 
 				local dx = roamTargetX.value - roamX.value

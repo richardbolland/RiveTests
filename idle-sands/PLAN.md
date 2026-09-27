@@ -548,8 +548,47 @@ inspected with zero wiring problems.
    for free, with no bot-specific wiring). Verified clean, inspected
    with zero wiring problems.
 
-6. **Auto-sell** — driver script sells inventory automatically on the
-   upgradeable timer; visible countdown in UI.
+6. **Auto-sell** ✅ — a fleet-wide timer that runs the exact same sum+clear
+   sweep as Sell All (`sell.luau`) automatically, on an upgradeable
+   interval, so a full robot doesn't just sit stalled waiting for the
+   player to notice and click. This milestone's original description
+   predates the per-producer-storage redesign (it assumed one shared
+   `Economy.inventory` list); the mechanic carried over unchanged in
+   spirit - sell everything, automatically, on a timer - just now
+   iterating every producer's own `storage` the same way `sell.luau`
+   and the bottom-strip aggregate already do. (The other idea raised in
+   the same vision-alignment conversation - a robot physically travels
+   to a docking station to sell - stays explicitly deferred, a
+   different and more involved feature for later.)
+
+   Implementation: `autoSellSeconds` (already declared, unused, since
+   Milestone 3) is now a real upgradeable stat - same shared
+   Cost(n) = base * growth^n curve as the other four upgrades, 90s→15s
+   over 5 steps - with a new `AutoSellPanel` mirroring
+   `DigSpeedPanel`/`StorageCapacityPanel` exactly. `clock.luau` tracks
+   `lastAutoSellTime` the same way each producer tracks its own
+   `lastDigTime`: every frame, `remaining = autoSellSeconds -
+   (gameTime - lastAutoSellTime)`; at zero, it sums and clears every
+   producer's storage into `currency` (byte-for-byte the same loop
+   `sell.luau` runs on a click) and resets. A live countdown
+   (`autoSellCountdownLabel`, e.g. "Auto-sell in 42s") sits next to the
+   "Stored: n ($v)" summary in the bottom strip - the "visible
+   countdown in UI" the original plan called for.
+
+   Verified headlessly: a `--data-dump-every` trace across a 95s window
+   confirmed the countdown ticks down accurately, fires within a
+   fraction of a second of the target time, and correctly resumes
+   counting from the fresh interval afterward (not from zero) - proof
+   the simulation steps per-frame rather than in one coarse jump.
+   Confirmed buying the upgrade immediately shortens the countdown
+   (90s→75s, cost $5→$14, matching the curve exactly). Most
+   importantly, confirmed the full loop this exists for: with a
+   temporarily lengthened interval, watched a robot fill to capacity
+   and freeze (badge reading "!") for over a hundred seconds, then
+   auto-sell fired, cleared its storage, paid out, and the robot
+   resumed collecting on its own the very next tick - with zero
+   player input. Verified clean, inspected with zero wiring problems.
+
 7. **Persistence** — host page saves/loads `Economy` to `localStorage`;
    reload the page mid-game and confirm state survives.
 8. **Visual feedback pass** — floating "+N" numbers on collect/sell, button

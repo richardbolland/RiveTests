@@ -69,6 +69,10 @@ local STORAGE_CAPACITY_START = 3
 local STORAGE_CAPACITY_STEP = 1
 local STORAGE_CAPACITY_MAX = 8
 
+local AUTO_SELL_START = 90
+local AUTO_SELL_STEP = -15
+local AUTO_SELL_MIN = 15
+
 -- Beach Boy is repeatable rather than a one-time flag: each purchase adds
 -- another producer and gets pricier, on its own (steeper, since these are
 -- whole extra producers rather than a shared stat) Cost(n) = base *
@@ -388,6 +392,17 @@ local function advance(self: ClockState, seconds: number): boolean
 		storageCapacityCostLabel.value = maxed and 'MAX' or tostring(cost)
 	end
 
+	local autoSellSecondsProp = economy:getNumber('autoSellSeconds')
+	local autoSellAffordable = economy:getNumber('autoSellAffordable')
+	local autoSellCostLabel = economy:getString('autoSellCostLabel')
+	if autoSellSecondsProp and autoSellAffordable and autoSellCostLabel then
+		local maxed = autoSellSecondsProp.value <= AUTO_SELL_MIN
+		local level = levelsBought(autoSellSecondsProp.value, AUTO_SELL_STEP, AUTO_SELL_START)
+		local cost = upgradeCost(level)
+		autoSellAffordable.value = (currencyValue >= cost and not maxed) and 1 or DIMMED_ALPHA
+		autoSellCostLabel.value = maxed and 'MAX' or tostring(cost)
+	end
+
 	-- Beach Boy purchase panel: repeatable, so just affordable/not - never
 	-- "owned" now that buying one doesn't stop you buying another
 	local beachBoyCount = economy:getNumber('beachBoyCount')
@@ -407,6 +422,41 @@ local function advance(self: ClockState, seconds: number): boolean
 		local cost = steelSeekerCost(steelSeekerCount.value)
 		steelSeekerAffordable.value = (currencyValue >= cost) and 1 or DIMMED_ALPHA
 		steelSeekerCostLabel.value = tostring(cost)
+	end
+
+	-- Auto-sell: runs the same sum+clear sweep as Sell All (sell.luau)
+	-- automatically on a timer, so a full fleet doesn't just sit idle
+	-- waiting on the player to notice and click. Upgradeable like any
+	-- other stat, via the same shared upgrade.luau/Cost(n) curve.
+	local autoSellSeconds = economy:getNumber('autoSellSeconds')
+	local lastAutoSellTime = economy:getNumber('lastAutoSellTime')
+	local autoSellCountdownLabel = economy:getString('autoSellCountdownLabel')
+	if autoSellSeconds and lastAutoSellTime and producers then
+		local remaining = autoSellSeconds.value - (gameTime - lastAutoSellTime.value)
+		if remaining <= 0 then
+			local autoSellTotal = 0
+			for i = 1, producers.length do
+				local storage = producers[i]:getList('storage')
+				if storage then
+					for j = 1, storage.length do
+						local item = storage[j]
+						local value = item:getNumber('value')
+						if value then
+							autoSellTotal += value.value
+						end
+					end
+					storage:clear()
+				end
+			end
+			if currency then
+				currency.value += autoSellTotal
+			end
+			lastAutoSellTime.value = gameTime
+			remaining = autoSellSeconds.value
+		end
+		if autoSellCountdownLabel then
+			autoSellCountdownLabel.value = tostring(math.ceil(math.max(0, remaining))) .. 's'
+		end
 	end
 
 	-- Live totals across every producer's own storage, for the bottom

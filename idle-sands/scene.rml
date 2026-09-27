@@ -248,6 +248,43 @@
                     </Text>
                 </LayoutComponent>
 
+                <LayoutComponent width="240" height="64" styleId="0:191" name="AutoSellPanel" id="0:190">
+                    <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                          flexDirectionValue="row" layoutAlignmentType="spaceBetweenCenter"
+                                          paddingLeft="16" paddingLeftUnitsValue="points"
+                                          paddingRight="16" paddingRightUnitsValue="points"
+                                          cornerRadiusTL="10" cornerRadiusTR="10" cornerRadiusBL="10" cornerRadiusBR="10"
+                                          name="AutoSellPanel Style" id="0:191"/>
+                    <DataBindContext sourcePathIds="0:200-0:285" propertyKey="18"/>
+                    <Fill name="Fill">
+                        <SolidColor colorValue="FF4F7062" name="C">
+                            <DataBindContext sourcePathIds="0:100-0:108" propertyKey="37"/>
+                        </SolidColor>
+                    </Fill>
+
+                    <Text name="AutoSellLabel" id="0:192">
+                        <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="AutoSellLabel Layout"/>
+                        <TextStylePaint fontSize="16" fontAssetId="0:300" name="AutoSellStyle" id="0:193">
+                            <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextValueRun styleId="0:193" text="Auto-Sell " name="AutoSellPrefix"/>
+                        <TextValueRun styleId="0:193" text="90" name="AutoSellValue">
+                            <DataBindContext sourcePathIds="0:200-0:204" propertyKey="268" converterId="0:301"/>
+                        </TextValueRun>
+                        <TextValueRun styleId="0:193" text="s" name="AutoSellSuffix"/>
+                    </Text>
+
+                    <Text name="AutoSellCost" id="0:194">
+                        <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="AutoSellCost Layout"/>
+                        <TextStylePaint fontSize="14" fontAssetId="0:300" name="AutoSellCostStyle" id="0:195">
+                            <Fill name="Fill"><SolidColor colorValue="FFE8C27A" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextValueRun styleId="0:195" text="5" name="AutoSellCostRun">
+                            <DataBindContext sourcePathIds="0:200-0:286" propertyKey="268"/>
+                        </TextValueRun>
+                    </Text>
+                </LayoutComponent>
+
                 <LayoutComponent width="240" height="64" styleId="0:161" name="BuyBeachBoyPanel" id="0:160">
                     <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
                                           flexDirectionValue="row" layoutAlignmentType="spaceBetweenCenter"
@@ -371,6 +408,17 @@
                 </TextValueRun>
                 <TextValueRun styleId="0:54" text=")" name="StoredSummarySuffix"/>
             </Text>
+
+            <Text name="AutoSellCountdown" id="0:55">
+                <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="AutoSellCountdown Layout"/>
+                <TextStylePaint fontSize="16" fontAssetId="0:300" name="AutoSellCountdownStyle" id="0:56">
+                    <Fill name="Fill"><SolidColor colorValue="FF4F7062" name="C"/></Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="0:56" text="Auto-sell in " name="AutoSellCountdownPrefix"/>
+                <TextValueRun styleId="0:56" text="90s" name="AutoSellCountdownValue">
+                    <DataBindContext sourcePathIds="0:200-0:284" propertyKey="268"/>
+                </TextValueRun>
+            </Text>
         </LayoutComponent>
 
         <StateMachine name="Main" id="0:7">
@@ -412,6 +460,17 @@
                     <ScriptInputNumber propertyValue="1" name="step"/>
                     <ScriptInputNumber propertyValue="1" name="minValue"/>
                     <ScriptInputNumber propertyValue="6" name="maxValue"/>
+                    <ScriptInputNumber propertyValue="5" name="baseCost"/>
+                    <ScriptInputNumber propertyValue="2.8" name="growth"/>
+                </ScriptedListenerAction>
+            </StateMachineListenerSingle>
+
+            <StateMachineListenerSingle targetId="0:190" listenerTypeValue="click" name="BuyAutoSell" id="0:196">
+                <ScriptedListenerAction scriptAssetId="0:312" id="0:197">
+                    <ScriptInputString propertyValue="autoSellSeconds" name="statName"/>
+                    <ScriptInputNumber propertyValue="-15" name="step"/>
+                    <ScriptInputNumber propertyValue="15" name="minValue"/>
+                    <ScriptInputNumber propertyValue="90" name="maxValue"/>
                     <ScriptInputNumber propertyValue="5" name="baseCost"/>
                     <ScriptInputNumber propertyValue="2.8" name="growth"/>
                 </ScriptedListenerAction>
@@ -512,11 +571,15 @@
         <ViewModelPropertyNumber name="steelSeekerCount" id="0:280"/>
         <ViewModelPropertyNumber name="steelSeekerAffordable" id="0:281"/>
         <ViewModelPropertyString name="steelSeekerCostLabel" id="0:282"/>
+        <ViewModelPropertyNumber name="lastAutoSellTime" id="0:283"/>
+        <ViewModelPropertyString name="autoSellCountdownLabel" id="0:284"/>
+        <ViewModelPropertyNumber name="autoSellAffordable" id="0:285"/>
+        <ViewModelPropertyString name="autoSellCostLabel" id="0:286"/>
         <ViewModelInstance exports="true" name="Default" id="0:210">
             <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:201"/>
             <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:202"/>
             <ViewModelInstanceNumber propertyValue="60" viewModelPropertyId="0:203"/>
-            <ViewModelInstanceNumber propertyValue="60" viewModelPropertyId="0:204"/>
+            <ViewModelInstanceNumber propertyValue="90" viewModelPropertyId="0:204"/>
             <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:205"/>
             <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:232"/>
             <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:233"/>
@@ -541,6 +604,10 @@
             <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:280"/>
             <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:281"/>
             <ViewModelInstanceString propertyValue="220" viewModelPropertyId="0:282"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:283"/>
+            <ViewModelInstanceString propertyValue="90s" viewModelPropertyId="0:284"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:285"/>
+            <ViewModelInstanceString propertyValue="5" viewModelPropertyId="0:286"/>
         </ViewModelInstance>
     </ViewModel>
 

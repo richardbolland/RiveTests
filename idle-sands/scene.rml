@@ -1,0 +1,1086 @@
+<Rive version="1" kind="fragment">
+    <Artboard defaultStateMachineId="0:7" styleId="0:5" width="1280" height="720" name="IdleSands" id="0:2">
+        <LayoutComponentStyle flexDirectionValue="column" name="Artboard Style" id="0:5"/>
+
+        <!-- End-of-beach recap, declared before even the tooltip so it
+             draws on top of literally everything else once shown (first
+             sibling draws on top). Hidden by default (endScreenDisplay
+             starts at "none"); clock.luau flips it to "flex" the moment
+             runComplete latches on, and freezes the whole beach
+             underneath at the same time so the recap's numbers hold
+             still until Start New Beach (startNewBeach.luau) is clicked. -->
+        <LayoutComponent width="1280" height="720" styleId="0:941" name="EndScreenOverlay" id="0:940">
+            <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                  positionTypeValue="absolute"
+                                  positionLeft="0" positionTop="0"
+                                  positionLeftUnitsValue="points" positionTopUnitsValue="points"
+                                  flexDirectionValue="column" layoutAlignmentType="center"
+                                  displayValue="none"
+                                  name="EndScreenOverlay Style" id="0:941">
+                <DataBindContext sourcePathIds="0:200-0:909" propertyKey="596"/>
+            </LayoutComponentStyle>
+            <Fill name="Fill"><SolidColor colorValue="E61D2B27" name="C"/></Fill>
+
+            <LayoutComponent width="420" height="10" styleId="0:943" name="EndScreenCard" id="0:942">
+                <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="hug"
+                                      flexDirectionValue="column" layoutAlignmentType="topCenter"
+                                      paddingTop="32" paddingTopUnitsValue="points"
+                                      paddingBottom="32" paddingBottomUnitsValue="points"
+                                      paddingLeft="32" paddingLeftUnitsValue="points"
+                                      paddingRight="32" paddingRightUnitsValue="points"
+                                      gapVertical="10" gapVerticalUnitsValue="points"
+                                      cornerRadiusTL="16" cornerRadiusTR="16" cornerRadiusBL="16" cornerRadiusBR="16"
+                                      name="EndScreenCard Style" id="0:943"/>
+                <Fill name="Fill"><SolidColor colorValue="FF3E5C50" name="C"/></Fill>
+
+                <Text name="EndHeadline" id="0:944">
+                    <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="EndHeadline Layout"/>
+                    <TextStylePaint fontSize="26" fontAssetId="0:300" name="EndHeadlineStyle" id="0:945">
+                        <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                    </TextStylePaint>
+                    <TextValueRun styleId="0:945" text="Beach " name="EndHeadlinePrefix"/>
+                    <TextValueRun styleId="0:945" text="1" name="EndHeadlineNumber">
+                        <DataBindContext sourcePathIds="0:200-0:900" propertyKey="268" converterId="0:301"/>
+                    </TextValueRun>
+                    <TextValueRun styleId="0:945" text=" Complete!" name="EndHeadlineSuffix"/>
+                </Text>
+
+                <Text name="EndItemsLabel" id="0:949">
+                    <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="EndItemsLabel Layout"/>
+                    <TextStylePaint fontSize="16" fontAssetId="0:300" name="EndItemsStyle" id="0:950">
+                        <Fill name="Fill"><SolidColor colorValue="FFE8C27A" name="C"/></Fill>
+                    </TextStylePaint>
+                    <TextValueRun styleId="0:950" text="Items collected: " name="EndItemsPrefix"/>
+                    <TextValueRun styleId="0:950" text="0" name="EndItemsValue">
+                        <DataBindContext sourcePathIds="0:200-0:905" propertyKey="268" converterId="0:301"/>
+                    </TextValueRun>
+                </Text>
+
+                <Text name="EndCurrencyLabel" id="0:953">
+                    <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="EndCurrencyLabel Layout"/>
+                    <TextStylePaint fontSize="16" fontAssetId="0:300" name="EndCurrencyStyle" id="0:954">
+                        <Fill name="Fill"><SolidColor colorValue="FFE8C27A" name="C"/></Fill>
+                    </TextStylePaint>
+                    <TextValueRun styleId="0:954" text="Currency earned: $" name="EndCurrencyPrefix"/>
+                    <TextValueRun styleId="0:954" text="0" name="EndCurrencyValue">
+                        <DataBindContext sourcePathIds="0:200-0:902" propertyKey="268" converterId="0:301"/>
+                    </TextValueRun>
+                </Text>
+
+                <Text name="EndTimeLabel" id="0:957">
+                    <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="EndTimeLabel Layout"/>
+                    <TextStylePaint fontSize="16" fontAssetId="0:300" name="EndTimeStyle" id="0:958">
+                        <Fill name="Fill"><SolidColor colorValue="FFE8C27A" name="C"/></Fill>
+                    </TextStylePaint>
+                    <TextValueRun styleId="0:958" text="Time: " name="EndTimePrefix"/>
+                    <TextValueRun styleId="0:958" text="0:00" name="EndTimeValue">
+                        <DataBindContext sourcePathIds="0:200-0:907" propertyKey="268"/>
+                    </TextValueRun>
+                </Text>
+
+                <Text name="EndBotsLabel" id="0:961">
+                    <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="EndBotsLabel Layout"/>
+                    <TextStylePaint fontSize="16" fontAssetId="0:300" name="EndBotsStyle" id="0:962">
+                        <Fill name="Fill"><SolidColor colorValue="FFE8C27A" name="C"/></Fill>
+                    </TextStylePaint>
+                    <TextValueRun styleId="0:962" text="Robots owned: " name="EndBotsPrefix"/>
+                    <TextValueRun styleId="0:962" text="1" name="EndBotsValue">
+                        <DataBindContext sourcePathIds="0:200-0:910" propertyKey="268" converterId="0:301"/>
+                    </TextValueRun>
+                </Text>
+
+                <LayoutComponent width="240" height="52" styleId="0:966" name="StartNewBeachButton" id="0:965">
+                    <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                          layoutAlignmentType="center"
+                                          marginTop="12" marginTopUnitsValue="points"
+                                          cornerRadiusTL="12" cornerRadiusTR="12" cornerRadiusBL="12" cornerRadiusBR="12"
+                                          name="StartNewBeachButton Style" id="0:966"/>
+                    <Fill name="Fill"><SolidColor colorValue="FFE8785A" name="C"/></Fill>
+
+                    <Text name="StartNewBeachLabel" id="0:967">
+                        <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="StartNewBeachLabel Layout"/>
+                        <TextStylePaint fontSize="18" fontAssetId="0:300" name="StartNewBeachStyle" id="0:968">
+                            <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextValueRun styleId="0:968" text="Start New Beach" name="StartNewBeachRun"/>
+                    </Text>
+                </LayoutComponent>
+            </LayoutComponent>
+        </LayoutComponent>
+
+        <!-- Universal tooltip overlay, declared right after the end
+             screen so it draws on top of everything else EXCEPT that
+             recap (first sibling draws on top - rive docs transforms).
+             Shown/hidden and positioned by showTooltip.luau /
+             hideTooltip.luau, never edited directly by any one feature. -->
+        <LayoutComponent width="10" height="10" styleId="0:261" name="Tooltip" id="0:260">
+            <LayoutComponentStyle layoutWidthScaleType="hug" layoutHeightScaleType="hug"
+                                  positionTypeValue="absolute"
+                                  positionLeftUnitsValue="points" positionTopUnitsValue="points"
+                                  paddingLeft="8" paddingRight="8"
+                                  paddingTop="4" paddingBottom="4"
+                                  cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"
+                                  name="Tooltip Style" id="0:261">
+                <DataBindContext sourcePathIds="0:270-0:273" propertyKey="516"/>
+                <DataBindContext sourcePathIds="0:270-0:274" propertyKey="518"/>
+            </LayoutComponentStyle>
+            <DataBindContext sourcePathIds="0:270-0:272" propertyKey="18"/>
+            <Fill name="Fill">
+                <SolidColor colorValue="F01D2B27" name="C"/>
+            </Fill>
+
+            <Text name="TooltipLabel" id="0:263">
+                <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="TooltipLabel Layout"/>
+                <TextStylePaint fontSize="12" fontAssetId="0:300" name="TooltipStyle" id="0:264">
+                    <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="0:264" text="" name="TooltipRun">
+                    <DataBindContext sourcePathIds="0:270-0:271" propertyKey="268"/>
+                </TextValueRun>
+            </Text>
+        </LayoutComponent>
+
+        <LayoutComponent width="0" height="0" styleId="0:131" name="Clock" id="0:130">
+            <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" name="Clock Style" id="0:131"/>
+            <ScriptedLayout scriptAssetId="0:313" name="ClockScript" id="0:132"/>
+        </LayoutComponent>
+
+        <LayoutComponent width="1280" height="64" styleId="0:11" name="TopBar" id="0:10">
+            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fixed"
+                                  flexDirectionValue="row" layoutAlignmentType="centerLeft"
+                                  paddingLeft="24" paddingLeftUnitsValue="points"
+                                  paddingRight="24" paddingRightUnitsValue="points"
+                                  name="TopBar Style" id="0:11"/>
+            <Fill name="Fill">
+                <SolidColor colorValue="FF2E7D8C" name="C">
+                    <DataBindContext sourcePathIds="0:100-0:102" propertyKey="37"/>
+                </SolidColor>
+            </Fill>
+
+            <Text name="CurrencyLabel" id="0:15">
+                <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="CurrencyLabel Layout"/>
+                <TextStylePaint fontSize="28" fontAssetId="0:300" name="CurrencyStyle" id="0:16">
+                    <Fill name="Fill">
+                        <SolidColor colorValue="FFFFFFFF" name="C"/>
+                    </Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="0:16" text="$" name="CurrencyPrefix"/>
+                <TextValueRun styleId="0:16" text="0" name="CurrencyValue">
+                    <DataBindContext sourcePathIds="0:200-0:201" propertyKey="268" converterId="0:301"/>
+                </TextValueRun>
+            </Text>
+        </LayoutComponent>
+
+        <!-- Prestige-loop progress bar: how close this beach is to
+             runGoal. The label is one script-computed string
+             (runStatusLabel, clock.luau) rather than several bound runs,
+             since "Beach N - $X / $Y" needs three live numbers stitched
+             together. The bar itself is native: runProgressFraction
+             (0-1, also computed in clock.luau, since a DataConverter's
+             own min/max are fixed at author time and can't track a goal
+             that changes every beach) drives a Rectangle's width through
+             a fixed 0-500px range mapper, same shape as the meter example
+             in the data-binding docs. -->
+        <LayoutComponent width="1280" height="32" styleId="0:921" name="ProgressBarRow" id="0:920">
+            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fixed"
+                                  flexDirectionValue="row" layoutAlignmentType="centerLeft"
+                                  paddingLeft="24" paddingLeftUnitsValue="points"
+                                  paddingRight="24" paddingRightUnitsValue="points"
+                                  gapHorizontal="16" gapHorizontalUnitsValue="points"
+                                  name="ProgressBarRow Style" id="0:921"/>
+            <Fill name="Fill"><SolidColor colorValue="FF234139" name="C"/></Fill>
+
+            <Text name="RunStatusLabel" id="0:922">
+                <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="RunStatusLabel Layout"/>
+                <TextStylePaint fontSize="14" fontAssetId="0:300" name="RunStatusStyle" id="0:923">
+                    <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="0:923" text="Beach 1 - $0 / $1000" name="RunStatusRun">
+                    <DataBindContext sourcePathIds="0:200-0:904" propertyKey="268"/>
+                </TextValueRun>
+            </Text>
+
+            <LayoutComponent width="500" height="10" styleId="0:926" name="ProgressTrack" id="0:925">
+                <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                      layoutTypeValue="stack" layoutAlignmentType="centerLeft"
+                                      cornerRadiusTL="5" cornerRadiusTR="5" cornerRadiusBL="5" cornerRadiusBR="5"
+                                      name="ProgressTrack Style" id="0:926"/>
+                <Fill name="Fill"><SolidColor colorValue="FF1D2B27" name="C"/></Fill>
+
+                <Shape name="ProgressFill" id="0:927">
+                    <!-- hug, not fixed: a fixed-size participant SCALES the
+                         Rectangle's path to fill its box regardless of the
+                         Rectangle's own bound width (layout docs - "fixed
+                         and fill scale every path in the shape together
+                         into the slot"), which would always render this at
+                         the full 500px track width. hug instead sizes the
+                         participant off the Rectangle's own live bounds, so
+                         the bound width actually draws at that literal
+                         pixel size and the bar visibly grows from the left. -->
+                    <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="fixed" height="10" name="ProgressFill Layout"/>
+                    <Rectangle width="0" height="10" originX="0" originY="0.5" name="Path" id="0:928">
+                        <DataBindContext sourcePathIds="0:200-0:903" propertyKey="20" converterId="0:302"/>
+                    </Rectangle>
+                    <Fill name="Fill"><SolidColor colorValue="FFE8785A" name="C"/></Fill>
+                </Shape>
+            </LayoutComponent>
+        </LayoutComponent>
+
+        <LayoutComponent width="1280" height="556" styleId="0:21" name="MiddleRow" id="0:20">
+            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" flexDirectionValue="row" name="MiddleRow Style" id="0:21"/>
+
+            <LayoutComponent width="1000" height="556" styleId="0:31" name="BeachArea" id="0:30">
+                <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill"
+                                      flexDirectionValue="row" layoutAlignmentType="center"
+                                      gapHorizontal="40" gapHorizontalUnitsValue="points"
+                                      name="BeachArea Style" id="0:31"/>
+                <Fill name="Fill">
+                    <SolidColor colorValue="FFE8C27A" name="C">
+                        <DataBindContext sourcePathIds="0:100-0:103" propertyKey="37"/>
+                    </SolidColor>
+                </Fill>
+
+                <!-- Declared before TrailDots so robots draw on top of the
+                     tracks (first sibling draws on top - confirmed by
+                     screenshot for this pair; see gotchas note below). -->
+                <ArtboardComponentList name="ProducerRows" id="0:33">
+                    <DataBindContext sourcePathIds="0:200-0:250" propertyKey="800"/>
+                </ArtboardComponentList>
+
+                <ArtboardComponentList name="TrailDots" id="0:34">
+                    <DataBindContext sourcePathIds="0:200-0:259" propertyKey="800"/>
+                </ArtboardComponentList>
+
+                <!-- The dock: fixed at the bottom-center of the beach area
+                     (BeachArea-local coordinates, same space roamX/roamY
+                     use, so a full producer can walk straight to it with
+                     no coordinate conversion). Dimmed until dockSpeed is
+                     first purchased, at full opacity once robots can
+                     actually use it. Declared last so robots and tracks
+                     both draw in front of it. -->
+                <LayoutComponent width="120" height="90" styleId="0:36" name="DockBox" id="0:35">
+                    <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                          layoutAlignmentType="center"
+                                          positionTypeValue="absolute"
+                                          positionLeft="440" positionLeftUnitsValue="points"
+                                          positionTop="435" positionTopUnitsValue="points"
+                                          cornerRadiusTL="12" cornerRadiusTR="12" cornerRadiusBL="12" cornerRadiusBR="12"
+                                          name="DockBox Style" id="0:36"/>
+                    <DataBindContext sourcePathIds="0:200-0:284" propertyKey="18"/>
+                    <Fill name="Fill">
+                        <SolidColor colorValue="FF8B6B47" name="C"/>
+                    </Fill>
+
+                    <Text name="DockLabel" id="0:37">
+                        <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="DockLabel Layout"/>
+                        <TextStylePaint fontSize="16" fontAssetId="0:300" name="DockLabelStyle" id="0:38">
+                            <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextValueRun styleId="0:38" text="DOCK" name="DockLabelRun"/>
+                    </Text>
+                </LayoutComponent>
+            </LayoutComponent>
+
+            <LayoutComponent width="280" height="556" styleId="0:41" name="SidePanel" id="0:40">
+                <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fill"
+                                      flexDirectionValue="column" layoutAlignmentType="topCenter"
+                                      paddingTop="24" paddingTopUnitsValue="points"
+                                      gapVertical="12" gapVerticalUnitsValue="points"
+                                      name="SidePanel Style" id="0:41"/>
+                <Fill name="Fill">
+                    <SolidColor colorValue="FF3E5C50" name="C">
+                        <DataBindContext sourcePathIds="0:100-0:104" propertyKey="37"/>
+                    </SolidColor>
+                </Fill>
+
+                <!-- Tab bar: switches which class's upgrade panels show
+                     (Beach Crew vs Steel Seeker) or swaps to the Robots
+                     tab (purchasing + fleet-wide Robot Speed). Steel
+                     Seeker starts hidden (steelSeekerTabDisplay) until
+                     discovered; selectTab.luau also refuses the click as
+                     a second guard. -->
+                <LayoutComponent width="240" height="40" styleId="0:801" name="TabBar" id="0:800">
+                    <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                          flexDirectionValue="row" layoutAlignmentType="spaceBetweenCenter"
+                                          gapHorizontal="4" gapHorizontalUnitsValue="points"
+                                          name="TabBar Style" id="0:801"/>
+
+                    <LayoutComponent width="76" height="32" styleId="0:803" name="TabBeachCrew" id="0:802">
+                        <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                              layoutAlignmentType="center"
+                                              cornerRadiusTL="8" cornerRadiusTR="8" cornerRadiusBL="8" cornerRadiusBR="8"
+                                              name="TabBeachCrew Style" id="0:803"/>
+                        <DataBindContext sourcePathIds="0:200-0:293" propertyKey="18"/>
+                        <Fill name="Fill"><SolidColor colorValue="FFD9B84A" name="C"/></Fill>
+
+                        <Text name="TabBeachCrewLabel" id="0:804">
+                            <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="TabBeachCrewLabel Layout"/>
+                            <TextStylePaint fontSize="13" fontAssetId="0:300" name="TabBeachCrewStyle" id="0:805">
+                                <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                            </TextStylePaint>
+                            <TextValueRun styleId="0:805" text="Beach Crew" name="TabBeachCrewRun"/>
+                        </Text>
+                    </LayoutComponent>
+
+                    <LayoutComponent width="76" height="32" styleId="0:807" name="TabSteelSeeker" id="0:806">
+                        <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                              layoutAlignmentType="center"
+                                              cornerRadiusTL="8" cornerRadiusTR="8" cornerRadiusBL="8" cornerRadiusBR="8"
+                                              displayValue="none" name="TabSteelSeeker Style" id="0:807">
+                            <DataBindContext sourcePathIds="0:200-0:298" propertyKey="596"/>
+                        </LayoutComponentStyle>
+                        <DataBindContext sourcePathIds="0:200-0:294" propertyKey="18"/>
+                        <Fill name="Fill"><SolidColor colorValue="FF7A8699" name="C"/></Fill>
+
+                        <Text name="TabSteelSeekerLabel" id="0:808">
+                            <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="TabSteelSeekerLabel Layout"/>
+                            <TextStylePaint fontSize="13" fontAssetId="0:300" name="TabSteelSeekerStyle" id="0:809">
+                                <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                            </TextStylePaint>
+                            <TextValueRun styleId="0:809" text="Steel Seeker" name="TabSteelSeekerRun"/>
+                        </Text>
+                    </LayoutComponent>
+
+                    <LayoutComponent width="76" height="32" styleId="0:811" name="TabRobots" id="0:810">
+                        <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                              layoutAlignmentType="center"
+                                              cornerRadiusTL="8" cornerRadiusTR="8" cornerRadiusBL="8" cornerRadiusBR="8"
+                                              name="TabRobots Style" id="0:811"/>
+                        <DataBindContext sourcePathIds="0:200-0:295" propertyKey="18"/>
+                        <Fill name="Fill"><SolidColor colorValue="FFE8785A" name="C"/></Fill>
+
+                        <Text name="TabRobotsLabel" id="0:812">
+                            <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="TabRobotsLabel Layout"/>
+                            <TextStylePaint fontSize="13" fontAssetId="0:300" name="TabRobotsStyle" id="0:813">
+                                <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                            </TextStylePaint>
+                            <TextValueRun styleId="0:813" text="Robots" name="TabRobotsRun"/>
+                        </Text>
+                    </LayoutComponent>
+                </LayoutComponent>
+
+                <!-- Wraps the four class-scoped upgrade panels: displayed
+                     only on a class tab (Beach Crew or Steel Seeker), not
+                     on the Robots tab. The panels themselves are unchanged
+                     - they always show whichever class is selected
+                     (Economy.selectedClassName), clock.luau's mirror. -->
+                <LayoutComponent width="240" height="292" styleId="0:815" name="ClassPanels" id="0:814">
+                    <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="hug"
+                                          flexDirectionValue="column" layoutAlignmentType="topCenter"
+                                          gapVertical="12" gapVerticalUnitsValue="points"
+                                          name="ClassPanels Style" id="0:815">
+                        <DataBindContext sourcePathIds="0:200-0:296" propertyKey="596"/>
+                    </LayoutComponentStyle>
+
+                <LayoutComponent width="240" height="64" styleId="0:71" name="ItemsPerDigPanel" id="0:70">
+                    <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                          flexDirectionValue="row" layoutAlignmentType="spaceBetweenCenter"
+                                          paddingLeft="16" paddingLeftUnitsValue="points"
+                                          paddingRight="16" paddingRightUnitsValue="points"
+                                          cornerRadiusTL="10" cornerRadiusTR="10" cornerRadiusBL="10" cornerRadiusBR="10"
+                                          name="ItemsPerDigPanel Style" id="0:71"/>
+                    <DataBindContext sourcePathIds="0:200-0:232" propertyKey="18"/>
+                    <Fill name="Fill">
+                        <SolidColor colorValue="FF4F7062" name="C">
+                            <DataBindContext sourcePathIds="0:100-0:108" propertyKey="37"/>
+                        </SolidColor>
+                    </Fill>
+
+                    <Text name="ItemsPerDigLabel" id="0:72">
+                        <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="ItemsPerDigLabel Layout"/>
+                        <TextStylePaint fontSize="16" fontAssetId="0:300" name="ItemsPerDigStyle" id="0:73">
+                            <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextValueRun styleId="0:73" text="Items/Dig " name="ItemsPerDigPrefix"/>
+                        <TextValueRun styleId="0:73" text="1" name="ItemsPerDigValue">
+                            <DataBindContext sourcePathIds="0:200-0:202" propertyKey="268" converterId="0:301"/>
+                        </TextValueRun>
+                    </Text>
+
+                    <Text name="ItemsPerDigCost" id="0:74">
+                        <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="ItemsPerDigCost Layout"/>
+                        <TextStylePaint fontSize="14" fontAssetId="0:300" name="ItemsPerDigCostStyle" id="0:75">
+                            <Fill name="Fill"><SolidColor colorValue="FFE8C27A" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextValueRun styleId="0:75" text="5" name="ItemsPerDigCostRun">
+                            <DataBindContext sourcePathIds="0:200-0:235" propertyKey="268"/>
+                        </TextValueRun>
+                    </Text>
+                </LayoutComponent>
+
+                <LayoutComponent width="240" height="64" styleId="0:81" name="DigSpeedPanel" id="0:80">
+                    <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                          flexDirectionValue="row" layoutAlignmentType="spaceBetweenCenter"
+                                          paddingLeft="16" paddingLeftUnitsValue="points"
+                                          paddingRight="16" paddingRightUnitsValue="points"
+                                          cornerRadiusTL="10" cornerRadiusTR="10" cornerRadiusBL="10" cornerRadiusBR="10"
+                                          name="DigSpeedPanel Style" id="0:81"/>
+                    <DataBindContext sourcePathIds="0:200-0:233" propertyKey="18"/>
+                    <Fill name="Fill">
+                        <SolidColor colorValue="FF4F7062" name="C">
+                            <DataBindContext sourcePathIds="0:100-0:108" propertyKey="37"/>
+                        </SolidColor>
+                    </Fill>
+
+                    <Text name="DigSpeedLabel" id="0:82">
+                        <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="DigSpeedLabel Layout"/>
+                        <TextStylePaint fontSize="16" fontAssetId="0:300" name="DigSpeedStyle" id="0:83">
+                            <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextValueRun styleId="0:83" text="Dig Speed " name="DigSpeedPrefix"/>
+                        <TextValueRun styleId="0:83" text="60" name="DigSpeedValue">
+                            <DataBindContext sourcePathIds="0:200-0:203" propertyKey="268" converterId="0:301"/>
+                        </TextValueRun>
+                        <TextValueRun styleId="0:83" text="s" name="DigSpeedSuffix"/>
+                    </Text>
+
+                    <Text name="DigSpeedCost" id="0:84">
+                        <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="DigSpeedCost Layout"/>
+                        <TextStylePaint fontSize="14" fontAssetId="0:300" name="DigSpeedCostStyle" id="0:85">
+                            <Fill name="Fill"><SolidColor colorValue="FFE8C27A" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextValueRun styleId="0:85" text="5" name="DigSpeedCostRun">
+                            <DataBindContext sourcePathIds="0:200-0:236" propertyKey="268"/>
+                        </TextValueRun>
+                    </Text>
+                </LayoutComponent>
+
+                <LayoutComponent width="240" height="64" styleId="0:151" name="ElbowGreasePanel" id="0:150">
+                    <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                          flexDirectionValue="row" layoutAlignmentType="spaceBetweenCenter"
+                                          paddingLeft="16" paddingLeftUnitsValue="points"
+                                          paddingRight="16" paddingRightUnitsValue="points"
+                                          cornerRadiusTL="10" cornerRadiusTR="10" cornerRadiusBL="10" cornerRadiusBR="10"
+                                          name="ElbowGreasePanel Style" id="0:151"/>
+                    <DataBindContext sourcePathIds="0:200-0:245" propertyKey="18"/>
+                    <Fill name="Fill">
+                        <SolidColor colorValue="FF4F7062" name="C">
+                            <DataBindContext sourcePathIds="0:100-0:108" propertyKey="37"/>
+                        </SolidColor>
+                    </Fill>
+
+                    <Text name="ElbowGreaseLabel" id="0:152">
+                        <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="ElbowGreaseLabel Layout"/>
+                        <TextStylePaint fontSize="16" fontAssetId="0:300" name="ElbowGreaseStyle" id="0:153">
+                            <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextValueRun styleId="0:153" text="Elbow Grease " name="ElbowGreasePrefix"/>
+                        <TextValueRun styleId="0:153" text="1" name="ElbowGreaseValue">
+                            <DataBindContext sourcePathIds="0:200-0:244" propertyKey="268" converterId="0:301"/>
+                        </TextValueRun>
+                        <TextValueRun styleId="0:153" text="%" name="ElbowGreaseSuffix"/>
+                    </Text>
+
+                    <Text name="ElbowGreaseCost" id="0:154">
+                        <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="ElbowGreaseCost Layout"/>
+                        <TextStylePaint fontSize="14" fontAssetId="0:300" name="ElbowGreaseCostStyle" id="0:155">
+                            <Fill name="Fill"><SolidColor colorValue="FFE8C27A" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextValueRun styleId="0:155" text="5" name="ElbowGreaseCostRun">
+                            <DataBindContext sourcePathIds="0:200-0:246" propertyKey="268"/>
+                        </TextValueRun>
+                    </Text>
+                </LayoutComponent>
+
+                <LayoutComponent width="240" height="64" styleId="0:171" name="StorageCapacityPanel" id="0:170">
+                    <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                          flexDirectionValue="row" layoutAlignmentType="spaceBetweenCenter"
+                                          paddingLeft="16" paddingLeftUnitsValue="points"
+                                          paddingRight="16" paddingRightUnitsValue="points"
+                                          cornerRadiusTL="10" cornerRadiusTR="10" cornerRadiusBL="10" cornerRadiusBR="10"
+                                          name="StorageCapacityPanel Style" id="0:171"/>
+                    <DataBindContext sourcePathIds="0:200-0:257" propertyKey="18"/>
+                    <Fill name="Fill">
+                        <SolidColor colorValue="FF4F7062" name="C">
+                            <DataBindContext sourcePathIds="0:100-0:108" propertyKey="37"/>
+                        </SolidColor>
+                    </Fill>
+
+                    <Text name="StorageCapacityLabel" id="0:172">
+                        <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="StorageCapacityLabel Layout"/>
+                        <TextStylePaint fontSize="16" fontAssetId="0:300" name="StorageCapacityStyle" id="0:173">
+                            <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextValueRun styleId="0:173" text="Capacity " name="StorageCapacityPrefix"/>
+                        <TextValueRun styleId="0:173" text="3" name="StorageCapacityValue">
+                            <DataBindContext sourcePathIds="0:200-0:256" propertyKey="268" converterId="0:301"/>
+                        </TextValueRun>
+                    </Text>
+
+                    <Text name="StorageCapacityCost" id="0:174">
+                        <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="StorageCapacityCost Layout"/>
+                        <TextStylePaint fontSize="14" fontAssetId="0:300" name="StorageCapacityCostStyle" id="0:175">
+                            <Fill name="Fill"><SolidColor colorValue="FFE8C27A" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextValueRun styleId="0:175" text="5" name="StorageCapacityCostRun">
+                            <DataBindContext sourcePathIds="0:200-0:258" propertyKey="268"/>
+                        </TextValueRun>
+                    </Text>
+                </LayoutComponent>
+                </LayoutComponent>
+
+                <!-- Wraps the Robots tab's own content: Robot Speed
+                     (fleet-wide - stays out of the per-class panels above)
+                     plus the two purchase panels. Steel Seeker's own
+                     purchase panel additionally hides on its own
+                     (steelSeekerBuyPanelDisplay) until discovered, since
+                     it must stay hidden even while this whole group shows. -->
+                <LayoutComponent width="240" height="220" styleId="0:817" name="RobotsPanels" id="0:816">
+                    <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="hug"
+                                          flexDirectionValue="column" layoutAlignmentType="topCenter"
+                                          gapVertical="12" gapVerticalUnitsValue="points"
+                                          name="RobotsPanels Style" id="0:817">
+                        <DataBindContext sourcePathIds="0:200-0:297" propertyKey="596"/>
+                    </LayoutComponentStyle>
+
+                <!-- One slot, two identities: before the first purchase it
+                     reads "Auto-Sell" (buying it unlocks docking at all);
+                     from then on the same panel becomes the repeatable
+                     "Robot Speed" upgrade for the dock-seeking trip. Both
+                     states are the same dockSpeed stat (0 = locked), so
+                     the label is a single computed string rather than two
+                     panels swapped by visibility. -->
+                <LayoutComponent width="240" height="64" styleId="0:191" name="AutoSellPanel" id="0:190">
+                    <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                          flexDirectionValue="row" layoutAlignmentType="spaceBetweenCenter"
+                                          paddingLeft="16" paddingLeftUnitsValue="points"
+                                          paddingRight="16" paddingRightUnitsValue="points"
+                                          cornerRadiusTL="10" cornerRadiusTR="10" cornerRadiusBL="10" cornerRadiusBR="10"
+                                          name="AutoSellPanel Style" id="0:191"/>
+                    <DataBindContext sourcePathIds="0:200-0:285" propertyKey="18"/>
+                    <Fill name="Fill">
+                        <SolidColor colorValue="FF4F7062" name="C">
+                            <DataBindContext sourcePathIds="0:100-0:108" propertyKey="37"/>
+                        </SolidColor>
+                    </Fill>
+
+                    <Text name="AutoSellLabel" id="0:192">
+                        <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="AutoSellLabel Layout"/>
+                        <TextStylePaint fontSize="16" fontAssetId="0:300" name="AutoSellStyle" id="0:193">
+                            <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextValueRun styleId="0:193" text="Auto-Sell" name="AutoSellPrefix">
+                            <DataBindContext sourcePathIds="0:200-0:204" propertyKey="268"/>
+                        </TextValueRun>
+                    </Text>
+
+                    <Text name="AutoSellCost" id="0:194">
+                        <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="AutoSellCost Layout"/>
+                        <TextStylePaint fontSize="14" fontAssetId="0:300" name="AutoSellCostStyle" id="0:195">
+                            <Fill name="Fill"><SolidColor colorValue="FFE8C27A" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextValueRun styleId="0:195" text="5" name="AutoSellCostRun">
+                            <DataBindContext sourcePathIds="0:200-0:286" propertyKey="268"/>
+                        </TextValueRun>
+                    </Text>
+                </LayoutComponent>
+
+                <LayoutComponent width="240" height="64" styleId="0:161" name="BuyBeachBoyPanel" id="0:160">
+                    <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                          flexDirectionValue="row" layoutAlignmentType="spaceBetweenCenter"
+                                          paddingLeft="16" paddingLeftUnitsValue="points"
+                                          paddingRight="16" paddingRightUnitsValue="points"
+                                          cornerRadiusTL="10" cornerRadiusTR="10" cornerRadiusBL="10" cornerRadiusBR="10"
+                                          name="BuyBeachBoyPanel Style" id="0:161"/>
+                    <DataBindContext sourcePathIds="0:200-0:253" propertyKey="18"/>
+                    <Fill name="Fill">
+                        <SolidColor colorValue="FFD9B84A" name="C"/>
+                    </Fill>
+
+                    <Text name="BuyBeachBoyLabel" id="0:162">
+                        <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="BuyBeachBoyLabel Layout"/>
+                        <TextStylePaint fontSize="16" fontAssetId="0:300" name="BuyBeachBoyStyle" id="0:163">
+                            <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextValueRun styleId="0:163" text="Beach Boy &#215;" name="BuyBeachBoyPrefix"/>
+                        <TextValueRun styleId="0:163" text="0" name="BuyBeachBoyCount">
+                            <DataBindContext sourcePathIds="0:200-0:252" propertyKey="268" converterId="0:301"/>
+                        </TextValueRun>
+                    </Text>
+
+                    <Text name="BuyBeachBoyCost" id="0:164">
+                        <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="BuyBeachBoyCost Layout"/>
+                        <TextStylePaint fontSize="14" fontAssetId="0:300" name="BuyBeachBoyCostStyle" id="0:165">
+                            <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextValueRun styleId="0:165" text="150" name="BuyBeachBoyCostRun">
+                            <DataBindContext sourcePathIds="0:200-0:254" propertyKey="268"/>
+                        </TextValueRun>
+                    </Text>
+                </LayoutComponent>
+
+                <LayoutComponent width="240" height="64" styleId="0:181" name="BuySteelSeekerPanel" id="0:180">
+                    <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                          flexDirectionValue="row" layoutAlignmentType="spaceBetweenCenter"
+                                          paddingLeft="16" paddingLeftUnitsValue="points"
+                                          paddingRight="16" paddingRightUnitsValue="points"
+                                          cornerRadiusTL="10" cornerRadiusTR="10" cornerRadiusBL="10" cornerRadiusBR="10"
+                                          name="BuySteelSeekerPanel Style" id="0:181">
+                        <DataBindContext sourcePathIds="0:200-0:299" propertyKey="596"/>
+                    </LayoutComponentStyle>
+                    <DataBindContext sourcePathIds="0:200-0:281" propertyKey="18"/>
+                    <Fill name="Fill">
+                        <SolidColor colorValue="FF7A8699" name="C"/>
+                    </Fill>
+
+                    <Text name="BuySteelSeekerLabel" id="0:182">
+                        <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="BuySteelSeekerLabel Layout"/>
+                        <TextStylePaint fontSize="16" fontAssetId="0:300" name="BuySteelSeekerStyle" id="0:183">
+                            <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextValueRun styleId="0:183" text="Steel Seeker &#215;" name="BuySteelSeekerPrefix"/>
+                        <TextValueRun styleId="0:183" text="0" name="BuySteelSeekerCount">
+                            <DataBindContext sourcePathIds="0:200-0:280" propertyKey="268" converterId="0:301"/>
+                        </TextValueRun>
+                    </Text>
+
+                    <Text name="BuySteelSeekerCost" id="0:184">
+                        <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="BuySteelSeekerCost Layout"/>
+                        <TextStylePaint fontSize="14" fontAssetId="0:300" name="BuySteelSeekerCostStyle" id="0:185">
+                            <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextValueRun styleId="0:185" text="220" name="BuySteelSeekerCostRun">
+                            <DataBindContext sourcePathIds="0:200-0:282" propertyKey="268"/>
+                        </TextValueRun>
+                    </Text>
+                </LayoutComponent>
+                </LayoutComponent>
+
+                <LayoutComponent width="200" height="56" styleId="0:61" name="SellButton" id="0:60">
+                    <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                          layoutAlignmentType="center"
+                                          cornerRadiusTL="12" cornerRadiusTR="12" cornerRadiusBL="12" cornerRadiusBR="12"
+                                          name="SellButton Style" id="0:61"/>
+                    <DataBindContext sourcePathIds="0:200-0:239" propertyKey="18"/>
+                    <Fill name="Fill">
+                        <SolidColor colorValue="FFE8785A" name="C">
+                            <DataBindContext sourcePathIds="0:100-0:106" propertyKey="37"/>
+                        </SolidColor>
+                    </Fill>
+
+                    <Text name="SellLabel" id="0:62">
+                        <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="SellLabel Layout"/>
+                        <TextStylePaint fontSize="20" fontAssetId="0:300" name="SellStyle" id="0:63">
+                            <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextValueRun styleId="0:63" text="Sell All ($" name="SellPrefixRun"/>
+                        <TextValueRun styleId="0:63" text="0" name="SellValueRun">
+                            <DataBindContext sourcePathIds="0:200-0:238" propertyKey="268" converterId="0:301"/>
+                        </TextValueRun>
+                        <TextValueRun styleId="0:63" text=")" name="SellSuffixRun"/>
+                    </Text>
+                </LayoutComponent>
+            </LayoutComponent>
+        </LayoutComponent>
+
+        <LayoutComponent width="1280" height="100" styleId="0:51" name="InventoryStrip" id="0:50">
+            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fixed"
+                                  flexDirectionValue="row" layoutAlignmentType="centerLeft"
+                                  gapHorizontal="8" gapHorizontalUnitsValue="points"
+                                  paddingLeft="16" paddingLeftUnitsValue="points"
+                                  paddingRight="16" paddingRightUnitsValue="points"
+                                  name="InventoryStrip Style" id="0:51"/>
+            <Fill name="Fill">
+                <SolidColor colorValue="FFD9C9A3" name="C">
+                    <DataBindContext sourcePathIds="0:100-0:105" propertyKey="37"/>
+                </SolidColor>
+            </Fill>
+
+            <Text name="StoredSummary" id="0:53">
+                <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="StoredSummary Layout"/>
+                <TextStylePaint fontSize="18" fontAssetId="0:300" name="StoredSummaryStyle" id="0:54">
+                    <Fill name="Fill"><SolidColor colorValue="FF1D2B27" name="C"/></Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="0:54" text="Stored: " name="StoredSummaryPrefix"/>
+                <TextValueRun styleId="0:54" text="0" name="StoredSummaryCount">
+                    <DataBindContext sourcePathIds="0:200-0:255" propertyKey="268" converterId="0:301"/>
+                </TextValueRun>
+                <TextValueRun styleId="0:54" text=" ($" name="StoredSummaryMid"/>
+                <TextValueRun styleId="0:54" text="0" name="StoredSummaryValue">
+                    <DataBindContext sourcePathIds="0:200-0:238" propertyKey="268" converterId="0:301"/>
+                </TextValueRun>
+                <TextValueRun styleId="0:54" text=")" name="StoredSummarySuffix"/>
+            </Text>
+        </LayoutComponent>
+
+        <StateMachine name="Main" id="0:7">
+            <StateMachineLayer name="Layer 1" id="0:8">
+                <AnyState x="0" y="-120"/>
+                <ExitState x="200" y="-120"/>
+                <EntryState x="-200" y="-120"/>
+            </StateMachineLayer>
+
+            <StateMachineListenerSingle targetId="0:802" listenerTypeValue="click" name="SelectBeachCrew" id="0:818">
+                <ScriptedListenerAction scriptAssetId="0:317" id="0:819">
+                    <ScriptInputString propertyValue="beachCrew" name="className"/>
+                    <ScriptInputNumber propertyValue="0" name="isRobotsTab"/>
+                </ScriptedListenerAction>
+            </StateMachineListenerSingle>
+
+            <StateMachineListenerSingle targetId="0:806" listenerTypeValue="click" name="SelectSteelSeeker" id="0:820">
+                <ScriptedListenerAction scriptAssetId="0:317" id="0:821">
+                    <ScriptInputString propertyValue="steelSeeker" name="className"/>
+                    <ScriptInputNumber propertyValue="0" name="isRobotsTab"/>
+                </ScriptedListenerAction>
+            </StateMachineListenerSingle>
+
+            <StateMachineListenerSingle targetId="0:810" listenerTypeValue="click" name="SelectRobotsTab" id="0:822">
+                <ScriptedListenerAction scriptAssetId="0:317" id="0:823">
+                    <ScriptInputString propertyValue="" name="className"/>
+                    <ScriptInputNumber propertyValue="1" name="isRobotsTab"/>
+                </ScriptedListenerAction>
+            </StateMachineListenerSingle>
+
+            <StateMachineListenerSingle targetId="0:60" listenerTypeValue="click" name="SellAll" id="0:64">
+                <ScriptedListenerAction scriptAssetId="0:311" id="0:65"/>
+            </StateMachineListenerSingle>
+
+            <StateMachineListenerSingle targetId="0:965" listenerTypeValue="click" name="StartNewBeach" id="0:970">
+                <ScriptedListenerAction scriptAssetId="0:318" id="0:971"/>
+            </StateMachineListenerSingle>
+
+            <StateMachineListenerSingle targetId="0:70" listenerTypeValue="click" name="BuyItemsPerDig" id="0:76">
+                <ScriptedListenerAction scriptAssetId="0:312" id="0:77">
+                    <ScriptInputString propertyValue="itemsPerDig" name="statName"/>
+                    <ScriptInputNumber propertyValue="1" name="step"/>
+                    <ScriptInputNumber propertyValue="1" name="minValue"/>
+                    <ScriptInputNumber propertyValue="6" name="maxValue"/>
+                    <ScriptInputNumber propertyValue="5" name="baseCost"/>
+                    <ScriptInputNumber propertyValue="2.8" name="growth"/>
+                    <ScriptInputNumber propertyValue="1" name="classScoped"/>
+                </ScriptedListenerAction>
+            </StateMachineListenerSingle>
+
+            <StateMachineListenerSingle targetId="0:80" listenerTypeValue="click" name="BuyDigSpeed" id="0:86">
+                <ScriptedListenerAction scriptAssetId="0:312" id="0:87">
+                    <ScriptInputString propertyValue="digSpeedSeconds" name="statName"/>
+                    <ScriptInputNumber propertyValue="-11" name="step"/>
+                    <ScriptInputNumber propertyValue="5" name="minValue"/>
+                    <ScriptInputNumber propertyValue="60" name="maxValue"/>
+                    <ScriptInputNumber propertyValue="5" name="baseCost"/>
+                    <ScriptInputNumber propertyValue="2.8" name="growth"/>
+                    <ScriptInputNumber propertyValue="1" name="classScoped"/>
+                </ScriptedListenerAction>
+            </StateMachineListenerSingle>
+
+            <StateMachineListenerSingle targetId="0:150" listenerTypeValue="click" name="BuyElbowGrease" id="0:156">
+                <ScriptedListenerAction scriptAssetId="0:312" id="0:157">
+                    <ScriptInputString propertyValue="elbowGreasePercent" name="statName"/>
+                    <ScriptInputNumber propertyValue="1" name="step"/>
+                    <ScriptInputNumber propertyValue="1" name="minValue"/>
+                    <ScriptInputNumber propertyValue="6" name="maxValue"/>
+                    <ScriptInputNumber propertyValue="5" name="baseCost"/>
+                    <ScriptInputNumber propertyValue="2.8" name="growth"/>
+                    <ScriptInputNumber propertyValue="1" name="classScoped"/>
+                </ScriptedListenerAction>
+            </StateMachineListenerSingle>
+
+            <StateMachineListenerSingle targetId="0:190" listenerTypeValue="click" name="BuyDockSpeed" id="0:196">
+                <ScriptedListenerAction scriptAssetId="0:312" id="0:197">
+                    <ScriptInputString propertyValue="dockSpeed" name="statName"/>
+                    <ScriptInputNumber propertyValue="20" name="step"/>
+                    <ScriptInputNumber propertyValue="0" name="minValue"/>
+                    <ScriptInputNumber propertyValue="100" name="maxValue"/>
+                    <ScriptInputNumber propertyValue="5" name="baseCost"/>
+                    <ScriptInputNumber propertyValue="2.8" name="growth"/>
+                </ScriptedListenerAction>
+            </StateMachineListenerSingle>
+
+            <StateMachineListenerSingle targetId="0:170" listenerTypeValue="click" name="BuyStorageCapacity" id="0:176">
+                <ScriptedListenerAction scriptAssetId="0:312" id="0:177">
+                    <ScriptInputString propertyValue="storageCapacity" name="statName"/>
+                    <ScriptInputNumber propertyValue="1" name="step"/>
+                    <ScriptInputNumber propertyValue="3" name="minValue"/>
+                    <ScriptInputNumber propertyValue="8" name="maxValue"/>
+                    <ScriptInputNumber propertyValue="5" name="baseCost"/>
+                    <ScriptInputNumber propertyValue="2.8" name="growth"/>
+                    <ScriptInputNumber propertyValue="1" name="classScoped"/>
+                </ScriptedListenerAction>
+            </StateMachineListenerSingle>
+
+            <StateMachineListenerSingle targetId="0:160" listenerTypeValue="click" name="BuyBeachBoy" id="0:166">
+                <ScriptedListenerAction scriptAssetId="0:314" id="0:167">
+                    <ScriptInputString propertyValue="BeachBoy" name="instanceName"/>
+                    <ScriptInputString propertyValue="beachBoyCount" name="countStatName"/>
+                    <ScriptInputNumber propertyValue="150" name="baseCost"/>
+                    <ScriptInputNumber propertyValue="1.6" name="growth"/>
+                </ScriptedListenerAction>
+            </StateMachineListenerSingle>
+
+            <StateMachineListenerSingle targetId="0:180" listenerTypeValue="click" name="BuySteelSeeker" id="0:186">
+                <ScriptedListenerAction scriptAssetId="0:314" id="0:187">
+                    <ScriptInputString propertyValue="SteelSeeker" name="instanceName"/>
+                    <ScriptInputString propertyValue="steelSeekerCount" name="countStatName"/>
+                    <ScriptInputNumber propertyValue="220" name="baseCost"/>
+                    <ScriptInputNumber propertyValue="1.6" name="growth"/>
+                </ScriptedListenerAction>
+            </StateMachineListenerSingle>
+
+            <!-- Upgrade-panel tooltips: same universal Tooltip overlay the
+                 producer robot uses (showTooltip.luau/hideTooltip.luau),
+                 anchored at a fixed root-artboard point to the left of the
+                 side panel (x=740) so it renders over the beach area and
+                 never clips against the right edge of the canvas, with
+                 anchorY roughly centered on each panel's own height. All
+                 seven side-panel buttons get one: the four class-scoped
+                 upgrades, Robot Speed/Auto-Sell, and the two bot-purchase
+                 panels. -->
+            <StateMachineListenerSingle targetId="0:70" listenerTypeValue="enter" name="ShowItemsPerDigTooltip" id="0:830">
+                <ScriptedListenerAction scriptAssetId="0:315" id="0:831">
+                    <ScriptInputString propertyValue="Each dig collects more items at once." name="text"/>
+                    <ScriptInputNumber propertyValue="740" name="anchorX"/>
+                    <ScriptInputNumber propertyValue="160" name="anchorY"/>
+                </ScriptedListenerAction>
+            </StateMachineListenerSingle>
+            <StateMachineListenerSingle targetId="0:70" listenerTypeValue="exit" name="HideItemsPerDigTooltip" id="0:832">
+                <ScriptedListenerAction scriptAssetId="0:316" id="0:833"/>
+            </StateMachineListenerSingle>
+
+            <StateMachineListenerSingle targetId="0:80" listenerTypeValue="enter" name="ShowDigSpeedTooltip" id="0:834">
+                <ScriptedListenerAction scriptAssetId="0:315" id="0:835">
+                    <ScriptInputString propertyValue="Shortens the automatic dig cycle." name="text"/>
+                    <ScriptInputNumber propertyValue="740" name="anchorX"/>
+                    <ScriptInputNumber propertyValue="236" name="anchorY"/>
+                </ScriptedListenerAction>
+            </StateMachineListenerSingle>
+            <StateMachineListenerSingle targetId="0:80" listenerTypeValue="exit" name="HideDigSpeedTooltip" id="0:836">
+                <ScriptedListenerAction scriptAssetId="0:316" id="0:837"/>
+            </StateMachineListenerSingle>
+
+            <StateMachineListenerSingle targetId="0:150" listenerTypeValue="enter" name="ShowElbowGreaseTooltip" id="0:838">
+                <ScriptedListenerAction scriptAssetId="0:315" id="0:839">
+                    <ScriptInputString propertyValue="Clicking speeds up the robot's current dig cycle." name="text"/>
+                    <ScriptInputNumber propertyValue="740" name="anchorX"/>
+                    <ScriptInputNumber propertyValue="312" name="anchorY"/>
+                </ScriptedListenerAction>
+            </StateMachineListenerSingle>
+            <StateMachineListenerSingle targetId="0:150" listenerTypeValue="exit" name="HideElbowGreaseTooltip" id="0:840">
+                <ScriptedListenerAction scriptAssetId="0:316" id="0:841"/>
+            </StateMachineListenerSingle>
+
+            <StateMachineListenerSingle targetId="0:170" listenerTypeValue="enter" name="ShowStorageCapacityTooltip" id="0:842">
+                <ScriptedListenerAction scriptAssetId="0:315" id="0:843">
+                    <ScriptInputString propertyValue="How much a robot can carry before docking." name="text"/>
+                    <ScriptInputNumber propertyValue="740" name="anchorX"/>
+                    <ScriptInputNumber propertyValue="388" name="anchorY"/>
+                </ScriptedListenerAction>
+            </StateMachineListenerSingle>
+            <StateMachineListenerSingle targetId="0:170" listenerTypeValue="exit" name="HideStorageCapacityTooltip" id="0:844">
+                <ScriptedListenerAction scriptAssetId="0:316" id="0:845"/>
+            </StateMachineListenerSingle>
+
+            <StateMachineListenerSingle targetId="0:190" listenerTypeValue="enter" name="ShowAutoSellTooltip" id="0:846">
+                <ScriptedListenerAction scriptAssetId="0:315" id="0:847">
+                    <ScriptInputString propertyValue="Unlocks auto-sell, then speeds up the trip." name="text"/>
+                    <ScriptInputNumber propertyValue="740" name="anchorX"/>
+                    <ScriptInputNumber propertyValue="160" name="anchorY"/>
+                </ScriptedListenerAction>
+            </StateMachineListenerSingle>
+            <StateMachineListenerSingle targetId="0:190" listenerTypeValue="exit" name="HideAutoSellTooltip" id="0:848">
+                <ScriptedListenerAction scriptAssetId="0:316" id="0:849"/>
+            </StateMachineListenerSingle>
+
+            <StateMachineListenerSingle targetId="0:160" listenerTypeValue="enter" name="ShowBuyBeachBoyTooltip" id="0:850">
+                <ScriptedListenerAction scriptAssetId="0:315" id="0:851">
+                    <ScriptInputString propertyValue="Buy another Beach Boy for your fleet." name="text"/>
+                    <ScriptInputNumber propertyValue="740" name="anchorX"/>
+                    <ScriptInputNumber propertyValue="236" name="anchorY"/>
+                </ScriptedListenerAction>
+            </StateMachineListenerSingle>
+            <StateMachineListenerSingle targetId="0:160" listenerTypeValue="exit" name="HideBuyBeachBoyTooltip" id="0:852">
+                <ScriptedListenerAction scriptAssetId="0:316" id="0:853"/>
+            </StateMachineListenerSingle>
+
+            <StateMachineListenerSingle targetId="0:180" listenerTypeValue="enter" name="ShowBuySteelSeekerTooltip" id="0:854">
+                <ScriptedListenerAction scriptAssetId="0:315" id="0:855">
+                    <ScriptInputString propertyValue="A separate robot class, upgraded on its own." name="text"/>
+                    <ScriptInputNumber propertyValue="740" name="anchorX"/>
+                    <ScriptInputNumber propertyValue="312" name="anchorY"/>
+                </ScriptedListenerAction>
+            </StateMachineListenerSingle>
+            <StateMachineListenerSingle targetId="0:180" listenerTypeValue="exit" name="HideBuySteelSeekerTooltip" id="0:856">
+                <ScriptedListenerAction scriptAssetId="0:316" id="0:857"/>
+            </StateMachineListenerSingle>
+        </StateMachine>
+    </Artboard>
+
+    <FontAsset file="Outfit-Bold.ttf" name="Outfit Bold" id="0:300"/>
+    <DataConverterToString decimals="0" round="true" name="CurrencyFormat" id="0:301"/>
+    <DataConverterRangeMapper minInput="0" maxInput="1" minOutput="0" maxOutput="500"
+                              clampLower="true" clampUpper="true" name="ProgressToPixels" id="0:302"/>
+    <ScriptAsset file="main.luau" name="main" id="0:310"/>
+    <ScriptAsset file="sell.luau" name="sell" id="0:311"/>
+    <ScriptAsset file="upgrade.luau" name="upgrade" id="0:312"/>
+    <ScriptAsset file="clock.luau" name="clock" id="0:313"/>
+    <ScriptAsset file="buyBot.luau" name="buyBot" id="0:314"/>
+    <ScriptAsset file="showTooltip.luau" name="showTooltip" id="0:315"/>
+    <ScriptAsset file="hideTooltip.luau" name="hideTooltip" id="0:316"/>
+    <ScriptAsset file="selectTab.luau" name="selectTab" id="0:317"/>
+    <ScriptAsset file="startNewBeach.luau" name="startNewBeach" id="0:318"/>
+
+    <!-- Design tokens: one global palette, swap these to re-theme the whole game -->
+    <ViewModel viewModelType="global" defaultInstanceId="0:110" name="Theme" id="0:100">
+        <ViewModelPropertyColor name="background" id="0:101"/>
+        <ViewModelPropertyColor name="topBar" id="0:102"/>
+        <ViewModelPropertyColor name="beach" id="0:103"/>
+        <ViewModelPropertyColor name="sidePanel" id="0:104"/>
+        <ViewModelPropertyColor name="inventoryStrip" id="0:105"/>
+        <ViewModelPropertyColor name="accent" id="0:106"/>
+        <ViewModelPropertyColor name="text" id="0:107"/>
+        <ViewModelPropertyColor name="panel" id="0:108"/>
+        <ViewModelInstance exports="true" name="Default" id="0:110">
+            <ViewModelInstanceColor propertyValue="FF1D2B27" viewModelPropertyId="0:101"/>
+            <ViewModelInstanceColor propertyValue="FF2E7D8C" viewModelPropertyId="0:102"/>
+            <ViewModelInstanceColor propertyValue="FFE8C27A" viewModelPropertyId="0:103"/>
+            <ViewModelInstanceColor propertyValue="FF3E5C50" viewModelPropertyId="0:104"/>
+            <ViewModelInstanceColor propertyValue="FFD9C9A3" viewModelPropertyId="0:105"/>
+            <ViewModelInstanceColor propertyValue="FFE8785A" viewModelPropertyId="0:106"/>
+            <ViewModelInstanceColor propertyValue="FF1D2B27" viewModelPropertyId="0:107"/>
+            <ViewModelInstanceColor propertyValue="FF4F7062" viewModelPropertyId="0:108"/>
+        </ViewModelInstance>
+    </ViewModel>
+
+    <!-- Shared game state: written by the driver script, read everywhere via data binding.
+         Per-producer state (cycle timing, pulse, popup) lives on each Producer
+         instance instead (producers.rml) - only account-wide stats live here. -->
+    <ViewModel viewModelType="global" defaultInstanceId="0:210" name="Economy" id="0:200">
+        <ViewModelPropertyNumber name="currency" id="0:201"/>
+        <ViewModelPropertyNumber name="itemsPerDig" id="0:202"/>
+        <ViewModelPropertyNumber name="digSpeedSeconds" id="0:203"/>
+        <ViewModelPropertyString name="dockSpeedLabel" id="0:204"/>
+        <ViewModelPropertyNumber name="gameTime" id="0:205"/>
+        <ViewModelPropertyNumber name="itemsPerDigAffordable" id="0:232"/>
+        <ViewModelPropertyNumber name="digSpeedAffordable" id="0:233"/>
+        <ViewModelPropertyString name="itemsPerDigCostLabel" id="0:235"/>
+        <ViewModelPropertyString name="digSpeedCostLabel" id="0:236"/>
+        <ViewModelPropertyNumber name="inventoryValue" id="0:238"/>
+        <ViewModelPropertyNumber name="sellAffordable" id="0:239"/>
+        <ViewModelPropertyNumber name="elbowGreasePercent" id="0:244"/>
+        <ViewModelPropertyNumber name="elbowGreaseAffordable" id="0:245"/>
+        <ViewModelPropertyString name="elbowGreaseCostLabel" id="0:246"/>
+        <ViewModelPropertyList name="producers" id="0:250"/>
+        <ViewModelPropertyNumber name="beachBoyCount" id="0:252"/>
+        <ViewModelPropertyNumber name="beachBoyAffordable" id="0:253"/>
+        <ViewModelPropertyString name="beachBoyCostLabel" id="0:254"/>
+        <ViewModelPropertyNumber name="storedCount" id="0:255"/>
+        <ViewModelPropertyNumber name="storageCapacity" id="0:256"/>
+        <ViewModelPropertyNumber name="storageCapacityAffordable" id="0:257"/>
+        <ViewModelPropertyString name="storageCapacityCostLabel" id="0:258"/>
+        <ViewModelPropertyList name="trail" id="0:259"/>
+        <ViewModelPropertyNumber name="steelSeekerCount" id="0:280"/>
+        <ViewModelPropertyNumber name="steelSeekerAffordable" id="0:281"/>
+        <ViewModelPropertyString name="steelSeekerCostLabel" id="0:282"/>
+        <ViewModelPropertyNumber name="dockSpeed" id="0:283"/>
+        <ViewModelPropertyNumber name="dockActiveAlpha" id="0:284"/>
+        <ViewModelPropertyNumber name="dockSpeedAffordable" id="0:285"/>
+        <ViewModelPropertyString name="dockSpeedCostLabel" id="0:286"/>
+        <ViewModelPropertyNumber name="elbowGreaseTaught" id="0:287"/>
+        <ViewModelPropertyList name="robotClasses" id="0:288"/>
+        <ViewModelPropertyString name="selectedClassName" id="0:289"/>
+        <ViewModelPropertyNumber name="activeTabIsRobots" id="0:290"/>
+        <ViewModelPropertyNumber name="lifetimeCurrencyEarned" id="0:291"/>
+        <ViewModelPropertyNumber name="steelSeekerDiscovered" id="0:292"/>
+        <ViewModelPropertyNumber name="beachCrewTabAlpha" id="0:293"/>
+        <ViewModelPropertyNumber name="steelSeekerTabAlpha" id="0:294"/>
+        <ViewModelPropertyNumber name="robotsTabAlpha" id="0:295"/>
+        <ViewModelPropertyNumber name="classPanelsDisplay" id="0:296"/>
+        <ViewModelPropertyNumber name="robotsPanelsDisplay" id="0:297"/>
+        <ViewModelPropertyNumber name="steelSeekerTabDisplay" id="0:298"/>
+        <ViewModelPropertyNumber name="steelSeekerBuyPanelDisplay" id="0:299"/>
+        <!-- Prestige loop ("beach" in player-facing text, "run" in field
+             names to avoid clashing with the unrelated beachBoy* fields
+             above). One run = play until runEarnings reaches runGoal,
+             recap on the end screen, Start New Beach resets currency/
+             items/timer and raises the goal - everything else (bots,
+             upgrades, Steel Seeker's unlock) carries over. -->
+        <ViewModelPropertyNumber name="runNumber" id="0:900"/>
+        <ViewModelPropertyNumber name="runGoal" id="0:901"/>
+        <ViewModelPropertyNumber name="runEarnings" id="0:902"/>
+        <ViewModelPropertyNumber name="runProgressFraction" id="0:903"/>
+        <ViewModelPropertyString name="runStatusLabel" id="0:904"/>
+        <ViewModelPropertyNumber name="runItemsCollected" id="0:905"/>
+        <ViewModelPropertyNumber name="runStartTime" id="0:906"/>
+        <ViewModelPropertyString name="runElapsedLabel" id="0:907"/>
+        <ViewModelPropertyNumber name="runComplete" id="0:908"/>
+        <ViewModelPropertyNumber name="endScreenDisplay" id="0:909"/>
+        <ViewModelPropertyNumber name="totalBotsOwned" id="0:910"/>
+        <ViewModelInstance exports="true" name="Default" id="0:210">
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:201"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:202"/>
+            <ViewModelInstanceNumber propertyValue="60" viewModelPropertyId="0:203"/>
+            <ViewModelInstanceString propertyValue="Auto-Sell" viewModelPropertyId="0:204"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:205"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:232"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:233"/>
+            <ViewModelInstanceString propertyValue="5" viewModelPropertyId="0:235"/>
+            <ViewModelInstanceString propertyValue="5" viewModelPropertyId="0:236"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:238"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:239"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:244"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:245"/>
+            <ViewModelInstanceString propertyValue="5" viewModelPropertyId="0:246"/>
+            <ViewModelInstanceList viewModelPropertyId="0:250">
+                <ViewModelInstanceListItem viewModelId="0:500" viewModelInstanceId="0:531"/>
+            </ViewModelInstanceList>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:252"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:253"/>
+            <ViewModelInstanceString propertyValue="150" viewModelPropertyId="0:254"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:255"/>
+            <ViewModelInstanceNumber propertyValue="3" viewModelPropertyId="0:256"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:257"/>
+            <ViewModelInstanceString propertyValue="5" viewModelPropertyId="0:258"/>
+            <ViewModelInstanceList viewModelPropertyId="0:259"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:280"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:281"/>
+            <ViewModelInstanceString propertyValue="220" viewModelPropertyId="0:282"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:283"/>
+            <ViewModelInstanceNumber propertyValue="0.4" viewModelPropertyId="0:284"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:285"/>
+            <ViewModelInstanceString propertyValue="5" viewModelPropertyId="0:286"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:287"/>
+            <ViewModelInstanceList viewModelPropertyId="0:288">
+                <ViewModelInstanceListItem viewModelId="0:700" viewModelInstanceId="0:711"/>
+                <ViewModelInstanceListItem viewModelId="0:700" viewModelInstanceId="0:712"/>
+            </ViewModelInstanceList>
+            <ViewModelInstanceString propertyValue="beachCrew" viewModelPropertyId="0:289"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:290"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:291"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:292"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:293"/>
+            <ViewModelInstanceNumber propertyValue="0.4" viewModelPropertyId="0:294"/>
+            <ViewModelInstanceNumber propertyValue="0.4" viewModelPropertyId="0:295"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:296"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:297"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:298"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:299"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:900"/>
+            <ViewModelInstanceNumber propertyValue="1000" viewModelPropertyId="0:901"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:902"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:903"/>
+            <ViewModelInstanceString propertyValue="Beach 1 &#8212; $0 / $1000" viewModelPropertyId="0:904"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:905"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:906"/>
+            <ViewModelInstanceString propertyValue="0:00" viewModelPropertyId="0:907"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:908"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:909"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:910"/>
+        </ViewModelInstance>
+    </ViewModel>
+
+    <!-- Universal tooltip: one shared overlay, positioned and retextured by
+         whichever hoverable element last showed it (showTooltip.luau /
+         hideTooltip.luau). Any new hoverable UI reuses this same
+         subsystem instead of building its own bubble. -->
+    <ViewModel viewModelType="global" defaultInstanceId="0:275" name="Tooltip" id="0:270">
+        <ViewModelPropertyString name="text" id="0:271"/>
+        <ViewModelPropertyNumber name="visible" id="0:272"/>
+        <ViewModelPropertyNumber name="x" id="0:273"/>
+        <ViewModelPropertyNumber name="y" id="0:274"/>
+        <ViewModelInstance exports="true" name="Default" id="0:275">
+            <ViewModelInstanceString propertyValue="" viewModelPropertyId="0:271"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:272"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:273"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:274"/>
+        </ViewModelInstance>
+    </ViewModel>
+</Rive>

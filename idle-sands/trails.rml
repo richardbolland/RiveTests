@@ -1,0 +1,44 @@
+<Rive version="1" kind="fragment">
+    <!-- Wheel tracks: a small fading mark left behind wherever a producer's
+         wheels have rolled. One shared Economy.trail list rather than a
+         per-producer one, since it just needs to render as flat marks in
+         BeachArea's own coordinate space (the same space roamX/roamY use)
+         - it doesn't matter afterward which producer dropped which mark.
+         clock.luau pushes a new TrackPoint as each producer travels far
+         enough, and fades/caps the list every frame. -->
+    <Artboard isComponent="true" viewModelId="0:600" styleId="0:606" x="1800" y="0" width="14" height="14" name="TrackDot" id="0:605">
+        <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                              positionTypeValue="absolute"
+                              positionLeftUnitsValue="points" positionTopUnitsValue="points"
+                              name="TrackDot Style" id="0:606">
+            <DataBindContext sourcePathIds="0:600-0:601" propertyKey="516"/>
+            <DataBindContext sourcePathIds="0:600-0:602" propertyKey="518"/>
+        </LayoutComponentStyle>
+
+        <Shape name="Dot" id="0:607">
+            <LayoutParticipant layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                               width="14" height="14" name="Dot Layout"/>
+            <DataBindContext sourcePathIds="0:600-0:603" propertyKey="18"/>
+            <Ellipse width="14" height="8" originX="0.5" originY="0.5" name="Path"/>
+            <Fill name="Fill">
+                <SolidColor colorValue="FF6B5638" name="C"/>
+            </Fill>
+        </Shape>
+    </Artboard>
+
+    <ComponentAsset artboardId="0:605" name="TrackDot"/>
+
+    <ViewModel defaultInstanceId="0:610" name="TrackPoint" id="0:600">
+        <ViewModelPropertyNumber name="x" id="0:601"/>
+        <ViewModelPropertyNumber name="y" id="0:602"/>
+        <ViewModelPropertyNumber name="alpha" id="0:603"/>
+        <ViewModelPropertyNumber name="spawnTime" id="0:604"/>
+
+        <ViewModelInstance exports="true" name="Default" id="0:610">
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:601"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:602"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:603"/>
+            <ViewModelInstanceNumber propertyValue="-100000" viewModelPropertyId="0:604"/>
+        </ViewModelInstance>
+    </ViewModel>
+</Rive>

@@ -1,0 +1,256 @@
+<Rive version="1" kind="fragment">
+    <!-- Reusable producer widget: the shared chassis (badge, cooldown
+         ring, dig popup, click/tooltip hit area) around whichever robot
+         is actually nested in the "Character" slot. One instance per
+         owned producer - the free starter, then purchased bots - rendered
+         via the ArtboardComponentList bound to Economy.producers. Each
+         row owns its own cycle/pulse/popup state; digSpeedSeconds,
+         itemsPerDig, elbowGreasePercent and storageCapacity are upgraded
+         per robotClass (robotClasses.rml), not shared fleet-wide - a
+         producer's own robotClass name picks which RobotClass instance
+         clock.luau reads those from each frame.
+
+         What a producer actually LOOKS like is a separate concern from
+         all of the above: characterArtboard (a ViewModelPropertyArtboard,
+         below) names which artboard in robots.rml this producer's
+         Character slot nests, so each robot class can be fully unique art
+         and animation instead of one shared shape tinted per instance. -->
+    <Artboard isComponent="true" viewModelId="0:500" styleId="0:502" x="1600" y="0" width="110" height="110" name="ProducerWidget" id="0:501">
+        <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                              positionTypeValue="absolute"
+                              positionLeftUnitsValue="points" positionTopUnitsValue="points"
+                              name="ProducerWidget Style" id="0:502">
+            <DataBindContext sourcePathIds="0:500-0:520" propertyKey="516"/>
+            <DataBindContext sourcePathIds="0:500-0:521" propertyKey="518"/>
+        </LayoutComponentStyle>
+
+        <!-- Declared before Stack so the badge draws on top of the robot
+             body (first sibling draws on top - rive docs transforms; these
+             are plain shapes in one artboard, so the rule applies as
+             documented, unlike the cross-ArtboardComponentList case above). -->
+        <LayoutComponent width="32" height="32" styleId="0:561" name="BadgeAnchor" id="0:560">
+            <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                  layoutTypeValue="stack" layoutAlignmentType="center"
+                                  positionTypeValue="absolute"
+                                  positionRight="-6" positionRightUnitsValue="points"
+                                  positionTop="-6" positionTopUnitsValue="points"
+                                  name="BadgeAnchor Style" id="0:561"/>
+
+            <!-- Declaration order is front-to-back (first sibling draws on
+                 top), so the label comes before its background pill. -->
+            <Text name="BadgeLabel" id="0:563">
+                <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="BadgeLabel Layout"/>
+                <TextStylePaint fontSize="13" fontAssetId="0:300" name="BadgeStyle" id="0:564">
+                    <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="0:564" text="0/3" name="BadgeRun">
+                    <DataBindContext sourcePathIds="0:500-0:526" propertyKey="268"/>
+                </TextValueRun>
+            </Text>
+
+            <Shape name="BadgeBg" id="0:562">
+                <LayoutParticipant layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                   width="32" height="32" name="BadgeBg Layout"/>
+                <Ellipse width="32" height="32" originX="0.5" originY="0.5" name="Path"/>
+                <Fill name="Fill">
+                    <SolidColor colorValue="FF1D2B27" name="C"/>
+                </Fill>
+            </Shape>
+        </LayoutComponent>
+
+        <LayoutComponent width="110" height="110" styleId="0:541" name="Stack" id="0:540">
+            <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                  layoutTypeValue="stack" layoutAlignmentType="center"
+                                  name="Stack Style" id="0:541"/>
+
+            <Text name="DigPopup" id="0:545">
+                <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="DigPopup Layout"/>
+                <DataBindContext sourcePathIds="0:500-0:517" propertyKey="18"/>
+                <TextStylePaint fontSize="18" fontAssetId="0:300" name="DigPopupStyle" id="0:546">
+                    <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="0:546" text="" name="DigPopupRun">
+                    <DataBindContext sourcePathIds="0:500-0:516" propertyKey="268"/>
+                </TextValueRun>
+            </Text>
+
+            <!-- The one thing that varies per robot TYPE: which artboard
+                 (robots.rml) is nested in this slot. A NestedArtboardLeaf
+                 takes its size from the LayoutComponent box around it
+                 (fit="contain" scales the nested artboard into that box,
+                 like an image into a frame) rather than a LayoutParticipant
+                 - a leaf isn't one of the three types (Shape/Text/Image) a
+                 participant can attach to. artboardId="0:1000" is just the
+                 authored starting value (StarterBot, matching the Default
+                 producer template) - the data bind below replaces it once
+                 a real producer instance is bound, the same way an
+                 Image's own starting assetId works. Kept the old Item
+                 shape's id (0:542) on the leaf itself so the click/tooltip
+                 listeners below, which target it, needed no changes. -->
+            <LayoutComponent width="80" height="80" styleId="0:572" name="Character Slot" id="0:571">
+                <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" name="Character Slot Style" id="0:572"/>
+                <NestedArtboardLeaf artboardId="0:1000" fit="contain" name="Character" id="0:542">
+                    <DataBindContext sourcePathIds="0:500-0:513" propertyKey="16"/>
+                    <DataBindContext sourcePathIds="0:500-0:513" propertyKey="17"/>
+                    <DataBindContext sourcePathIds="0:500-0:570" propertyKey="197"/>
+                </NestedArtboardLeaf>
+            </LayoutComponent>
+
+            <Shape name="CooldownRing" id="0:543">
+                <LayoutParticipant layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                   width="110" height="110" name="CooldownRing Layout"/>
+                <Ellipse width="100" height="100" originX="0.5" originY="0.5" name="Path"/>
+                <Stroke thickness="6" name="Stroke">
+                    <SolidColor colorValue="FF1D2B27" name="Color">
+                        <DataBindContext sourcePathIds="0:100-0:107" propertyKey="37"/>
+                    </SolidColor>
+                    <TrimPath start="0" end="0" name="Trim" id="0:544">
+                        <DataBindContext sourcePathIds="0:500-0:512" propertyKey="115"/>
+                    </TrimPath>
+                </Stroke>
+            </Shape>
+        </LayoutComponent>
+
+        <StateMachine name="Main" id="0:550">
+            <StateMachineLayer name="Layer 1" id="0:551">
+                <AnyState x="0" y="-120"/>
+                <ExitState x="200" y="-120"/>
+                <EntryState x="-200" y="-120"/>
+            </StateMachineLayer>
+
+            <StateMachineListenerSingle targetId="0:542" listenerTypeValue="click" name="Boost" id="0:552">
+                <ScriptedListenerAction scriptAssetId="0:310" id="0:553"/>
+            </StateMachineListenerSingle>
+
+            <StateMachineListenerSingle targetId="0:542" listenerTypeValue="enter" name="ShowTooltip" id="0:554">
+                <ScriptedListenerAction scriptAssetId="0:315" id="0:555">
+                    <ScriptInputString propertyValue="Click to dig faster!" name="text"/>
+                    <ScriptInputNumber propertyValue="0" name="anchorX"/>
+                    <ScriptInputNumber propertyValue="-60" name="anchorY"/>
+                    <ScriptInputNumber propertyValue="1" name="onlyBeforeTaught"/>
+                </ScriptedListenerAction>
+            </StateMachineListenerSingle>
+
+            <StateMachineListenerSingle targetId="0:542" listenerTypeValue="exit" name="HideTooltip" id="0:556">
+                <ScriptedListenerAction scriptAssetId="0:316" id="0:557"/>
+            </StateMachineListenerSingle>
+        </StateMachine>
+    </Artboard>
+
+    <ComponentAsset artboardId="0:501" name="ProducerWidget"/>
+
+    <ViewModel defaultInstanceId="0:530" name="Producer" id="0:500">
+        <ViewModelPropertyNumber name="lastDigTime" id="0:511"/>
+        <ViewModelPropertyNumber name="digCooldownFraction" id="0:512"/>
+        <ViewModelPropertyNumber name="itemPulseScale" id="0:513"/>
+        <ViewModelPropertyNumber name="lastPulseTime" id="0:514"/>
+        <ViewModelPropertyNumber name="pulseMagnitude" id="0:515"/>
+        <ViewModelPropertyString name="digPopupText" id="0:516"/>
+        <ViewModelPropertyNumber name="digPopupAlpha" id="0:517"/>
+        <ViewModelPropertyNumber name="lastDigPopupTime" id="0:518"/>
+        <ViewModelPropertyString name="itemPoolName" id="0:519"/>
+        <ViewModelPropertyNumber name="roamX" id="0:520"/>
+        <ViewModelPropertyNumber name="roamY" id="0:521"/>
+        <ViewModelPropertyNumber name="roamTargetX" id="0:522"/>
+        <ViewModelPropertyNumber name="roamTargetY" id="0:523"/>
+        <ViewModelPropertyNumber name="storageCapacity" id="0:524"/>
+        <ViewModelPropertyList name="storage" id="0:525"/>
+        <ViewModelPropertyString name="storageLabel" id="0:526"/>
+        <ViewModelPropertyNumber name="lastTrailX" id="0:527"/>
+        <ViewModelPropertyNumber name="lastTrailY" id="0:528"/>
+        <ViewModelPropertyString name="robotClass" id="0:529"/>
+        <ViewModelPropertyArtboard name="characterArtboard" id="0:570"/>
+
+        <ViewModelInstance exports="true" name="Default" id="0:530">
+            <ViewModelInstanceArtboard propertyValue="0:1000" viewModelPropertyId="0:570"/>
+            <ViewModelInstanceNumber propertyValue="-100000" viewModelPropertyId="0:511"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:512"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:513"/>
+            <ViewModelInstanceNumber propertyValue="-100000" viewModelPropertyId="0:514"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:515"/>
+            <ViewModelInstanceString propertyValue="" viewModelPropertyId="0:516"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:517"/>
+            <ViewModelInstanceNumber propertyValue="-100000" viewModelPropertyId="0:518"/>
+            <ViewModelInstanceString propertyValue="all" viewModelPropertyId="0:519"/>
+            <ViewModelInstanceNumber propertyValue="100" viewModelPropertyId="0:520"/>
+            <ViewModelInstanceNumber propertyValue="100" viewModelPropertyId="0:521"/>
+            <ViewModelInstanceNumber propertyValue="100" viewModelPropertyId="0:522"/>
+            <ViewModelInstanceNumber propertyValue="100" viewModelPropertyId="0:523"/>
+            <ViewModelInstanceNumber propertyValue="3" viewModelPropertyId="0:524"/>
+            <ViewModelInstanceList viewModelPropertyId="0:525"/>
+            <ViewModelInstanceString propertyValue="0/3" viewModelPropertyId="0:526"/>
+            <ViewModelInstanceNumber propertyValue="100" viewModelPropertyId="0:527"/>
+            <ViewModelInstanceNumber propertyValue="100" viewModelPropertyId="0:528"/>
+            <ViewModelInstanceString propertyValue="beachCrew" viewModelPropertyId="0:529"/>
+        </ViewModelInstance>
+
+        <ViewModelInstance exports="true" name="Starter" id="0:531">
+            <ViewModelInstanceArtboard propertyValue="0:1000" viewModelPropertyId="0:570"/>
+            <ViewModelInstanceNumber propertyValue="-100000" viewModelPropertyId="0:511"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:512"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:513"/>
+            <ViewModelInstanceNumber propertyValue="-100000" viewModelPropertyId="0:514"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:515"/>
+            <ViewModelInstanceString propertyValue="" viewModelPropertyId="0:516"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:517"/>
+            <ViewModelInstanceNumber propertyValue="-100000" viewModelPropertyId="0:518"/>
+            <ViewModelInstanceString propertyValue="all" viewModelPropertyId="0:519"/>
+            <ViewModelInstanceNumber propertyValue="120" viewModelPropertyId="0:520"/>
+            <ViewModelInstanceNumber propertyValue="150" viewModelPropertyId="0:521"/>
+            <ViewModelInstanceNumber propertyValue="120" viewModelPropertyId="0:522"/>
+            <ViewModelInstanceNumber propertyValue="150" viewModelPropertyId="0:523"/>
+            <ViewModelInstanceNumber propertyValue="3" viewModelPropertyId="0:524"/>
+            <ViewModelInstanceList viewModelPropertyId="0:525"/>
+            <ViewModelInstanceString propertyValue="0/3" viewModelPropertyId="0:526"/>
+            <ViewModelInstanceNumber propertyValue="120" viewModelPropertyId="0:527"/>
+            <ViewModelInstanceNumber propertyValue="150" viewModelPropertyId="0:528"/>
+            <ViewModelInstanceString propertyValue="beachCrew" viewModelPropertyId="0:529"/>
+        </ViewModelInstance>
+
+        <ViewModelInstance exports="true" name="BeachBoy" id="0:532">
+            <ViewModelInstanceArtboard propertyValue="0:1010" viewModelPropertyId="0:570"/>
+            <ViewModelInstanceNumber propertyValue="-100000" viewModelPropertyId="0:511"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:512"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:513"/>
+            <ViewModelInstanceNumber propertyValue="-100000" viewModelPropertyId="0:514"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:515"/>
+            <ViewModelInstanceString propertyValue="" viewModelPropertyId="0:516"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:517"/>
+            <ViewModelInstanceNumber propertyValue="-100000" viewModelPropertyId="0:518"/>
+            <ViewModelInstanceString propertyValue="beachBoy" viewModelPropertyId="0:519"/>
+            <ViewModelInstanceNumber propertyValue="400" viewModelPropertyId="0:520"/>
+            <ViewModelInstanceNumber propertyValue="150" viewModelPropertyId="0:521"/>
+            <ViewModelInstanceNumber propertyValue="400" viewModelPropertyId="0:522"/>
+            <ViewModelInstanceNumber propertyValue="150" viewModelPropertyId="0:523"/>
+            <ViewModelInstanceNumber propertyValue="3" viewModelPropertyId="0:524"/>
+            <ViewModelInstanceList viewModelPropertyId="0:525"/>
+            <ViewModelInstanceString propertyValue="0/3" viewModelPropertyId="0:526"/>
+            <ViewModelInstanceNumber propertyValue="400" viewModelPropertyId="0:527"/>
+            <ViewModelInstanceNumber propertyValue="150" viewModelPropertyId="0:528"/>
+            <ViewModelInstanceString propertyValue="beachCrew" viewModelPropertyId="0:529"/>
+        </ViewModelInstance>
+
+        <ViewModelInstance exports="true" name="SteelSeeker" id="0:533">
+            <ViewModelInstanceArtboard propertyValue="0:1020" viewModelPropertyId="0:570"/>
+            <ViewModelInstanceNumber propertyValue="-100000" viewModelPropertyId="0:511"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:512"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:513"/>
+            <ViewModelInstanceNumber propertyValue="-100000" viewModelPropertyId="0:514"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:515"/>
+            <ViewModelInstanceString propertyValue="" viewModelPropertyId="0:516"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:517"/>
+            <ViewModelInstanceNumber propertyValue="-100000" viewModelPropertyId="0:518"/>
+            <ViewModelInstanceString propertyValue="steelSeeker" viewModelPropertyId="0:519"/>
+            <ViewModelInstanceNumber propertyValue="250" viewModelPropertyId="0:520"/>
+            <ViewModelInstanceNumber propertyValue="250" viewModelPropertyId="0:521"/>
+            <ViewModelInstanceNumber propertyValue="250" viewModelPropertyId="0:522"/>
+            <ViewModelInstanceNumber propertyValue="250" viewModelPropertyId="0:523"/>
+            <ViewModelInstanceNumber propertyValue="3" viewModelPropertyId="0:524"/>
+            <ViewModelInstanceList viewModelPropertyId="0:525"/>
+            <ViewModelInstanceString propertyValue="0/3" viewModelPropertyId="0:526"/>
+            <ViewModelInstanceNumber propertyValue="250" viewModelPropertyId="0:527"/>
+            <ViewModelInstanceNumber propertyValue="250" viewModelPropertyId="0:528"/>
+            <ViewModelInstanceString propertyValue="steelSeeker" viewModelPropertyId="0:529"/>
+        </ViewModelInstance>
+    </ViewModel>
+</Rive>

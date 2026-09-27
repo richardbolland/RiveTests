@@ -10,9 +10,9 @@
             <LayoutComponentStyle layoutWidthScaleType="hug" layoutHeightScaleType="hug"
                                   positionTypeValue="absolute"
                                   positionLeftUnitsValue="points" positionTopUnitsValue="points"
-                                  paddingLeft="10" paddingRight="10"
-                                  paddingTop="6" paddingBottom="6"
-                                  cornerRadiusTL="8" cornerRadiusTR="8" cornerRadiusBL="8" cornerRadiusBR="8"
+                                  paddingLeft="8" paddingRight="8"
+                                  paddingTop="4" paddingBottom="4"
+                                  cornerRadiusTL="6" cornerRadiusTR="6" cornerRadiusBL="6" cornerRadiusBR="6"
                                   name="Tooltip Style" id="0:261">
                 <DataBindContext sourcePathIds="0:270-0:273" propertyKey="516"/>
                 <DataBindContext sourcePathIds="0:270-0:274" propertyKey="518"/>
@@ -24,7 +24,7 @@
 
             <Text name="TooltipLabel" id="0:263">
                 <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="TooltipLabel Layout"/>
-                <TextStylePaint fontSize="14" fontAssetId="0:300" name="TooltipStyle" id="0:264">
+                <TextStylePaint fontSize="12" fontAssetId="0:300" name="TooltipStyle" id="0:264">
                     <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
                 </TextStylePaint>
                 <TextValueRun styleId="0:264" text="" name="TooltipRun">
@@ -78,15 +78,17 @@
                     </SolidColor>
                 </Fill>
 
-                <ArtboardComponentList name="ProducerRows" id="0:33">
-                    <DataBindContext sourcePathIds="0:200-0:250" propertyKey="800"/>
-                </ArtboardComponentList>
-
-                <!-- Declared after ProducerRows so tracks draw behind the
-                     robots (first sibling draws on top - rive docs
-                     transforms). -->
+                <!-- Declared before ProducerRows so tracks draw behind the
+                     robots. NOTE: for ArtboardComponentList-generated rows,
+                     draw order came out the OPPOSITE of the usual "first
+                     sibling draws on top" rule for plain shapes - verified
+                     empirically by screenshot, not assumed from the docs. -->
                 <ArtboardComponentList name="TrailDots" id="0:34">
                     <DataBindContext sourcePathIds="0:200-0:259" propertyKey="800"/>
+                </ArtboardComponentList>
+
+                <ArtboardComponentList name="ProducerRows" id="0:33">
+                    <DataBindContext sourcePathIds="0:200-0:250" propertyKey="800"/>
                 </ArtboardComponentList>
 
                 <!-- The dock: fixed at the bottom-center of the beach area
@@ -598,6 +600,7 @@
         <ViewModelPropertyNumber name="dockActiveAlpha" id="0:284"/>
         <ViewModelPropertyNumber name="dockSpeedAffordable" id="0:285"/>
         <ViewModelPropertyString name="dockSpeedCostLabel" id="0:286"/>
+        <ViewModelPropertyNumber name="elbowGreaseTaught" id="0:287"/>
         <ViewModelInstance exports="true" name="Default" id="0:210">
             <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:201"/>
             <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:202"/>
@@ -631,6 +634,7 @@
             <ViewModelInstanceNumber propertyValue="0.4" viewModelPropertyId="0:284"/>
             <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:285"/>
             <ViewModelInstanceString propertyValue="5" viewModelPropertyId="0:286"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:287"/>
         </ViewModelInstance>
     </ViewModel>
 

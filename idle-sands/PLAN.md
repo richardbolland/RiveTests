@@ -620,6 +620,63 @@ inspected with zero wiring problems.
    moved toward that new point rather than back toward the dock.
    Verified clean, inspected with zero wiring problems.
 
+**UI/UX polish pass (playtesting round 2)** — the first of a batch of six
+notes, ordered so the big architectural one (per-class upgrades + tabs +
+Steel Seeker discovery, not yet started) doesn't force rework of things
+built before it.
+
+- **Wheel-track/badge layer order fix.** The wheel tracks were rendering
+  *above* the robot body instead of behind it - confirmed by screenshot,
+  not assumed from docs, since it turned out `ArtboardComponentList`-
+  generated rows draw in the OPPOSITE order from the general "first
+  sibling draws on top" rule that plain shapes in one artboard follow
+  (verified both ways empirically: swapping `TrailDots`/`ProducerRows`
+  declaration order in `scene.rml` fixed the trail, while the *existing*
+  correct rule - first declared, drawn on top - is what already made
+  `BadgeLabel` sit on `BadgeBg` and now also puts the whole `BadgeAnchor`
+  on top of the robot's own `Stack` after swapping their order too).
+  Final stack, back to front: background, trail, cooldown ring, robot
+  body, popup, badge, tooltip. Verified via before/after screenshots
+  (cropped/zoomed on an overlapping trail dot) showing it now correctly
+  hidden behind the robot except where the trail extends past it.
+
+- **Tutorial tooltip: smaller, and one-time instead of hover-spam.** The
+  robot's tooltip bubble was judged too large/intrusive on hover. Shrank
+  it (smaller font/padding) and shortened the copy ("Click to dig
+  faster!"), but the bigger change is behavioral: it now auto-shows over
+  the first producer from the very start of the game - no hover needed -
+  and disappears for good the first time the player clicks *any* robot
+  (`Economy.elbowGreaseTaught`, flipped once in `main.luau` regardless of
+  which click branch fires). `clock.luau` forces the shared `Tooltip`
+  overlay onto the first producer's position every frame while
+  untaught; the moment the flag flips, it stops touching `Tooltip` at
+  all and hands control back to the ordinary hover-driven
+  `showTooltip.luau`/`hideTooltip.luau`, which still works afterward as
+  an opt-in reminder. Verified headlessly: tooltip visible at frame 1
+  with no hover; a single click flips the flag and it stays hidden 30
+  simulated seconds later even off-hover; hovering the robot again after
+  being taught still shows it normally (opt-in, not forced).
+
+Still to come from this same playtesting round, not yet started:
+- **Upgrade-panel tooltips** - hover explanations on all seven side-panel
+  buttons, deliberately sequenced *after* the tabbed restructure below so
+  they're wired onto the final panel layout, not thrown away.
+- **Per-class upgrades + tabbed UI + Steel Seeker discovery** - the big
+  one. Each robot class (Starter/Beach Boy/Steel Seeker) gets its own
+  independent `itemsPerDig`/`digSpeedSeconds`/`elbowGreasePercent`/
+  `storageCapacity` instead of one shared set (a new `RobotClass` view
+  model, mirroring how `Producer` already works, with `Producer` gaining
+  a class reference); a tab bar per class plus a "Robots" tab for
+  purchases; Steel Seeker starts hidden until some unlock condition
+  (still to be decided) fires. Blocked on three open questions before
+  starting: whether Starter gets its own tab or shares Beach Boy's,
+  what specifically unlocks Steel Seeker, and whether Robot Speed
+  (the dock upgrade) stays one fleet-wide stat or also goes per-class.
+- **Bento-style stats dashboard** - a later, larger view of full
+  lifetime/fleet statistics once unlocked. Explicitly scoped as a
+  future milestone, not part of this pass - added here as a placeholder
+  only, no design work done yet.
+
 7. **Persistence** — host page saves/loads `Economy` to `localStorage`;
    reload the page mid-game and confirm state survives.
 8. **Visual feedback pass** — floating "+N" numbers on collect/sell, button
@@ -632,4 +689,6 @@ inspected with zero wiring problems.
 
 Later milestones (post-v1, not yet scheduled): remaining 2 bots + items,
 achievements, tooltips polish pass, `rive push`/`rive pull` handoff for a
-manual art pass in the Editor, offline/away earnings, portrait layout.
+manual art pass in the Editor, offline/away earnings, portrait layout,
+bento-style full-fleet stats dashboard (unlocked view of lifetime/fleet
+statistics).

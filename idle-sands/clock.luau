@@ -145,6 +145,17 @@ local TRAIL_MAX_COUNT = 40
 local PRODUCER_WIDGET_CENTER = 55 -- half of ProducerWidget's 110x110
 local TRACK_DOT_HALF = 7 -- half of TrackDot's 14x14
 
+-- Elbow Grease tutorial: the shared Tooltip overlay auto-shows over the
+-- first producer, with no hover needed, until the player has ever clicked
+-- a robot (main.luau flips elbowGreaseTaught the first time that happens).
+-- Root-space conversion matches showTooltip.luau's own (roamX/roamY are
+-- BeachArea-local); anchorY here mirrors the ScriptInputNumber on the
+-- ShowTooltip listener in producers.rml, so the tutorial and the ordinary
+-- hover tooltip land in the same spot.
+local BEACH_AREA_ROOT_Y = 64
+local TUTORIAL_ANCHOR_Y = -60
+local TUTORIAL_TEXT = 'Click to dig faster!'
+
 local function init(self: ClockState, context: Context): boolean
 	self.context = context
 	return true
@@ -548,6 +559,31 @@ local function advance(self: ClockState, seconds: number): boolean
 	local sellAffordable = economy:getNumber('sellAffordable')
 	if sellAffordable then
 		sellAffordable.value = (total > 0) and 1 or DIMMED_ALPHA
+	end
+
+	-- Elbow Grease tutorial: force the shared tooltip onto the first
+	-- producer every frame until the player has ever clicked one. Once
+	-- taught, this stops touching Tooltip entirely and ordinary
+	-- hover-driven show/hide (showTooltip.luau/hideTooltip.luau) takes
+	-- back over.
+	local elbowGreaseTaught = economy:getNumber('elbowGreaseTaught')
+	if elbowGreaseTaught and elbowGreaseTaught.value <= 0 and producers and producers.length > 0 then
+		local tutorialTarget = producers[1]
+		local tRoamX = tutorialTarget:getNumber('roamX')
+		local tRoamY = tutorialTarget:getNumber('roamY')
+		local tooltip = context:globalViewModel('Tooltip')
+		if tRoamX and tRoamY and tooltip then
+			local tText = tooltip:getString('text')
+			local tVisible = tooltip:getNumber('visible')
+			local tX = tooltip:getNumber('x')
+			local tY = tooltip:getNumber('y')
+			if tText and tVisible and tX and tY then
+				tText.value = TUTORIAL_TEXT
+				tX.value = tRoamX.value + PRODUCER_WIDGET_CENTER
+				tY.value = tRoamY.value + BEACH_AREA_ROOT_Y + PRODUCER_WIDGET_CENTER + TUTORIAL_ANCHOR_Y
+				tVisible.value = 1
+			end
+		end
 	end
 
 	return true

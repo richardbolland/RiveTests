@@ -49,6 +49,14 @@ local function performAction(self: BoostState, listenerContext: ListenerContext)
 		return
 	end
 
+	-- First-ever click on any robot: the player now knows clicking does
+	-- something, so the auto-shown tutorial tooltip (clock.luau) can stop
+	-- teaching it. One flag for the whole fleet, not per-robot.
+	local elbowGreaseTaught = economy:getNumber('elbowGreaseTaught')
+	if elbowGreaseTaught and elbowGreaseTaught.value <= 0 then
+		elbowGreaseTaught.value = 1
+	end
+
 	local storage = producer:getList('storage')
 	local storageCapacity = producer:getNumber('storageCapacity')
 	if storage and storageCapacity and storage.length >= storageCapacity.value then

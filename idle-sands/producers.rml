@@ -1,12 +1,20 @@
 <Rive version="1" kind="fragment">
-    <!-- Reusable producer widget: the digging circle + cooldown ring + popup.
-         One instance per owned producer - the free starter, then purchased
-         bots - rendered via the ArtboardComponentList bound to
-         Economy.producers. Each row owns its own cycle/pulse/popup state;
-         digSpeedSeconds, itemsPerDig, elbowGreasePercent and
-         storageCapacity are upgraded per robotClass (robotClasses.rml),
-         not shared fleet-wide - a producer's own robotClass name picks
-         which RobotClass instance clock.luau reads those from each frame. -->
+    <!-- Reusable producer widget: the shared chassis (badge, cooldown
+         ring, dig popup, click/tooltip hit area) around whichever robot
+         is actually nested in the "Character" slot. One instance per
+         owned producer - the free starter, then purchased bots - rendered
+         via the ArtboardComponentList bound to Economy.producers. Each
+         row owns its own cycle/pulse/popup state; digSpeedSeconds,
+         itemsPerDig, elbowGreasePercent and storageCapacity are upgraded
+         per robotClass (robotClasses.rml), not shared fleet-wide - a
+         producer's own robotClass name picks which RobotClass instance
+         clock.luau reads those from each frame.
+
+         What a producer actually LOOKS like is a separate concern from
+         all of the above: characterArtboard (a ViewModelPropertyArtboard,
+         below) names which artboard in robots.rml this producer's
+         Character slot nests, so each robot class can be fully unique art
+         and animation instead of one shared shape tinted per instance. -->
     <Artboard isComponent="true" viewModelId="0:500" styleId="0:502" x="1600" y="0" width="110" height="110" name="ProducerWidget" id="0:501">
         <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
                               positionTypeValue="absolute"
@@ -66,18 +74,27 @@
                 </TextValueRun>
             </Text>
 
-            <Shape name="Item" id="0:542">
-                <LayoutParticipant layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
-                                   width="80" height="80" name="Item Layout"/>
-                <DataBindContext sourcePathIds="0:500-0:513" propertyKey="16"/>
-                <DataBindContext sourcePathIds="0:500-0:513" propertyKey="17"/>
-                <Ellipse width="80" height="80" originX="0.5" originY="0.5" name="Path"/>
-                <Fill name="Fill">
-                    <SolidColor colorValue="FFE8785A" name="C">
-                        <DataBindContext sourcePathIds="0:500-0:510" propertyKey="37"/>
-                    </SolidColor>
-                </Fill>
-            </Shape>
+            <!-- The one thing that varies per robot TYPE: which artboard
+                 (robots.rml) is nested in this slot. A NestedArtboardLeaf
+                 takes its size from the LayoutComponent box around it
+                 (fit="contain" scales the nested artboard into that box,
+                 like an image into a frame) rather than a LayoutParticipant
+                 - a leaf isn't one of the three types (Shape/Text/Image) a
+                 participant can attach to. artboardId="0:1000" is just the
+                 authored starting value (StarterBot, matching the Default
+                 producer template) - the data bind below replaces it once
+                 a real producer instance is bound, the same way an
+                 Image's own starting assetId works. Kept the old Item
+                 shape's id (0:542) on the leaf itself so the click/tooltip
+                 listeners below, which target it, needed no changes. -->
+            <LayoutComponent width="80" height="80" styleId="0:572" name="Character Slot" id="0:571">
+                <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" name="Character Slot Style" id="0:572"/>
+                <NestedArtboardLeaf artboardId="0:1000" fit="contain" name="Character" id="0:542">
+                    <DataBindContext sourcePathIds="0:500-0:513" propertyKey="16"/>
+                    <DataBindContext sourcePathIds="0:500-0:513" propertyKey="17"/>
+                    <DataBindContext sourcePathIds="0:500-0:570" propertyKey="197"/>
+                </NestedArtboardLeaf>
+            </LayoutComponent>
 
             <Shape name="CooldownRing" id="0:543">
                 <LayoutParticipant layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
@@ -123,7 +140,6 @@
     <ComponentAsset artboardId="0:501" name="ProducerWidget"/>
 
     <ViewModel defaultInstanceId="0:530" name="Producer" id="0:500">
-        <ViewModelPropertyColor name="swatch" id="0:510"/>
         <ViewModelPropertyNumber name="lastDigTime" id="0:511"/>
         <ViewModelPropertyNumber name="digCooldownFraction" id="0:512"/>
         <ViewModelPropertyNumber name="itemPulseScale" id="0:513"/>
@@ -143,9 +159,10 @@
         <ViewModelPropertyNumber name="lastTrailX" id="0:527"/>
         <ViewModelPropertyNumber name="lastTrailY" id="0:528"/>
         <ViewModelPropertyString name="robotClass" id="0:529"/>
+        <ViewModelPropertyArtboard name="characterArtboard" id="0:570"/>
 
         <ViewModelInstance exports="true" name="Default" id="0:530">
-            <ViewModelInstanceColor propertyValue="FFE8785A" viewModelPropertyId="0:510"/>
+            <ViewModelInstanceArtboard propertyValue="0:1000" viewModelPropertyId="0:570"/>
             <ViewModelInstanceNumber propertyValue="-100000" viewModelPropertyId="0:511"/>
             <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:512"/>
             <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:513"/>
@@ -168,7 +185,7 @@
         </ViewModelInstance>
 
         <ViewModelInstance exports="true" name="Starter" id="0:531">
-            <ViewModelInstanceColor propertyValue="FFE8785A" viewModelPropertyId="0:510"/>
+            <ViewModelInstanceArtboard propertyValue="0:1000" viewModelPropertyId="0:570"/>
             <ViewModelInstanceNumber propertyValue="-100000" viewModelPropertyId="0:511"/>
             <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:512"/>
             <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:513"/>
@@ -191,7 +208,7 @@
         </ViewModelInstance>
 
         <ViewModelInstance exports="true" name="BeachBoy" id="0:532">
-            <ViewModelInstanceColor propertyValue="FFD9B84A" viewModelPropertyId="0:510"/>
+            <ViewModelInstanceArtboard propertyValue="0:1010" viewModelPropertyId="0:570"/>
             <ViewModelInstanceNumber propertyValue="-100000" viewModelPropertyId="0:511"/>
             <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:512"/>
             <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:513"/>
@@ -214,7 +231,7 @@
         </ViewModelInstance>
 
         <ViewModelInstance exports="true" name="SteelSeeker" id="0:533">
-            <ViewModelInstanceColor propertyValue="FF7A8699" viewModelPropertyId="0:510"/>
+            <ViewModelInstanceArtboard propertyValue="0:1020" viewModelPropertyId="0:570"/>
             <ViewModelInstanceNumber propertyValue="-100000" viewModelPropertyId="0:511"/>
             <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:512"/>
             <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:513"/>

@@ -857,13 +857,54 @@ Still to come from this same playtesting round, not yet started:
    no-ops while frozen; Start New Beach resets currency/items/elapsed
    time to zero, doubles the next goal, and leaves every bot, upgrade and
    the now-permanent Steel Seeker unlock untouched.
-8. **Persistence** — host page saves/loads `Economy` to `localStorage`;
+8. **Per-robot artboards** ✅ — after looking at the file in the Rive
+   editor, the player flagged that every robot shared one `ProducerWidget`
+   circle tinted per instance (`Producer.swatch`), which is no good for
+   giving each robot class unique art and animation. Restructured so a
+   robot's actual look is a separate concern from its shared chassis: a
+   new `robots.rml` holds one small artboard per robot TYPE
+   (`StarterBot`/`BeachBoyBot`/`SteelSeekerBot` for now, still placeholder
+   colored circles - real art/animation is the player's next pass), and
+   `ProducerWidget`'s "Character" slot nests whichever one matches a given
+   producer via `Producer.characterArtboard` (a new
+   `ViewModelPropertyArtboard`) driving `NestedArtboardLeaf.artboardId` -
+   Rive's built-in mechanism for swapping which artboard renders per data
+   row, since an `ArtboardComponentList` itself only ever instances one
+   artboard for every row in the list it's bound to. `swatch` was removed
+   as fully unused now that art differentiates instead of color.
+
+   Everything shared across every robot - the badge, cooldown ring, dig
+   popup, click/tooltip hit area, roaming/economy logic - stayed exactly
+   where it was in `ProducerWidget` and needed zero changes; only the
+   slot's contents became swappable. The click/pulse/tooltip listeners
+   even kept the same target id (moved from the old `Item` shape onto the
+   new `NestedArtboardLeaf`), so `producers.rml`'s `StateMachine` block
+   didn't need touching either.
+
+   One real gotcha along the way: a `LayoutParticipant` can only attach to
+   a `Shape`, `Text` or `Image` - not a `NestedArtboard` - so the initial
+   attempt built clean in `--verify` but `inspect` caught it as
+   `wrong-parent`. Fixed per the layout docs' own guidance: a
+   `NestedArtboardLeaf` takes its size from being inside a `fixed`/`fill`
+   `LayoutComponent` box directly (its `fit="contain"` scales the nested
+   artboard into that box, like an image into a frame), no participant
+   needed - the same shape as the docs' own icon-in-a-slot example.
+
+   Verified headlessly: clean verify/inspect (down to fixing two
+   editor-stage overlap warnings from the new artboards' placement);
+   screenshots confirm the Starter's placeholder circle renders unchanged
+   through the new nesting path; buying a Beach Boy shows a second,
+   visually distinct robot (its own `BeachBoyBot` artboard) alongside the
+   Starter; and the click-boost pulse (`itemPulseScale`, scaleX/scaleY)
+   still animates correctly now that it targets the nested artboard
+   instead of the old plain shape.
+9. **Persistence** — host page saves/loads `Economy` to `localStorage`;
    reload the page mid-game and confirm state survives.
-9. **Visual feedback pass** — floating "+N" numbers on collect/sell, button
-   press feedback, bot-purchase feedback animation.
-10. **Responsive layout pass** — verify the layout holds up from narrow
+10. **Visual feedback pass** — floating "+N" numbers on collect/sell, button
+    press feedback, bot-purchase feedback animation.
+11. **Responsive layout pass** — verify the layout holds up from narrow
     laptop width to ultra-wide, horizontally only.
-11. **Ship** — HTML host page using the Rive web runtime pointed at the
+12. **Ship** — HTML host page using the Rive web runtime pointed at the
     signed build, published both via `rive --publish=web` and to GitHub
     Pages from this repo.
 

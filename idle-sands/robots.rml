@@ -1,0 +1,58 @@
+<Rive version="1" kind="fragment">
+    <!-- One artboard per robot TYPE - the actual character art and
+         animation, fully independent of each other. producers.rml's
+         shared ProducerWidget nests whichever one of these matches a
+         given producer's Producer.characterArtboard field (a
+         ViewModelPropertyArtboard), via NestedArtboard.artboardId - Rive's
+         built-in mechanism for swapping which artboard renders per data
+         row, since an ArtboardComponentList itself only ever instances
+         ONE artboard for every row in the list it's bound to.
+
+         Everything shared across every robot (the badge, cooldown ring,
+         dig popup, click/tooltip hit area, roaming/economy logic) stays
+         in ProducerWidget and never needs to change as these get their
+         own real art - only the body swaps. The placeholder below is
+         just a plain colored circle so nothing changes visually until
+         that art pass happens.
+
+         Keep each one this same 80x80 footprint (ProducerWidget's
+         "Character" slot is a fixed 80x80 box that a NestedArtboardLeaf's
+         fit="contain" scales whatever is nested into, like an image into
+         a frame) so a robot drawn at a different native size still reads
+         at a consistent scale next to the others; widen the slot in
+         producers.rml instead if a design genuinely needs more room. Add
+         a new <Artboard> here (plus its <ComponentAsset>) for every
+         future robot class, then point that class's Producer template
+         instance in producers.rml at it. -->
+
+    <Artboard isComponent="true" styleId="0:1001" x="2000" y="0" width="80" height="80" name="StarterBot" id="0:1000">
+        <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" name="StarterBot Style" id="0:1001"/>
+        <Shape name="Body" id="0:1002">
+            <LayoutParticipant layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" width="80" height="80" name="Body Layout"/>
+            <Ellipse width="80" height="80" originX="0.5" originY="0.5" name="Path"/>
+            <Fill name="Fill"><SolidColor colorValue="FFE8785A" name="C"/></Fill>
+        </Shape>
+    </Artboard>
+
+    <Artboard isComponent="true" styleId="0:1011" x="2000" y="100" width="80" height="80" name="BeachBoyBot" id="0:1010">
+        <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" name="BeachBoyBot Style" id="0:1011"/>
+        <Shape name="Body" id="0:1012">
+            <LayoutParticipant layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" width="80" height="80" name="Body Layout"/>
+            <Ellipse width="80" height="80" originX="0.5" originY="0.5" name="Path"/>
+            <Fill name="Fill"><SolidColor colorValue="FFD9B84A" name="C"/></Fill>
+        </Shape>
+    </Artboard>
+
+    <Artboard isComponent="true" styleId="0:1021" x="2000" y="200" width="80" height="80" name="SteelSeekerBot" id="0:1020">
+        <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" name="SteelSeekerBot Style" id="0:1021"/>
+        <Shape name="Body" id="0:1022">
+            <LayoutParticipant layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" width="80" height="80" name="Body Layout"/>
+            <Ellipse width="80" height="80" originX="0.5" originY="0.5" name="Path"/>
+            <Fill name="Fill"><SolidColor colorValue="FF7A8699" name="C"/></Fill>
+        </Shape>
+    </Artboard>
+
+    <ComponentAsset artboardId="0:1000" name="StarterBot"/>
+    <ComponentAsset artboardId="0:1010" name="BeachBoyBot"/>
+    <ComponentAsset artboardId="0:1020" name="SteelSeekerBot"/>
+</Rive>

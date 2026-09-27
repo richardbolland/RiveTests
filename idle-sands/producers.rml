@@ -69,7 +69,6 @@
             <Shape name="Item" id="0:542">
                 <LayoutParticipant layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
                                    width="80" height="80" name="Item Layout"/>
-                <DataBindContext sourcePathIds="0:500-0:512" propertyKey="18" converterId="0:302"/>
                 <DataBindContext sourcePathIds="0:500-0:513" propertyKey="16"/>
                 <DataBindContext sourcePathIds="0:500-0:513" propertyKey="17"/>
                 <Ellipse width="80" height="80" originX="0.5" originY="0.5" name="Path"/>
@@ -111,6 +110,7 @@
                     <ScriptInputString propertyValue="Click to dig faster!" name="text"/>
                     <ScriptInputNumber propertyValue="0" name="anchorX"/>
                     <ScriptInputNumber propertyValue="-60" name="anchorY"/>
+                    <ScriptInputNumber propertyValue="1" name="onlyBeforeTaught"/>
                 </ScriptedListenerAction>
             </StateMachineListenerSingle>
 

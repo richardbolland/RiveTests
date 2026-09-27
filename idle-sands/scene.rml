@@ -740,8 +740,6 @@
 
     <FontAsset file="Outfit-Bold.ttf" name="Outfit Bold" id="0:300"/>
     <DataConverterToString decimals="0" round="true" name="CurrencyFormat" id="0:301"/>
-    <DataConverterRangeMapper minInput="0" maxInput="1" minOutput="1" maxOutput="0.5"
-                              clampLower="true" clampUpper="true" name="CooldownDim" id="0:302"/>
     <ScriptAsset file="main.luau" name="main" id="0:310"/>
     <ScriptAsset file="sell.luau" name="sell" id="0:311"/>
     <ScriptAsset file="upgrade.luau" name="upgrade" id="0:312"/>

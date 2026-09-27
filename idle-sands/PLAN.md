@@ -751,6 +751,37 @@ built before it.
   (pointer exit then re-enter) still shows it normally, confirming the
   opt-in reminder path is untouched.
 
+**Bug fixes (playtesting round 4):**
+- **Trail visible through the robot, root cause finally found.** Round 3's
+  draw-order swap was correct but incomplete: the robot's own dig-cycle
+  dimming effect (`opacity` bound to `digCooldownFraction`, 1.0->0.5,
+  added back in the auto-collect milestone) meant it was routinely
+  rendering below full opacity, so the trail dot underneath showed
+  through the translucent body regardless of draw order. Per instruction,
+  removed that opacity bind entirely (and the now-unused `CooldownDim`
+  range-mapper converter) so the robot always renders fully opaque; the
+  cooldown ring and item-pulse animation still communicate cycle
+  progress without needing the body itself to fade. Verified via a
+  zoomed screenshot crop mid-cycle next to a trail dot: solid color,
+  no bleed-through.
+- **Tooltip reappearing on re-hover after being taught.** The click-hides-
+  it fix (round 3) only cleared `Tooltip.visible` at the moment of the
+  teaching click; it didn't stop the ordinary hover listener
+  (`showTooltip.luau`'s enter handler) from showing it again on any
+  later hover, which the player correctly flagged as still wrong per the
+  original ask ("disappear ... player has now learnt about that
+  mechanic" - permanently, not just until the next hover).
+  `showTooltip.luau` gained an optional `onlyBeforeTaught` input: when
+  set, the listener becomes a permanent no-op once
+  `Economy.elbowGreaseTaught` is set, rather than acting as an ordinary
+  reminder. Wired onto the robot's own tooltip listener only (in
+  `producers.rml`) - the seven side-panel tooltips added in phase 2 omit
+  it and keep working on every hover, since they were never meant to be
+  one-time. Verified headlessly: hover shows it pre-teach, a click hides
+  it immediately, and a subsequent exit+re-enter no longer brings it
+  back - while a side-panel tooltip hovered in the same run still shows
+  normally, confirming the gate is scoped to the one listener that opted in.
+
 Still to come from this same playtesting round, not yet started:
 - **Bento-style stats dashboard** - a later, larger view of full
   lifetime/fleet statistics once unlocked. Explicitly scoped as a

@@ -14,12 +14,19 @@
 ---   producer's own current position, converted from its roamX/roamY
 ---   (BeachArea-local) into root-artboard coordinates, so the tooltip
 ---   follows a moving target without every caller needing to know that.
+---
+--- onlyBeforeTaught (optional, truthy = 1) is for the robot's own
+--- one-time-teach tutorial hint specifically: once set, this listener
+--- becomes a no-op forever after Economy.elbowGreaseTaught flips, instead
+--- of acting as an ordinary hover reminder. Leave it off (the default,
+--- used by every side-panel tooltip) to always show on hover.
 
 type ShowTooltipState = {
 	context: Context?,
 	text: Input<string>?,
 	anchorX: Input<number>?,
 	anchorY: Input<number>?,
+	onlyBeforeTaught: Input<number>?,
 }
 
 -- ProducerWidget is 110x110 (producers.rml); BeachArea sits directly below
@@ -47,6 +54,15 @@ local function performAction(self: ShowTooltipState, listenerContext: ListenerCo
 	local tooltip = context:globalViewModel('Tooltip')
 	if not tooltip then
 		return
+	end
+
+	local onlyBeforeTaught = self.onlyBeforeTaught
+	if onlyBeforeTaught and onlyBeforeTaught > 0 then
+		local economy = context:globalViewModel('Economy')
+		local elbowGreaseTaught = if economy then economy:getNumber('elbowGreaseTaught') else nil
+		if elbowGreaseTaught and elbowGreaseTaught.value > 0 then
+			return
+		end
 	end
 
 	local textProp = tooltip:getString('text')

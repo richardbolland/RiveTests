@@ -88,6 +88,35 @@
                 <ArtboardComponentList name="TrailDots" id="0:34">
                     <DataBindContext sourcePathIds="0:200-0:259" propertyKey="800"/>
                 </ArtboardComponentList>
+
+                <!-- The dock: fixed at the bottom-center of the beach area
+                     (BeachArea-local coordinates, same space roamX/roamY
+                     use, so a full producer can walk straight to it with
+                     no coordinate conversion). Dimmed until dockSpeed is
+                     first purchased, at full opacity once robots can
+                     actually use it. Declared last so robots and tracks
+                     both draw in front of it. -->
+                <LayoutComponent width="120" height="90" styleId="0:36" name="DockBox" id="0:35">
+                    <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                          layoutAlignmentType="center"
+                                          positionTypeValue="absolute"
+                                          positionLeft="440" positionLeftUnitsValue="points"
+                                          positionTop="435" positionTopUnitsValue="points"
+                                          cornerRadiusTL="12" cornerRadiusTR="12" cornerRadiusBL="12" cornerRadiusBR="12"
+                                          name="DockBox Style" id="0:36"/>
+                    <DataBindContext sourcePathIds="0:200-0:284" propertyKey="18"/>
+                    <Fill name="Fill">
+                        <SolidColor colorValue="FF8B6B47" name="C"/>
+                    </Fill>
+
+                    <Text name="DockLabel" id="0:37">
+                        <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="DockLabel Layout"/>
+                        <TextStylePaint fontSize="16" fontAssetId="0:300" name="DockLabelStyle" id="0:38">
+                            <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextValueRun styleId="0:38" text="DOCK" name="DockLabelRun"/>
+                    </Text>
+                </LayoutComponent>
             </LayoutComponent>
 
             <LayoutComponent width="280" height="556" styleId="0:41" name="SidePanel" id="0:40">
@@ -248,6 +277,13 @@
                     </Text>
                 </LayoutComponent>
 
+                <!-- One slot, two identities: before the first purchase it
+                     reads "Auto-Sell" (buying it unlocks docking at all);
+                     from then on the same panel becomes the repeatable
+                     "Robot Speed" upgrade for the dock-seeking trip. Both
+                     states are the same dockSpeed stat (0 = locked), so
+                     the label is a single computed string rather than two
+                     panels swapped by visibility. -->
                 <LayoutComponent width="240" height="64" styleId="0:191" name="AutoSellPanel" id="0:190">
                     <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
                                           flexDirectionValue="row" layoutAlignmentType="spaceBetweenCenter"
@@ -267,11 +303,9 @@
                         <TextStylePaint fontSize="16" fontAssetId="0:300" name="AutoSellStyle" id="0:193">
                             <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
                         </TextStylePaint>
-                        <TextValueRun styleId="0:193" text="Auto-Sell " name="AutoSellPrefix"/>
-                        <TextValueRun styleId="0:193" text="90" name="AutoSellValue">
-                            <DataBindContext sourcePathIds="0:200-0:204" propertyKey="268" converterId="0:301"/>
+                        <TextValueRun styleId="0:193" text="Auto-Sell" name="AutoSellPrefix">
+                            <DataBindContext sourcePathIds="0:200-0:204" propertyKey="268"/>
                         </TextValueRun>
-                        <TextValueRun styleId="0:193" text="s" name="AutoSellSuffix"/>
                     </Text>
 
                     <Text name="AutoSellCost" id="0:194">
@@ -408,17 +442,6 @@
                 </TextValueRun>
                 <TextValueRun styleId="0:54" text=")" name="StoredSummarySuffix"/>
             </Text>
-
-            <Text name="AutoSellCountdown" id="0:55">
-                <LayoutParticipant layoutWidthScaleType="hug" layoutHeightScaleType="hug" name="AutoSellCountdown Layout"/>
-                <TextStylePaint fontSize="16" fontAssetId="0:300" name="AutoSellCountdownStyle" id="0:56">
-                    <Fill name="Fill"><SolidColor colorValue="FF4F7062" name="C"/></Fill>
-                </TextStylePaint>
-                <TextValueRun styleId="0:56" text="Auto-sell in " name="AutoSellCountdownPrefix"/>
-                <TextValueRun styleId="0:56" text="90s" name="AutoSellCountdownValue">
-                    <DataBindContext sourcePathIds="0:200-0:284" propertyKey="268"/>
-                </TextValueRun>
-            </Text>
         </LayoutComponent>
 
         <StateMachine name="Main" id="0:7">
@@ -465,12 +488,12 @@
                 </ScriptedListenerAction>
             </StateMachineListenerSingle>
 
-            <StateMachineListenerSingle targetId="0:190" listenerTypeValue="click" name="BuyAutoSell" id="0:196">
+            <StateMachineListenerSingle targetId="0:190" listenerTypeValue="click" name="BuyDockSpeed" id="0:196">
                 <ScriptedListenerAction scriptAssetId="0:312" id="0:197">
-                    <ScriptInputString propertyValue="autoSellSeconds" name="statName"/>
-                    <ScriptInputNumber propertyValue="-15" name="step"/>
-                    <ScriptInputNumber propertyValue="15" name="minValue"/>
-                    <ScriptInputNumber propertyValue="90" name="maxValue"/>
+                    <ScriptInputString propertyValue="dockSpeed" name="statName"/>
+                    <ScriptInputNumber propertyValue="20" name="step"/>
+                    <ScriptInputNumber propertyValue="0" name="minValue"/>
+                    <ScriptInputNumber propertyValue="100" name="maxValue"/>
                     <ScriptInputNumber propertyValue="5" name="baseCost"/>
                     <ScriptInputNumber propertyValue="2.8" name="growth"/>
                 </ScriptedListenerAction>
@@ -548,7 +571,7 @@
         <ViewModelPropertyNumber name="currency" id="0:201"/>
         <ViewModelPropertyNumber name="itemsPerDig" id="0:202"/>
         <ViewModelPropertyNumber name="digSpeedSeconds" id="0:203"/>
-        <ViewModelPropertyNumber name="autoSellSeconds" id="0:204"/>
+        <ViewModelPropertyString name="dockSpeedLabel" id="0:204"/>
         <ViewModelPropertyNumber name="gameTime" id="0:205"/>
         <ViewModelPropertyNumber name="itemsPerDigAffordable" id="0:232"/>
         <ViewModelPropertyNumber name="digSpeedAffordable" id="0:233"/>
@@ -571,15 +594,15 @@
         <ViewModelPropertyNumber name="steelSeekerCount" id="0:280"/>
         <ViewModelPropertyNumber name="steelSeekerAffordable" id="0:281"/>
         <ViewModelPropertyString name="steelSeekerCostLabel" id="0:282"/>
-        <ViewModelPropertyNumber name="lastAutoSellTime" id="0:283"/>
-        <ViewModelPropertyString name="autoSellCountdownLabel" id="0:284"/>
-        <ViewModelPropertyNumber name="autoSellAffordable" id="0:285"/>
-        <ViewModelPropertyString name="autoSellCostLabel" id="0:286"/>
+        <ViewModelPropertyNumber name="dockSpeed" id="0:283"/>
+        <ViewModelPropertyNumber name="dockActiveAlpha" id="0:284"/>
+        <ViewModelPropertyNumber name="dockSpeedAffordable" id="0:285"/>
+        <ViewModelPropertyString name="dockSpeedCostLabel" id="0:286"/>
         <ViewModelInstance exports="true" name="Default" id="0:210">
             <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:201"/>
             <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:202"/>
             <ViewModelInstanceNumber propertyValue="60" viewModelPropertyId="0:203"/>
-            <ViewModelInstanceNumber propertyValue="90" viewModelPropertyId="0:204"/>
+            <ViewModelInstanceString propertyValue="Auto-Sell" viewModelPropertyId="0:204"/>
             <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:205"/>
             <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:232"/>
             <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:233"/>
@@ -605,7 +628,7 @@
             <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:281"/>
             <ViewModelInstanceString propertyValue="220" viewModelPropertyId="0:282"/>
             <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:283"/>
-            <ViewModelInstanceString propertyValue="90s" viewModelPropertyId="0:284"/>
+            <ViewModelInstanceNumber propertyValue="0.4" viewModelPropertyId="0:284"/>
             <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="0:285"/>
             <ViewModelInstanceString propertyValue="5" viewModelPropertyId="0:286"/>
         </ViewModelInstance>

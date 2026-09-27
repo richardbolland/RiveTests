@@ -9,8 +9,10 @@
 --- (so storageLabel can be computed locally) but this script is the only
 --- writer of it, syncing it from Economy.storageCapacity every frame, the
 --- same way every other shared upgrade works. Also owns each upgrade
---- panel's and Sell All's affordable state, the live storage totals, and
---- whether Beach Boy is affordable to buy.
+--- panel's and Sell All's affordable state, the live storage totals,
+--- whether Beach Boy/Steel Seeker are affordable to buy, and - once
+--- dockSpeed is unlocked - routing a full producer to the dock and
+--- selling it there on arrival instead of leaving it frozen.
 
 type ClockState = {
 	context: Context?,
@@ -69,9 +71,16 @@ local STORAGE_CAPACITY_START = 3
 local STORAGE_CAPACITY_STEP = 1
 local STORAGE_CAPACITY_MAX = 8
 
-local AUTO_SELL_START = 90
-local AUTO_SELL_STEP = -15
-local AUTO_SELL_MIN = 15
+-- Dock speed: 0 means docking hasn't been unlocked yet (a full producer
+-- just sits frozen, same as before this feature existed - only a manual
+-- click empties it). The first purchase moves it off zero, which both
+-- unlocks docking and sets its initial speed; further purchases only
+-- make the dock-seeking trip faster. Ambient wandering is unaffected -
+-- it always uses the fixed ROAM_SPEED below, so robots never stand
+-- still just because docking hasn't been bought yet.
+local MOVE_SPEED_START = 0
+local MOVE_SPEED_STEP = 20
+local MOVE_SPEED_MAX = 100
 
 -- Beach Boy is repeatable rather than a one-time flag: each purchase adds
 -- another producer and gets pricier, on its own (steeper, since these are
@@ -114,6 +123,15 @@ local ROAM_MAX_X = 520
 local ROAM_MIN_Y = 20
 local ROAM_MAX_Y = 320
 local ROAM_ARRIVE_THRESHOLD = 4
+
+-- The dock: a fixed point at the bottom-center of the beach area
+-- (BeachArea-local coordinates, matching DockBox's static position in
+-- scene.rml). Once dockSpeed is unlocked, a full producer heads straight
+-- here instead of picking a new random roam target, and auto-sells the
+-- moment it arrives.
+local DOCK_CENTER_X = 500
+local DOCK_CENTER_Y = 480
+local DOCK_ARRIVE_THRESHOLD = 10
 
 -- Wheel tracks: a mark drops every TRAIL_DROP_DISTANCE points a producer
 -- travels, fades out linearly over TRAIL_FADE_DURATION seconds, and the
@@ -181,6 +199,9 @@ local function advance(self: ClockState, seconds: number): boolean
 	local itemsPerDig = if itemsPerDigProp then math.floor(itemsPerDigProp.value) else 1
 	local storageCapacityProp = economy:getNumber('storageCapacity')
 	local storageCapacityValue = if storageCapacityProp then storageCapacityProp.value else STORAGE_CAPACITY_START
+	local dockSpeedProp = economy:getNumber('dockSpeed')
+	local currency = economy:getNumber('currency')
+	local currencyValue = if currency then currency.value else 0
 
 	-- Every producer runs the same cycle: tick down, collect and restart
 	-- when it reaches zero, into its OWN onboard storage. Clicking
@@ -279,19 +300,71 @@ local function advance(self: ClockState, seconds: number): boolean
 
 			-- Roaming: drift toward roamTarget*, pick a new one on arrival,
 			-- so the producer looks like it's wandering around collecting.
+			-- Once full, if docking has been unlocked (dockSpeed > 0), it
+			-- beelines for the dock instead of a random point, at
+			-- dockSpeed rather than ROAM_SPEED, and auto-sells the moment
+			-- it arrives. Ambient wandering itself never depends on
+			-- dockSpeed, so robots always wander even before docking is
+			-- unlocked; only a full robot's behaviour changes.
 			local roamX = producer:getNumber('roamX')
 			local roamY = producer:getNumber('roamY')
 			local roamTargetX = producer:getNumber('roamTargetX')
 			local roamTargetY = producer:getNumber('roamTargetY')
 			if roamX and roamY and roamTargetX and roamTargetY then
+				local dockSpeedValue = if dockSpeedProp then dockSpeedProp.value else 0
+				local docking = isFull and dockSpeedValue > 0
+				local speed = ROAM_SPEED
+
+				if docking then
+					roamTargetX.value = DOCK_CENTER_X - PRODUCER_WIDGET_CENTER
+					roamTargetY.value = DOCK_CENTER_Y - PRODUCER_WIDGET_CENTER
+					speed = dockSpeedValue
+				end
+
 				local dx = roamTargetX.value - roamX.value
 				local dy = roamTargetY.value - roamY.value
 				local dist = math.sqrt(dx * dx + dy * dy)
-				if dist < ROAM_ARRIVE_THRESHOLD then
+
+				if docking and dist < DOCK_ARRIVE_THRESHOLD then
+					-- Arrived at the dock: sell this producer's own
+					-- storage on the spot (the same sum+clear sweep as a
+					-- manual full-click sale in main.luau), then it's
+					-- free to wander again.
+					local dockTotal = 0
+					if storage then
+						for i2 = 1, storage.length do
+							local item = storage[i2]
+							local value = item:getNumber('value')
+							if value then
+								dockTotal += value.value
+							end
+						end
+						storage:clear()
+					end
+					if currency then
+						currency.value += dockTotal
+					end
+
+					local dockPulseTime = producer:getNumber('lastPulseTime')
+					local dockPulseMagnitude = producer:getNumber('pulseMagnitude')
+					if dockPulseTime and dockPulseMagnitude then
+						dockPulseTime.value = gameTime
+						dockPulseMagnitude.value = COLLECT_PULSE_MAGNITUDE
+					end
+					local dockPopupTime = producer:getNumber('lastDigPopupTime')
+					local digPopupText = producer:getString('digPopupText')
+					if dockPopupTime and digPopupText and dockTotal > 0 then
+						dockPopupTime.value = gameTime
+						digPopupText.value = 'SOLD +$' .. tostring(dockTotal)
+					end
+
+					roamTargetX.value = ROAM_MIN_X + math.random() * (ROAM_MAX_X - ROAM_MIN_X)
+					roamTargetY.value = ROAM_MIN_Y + math.random() * (ROAM_MAX_Y - ROAM_MIN_Y)
+				elseif (not docking) and dist < ROAM_ARRIVE_THRESHOLD then
 					roamTargetX.value = ROAM_MIN_X + math.random() * (ROAM_MAX_X - ROAM_MIN_X)
 					roamTargetY.value = ROAM_MIN_Y + math.random() * (ROAM_MAX_Y - ROAM_MIN_Y)
 				else
-					local step = math.min(ROAM_SPEED * seconds, dist)
+					local step = math.min(speed * seconds, dist)
 					roamX.value += (dx / dist) * step
 					roamY.value += (dy / dist) * step
 				end
@@ -348,9 +421,6 @@ local function advance(self: ClockState, seconds: number): boolean
 
 	-- Upgrade panels: affordable/maxed state, each priced on its own
 	-- Cost(n) = base * growth^n curve rather than one shared flat price
-	local currency = economy:getNumber('currency')
-	local currencyValue = if currency then currency.value else 0
-
 	local itemsPerDigAffordable = economy:getNumber('itemsPerDigAffordable')
 	local itemsPerDigCostLabel = economy:getString('itemsPerDigCostLabel')
 	if itemsPerDigProp and itemsPerDigAffordable and itemsPerDigCostLabel then
@@ -392,15 +462,28 @@ local function advance(self: ClockState, seconds: number): boolean
 		storageCapacityCostLabel.value = maxed and 'MAX' or tostring(cost)
 	end
 
-	local autoSellSecondsProp = economy:getNumber('autoSellSeconds')
-	local autoSellAffordable = economy:getNumber('autoSellAffordable')
-	local autoSellCostLabel = economy:getString('autoSellCostLabel')
-	if autoSellSecondsProp and autoSellAffordable and autoSellCostLabel then
-		local maxed = autoSellSecondsProp.value <= AUTO_SELL_MIN
-		local level = levelsBought(autoSellSecondsProp.value, AUTO_SELL_STEP, AUTO_SELL_START)
+	-- Dock speed panel: reads "Auto-Sell" (a locked/unlock purchase) while
+	-- dockSpeed is still 0, then becomes the repeatable "Robot Speed"
+	-- upgrade once bought. dockActiveAlpha dims the dock box itself the
+	-- same way until then.
+	local dockSpeedAffordable = economy:getNumber('dockSpeedAffordable')
+	local dockSpeedCostLabel = economy:getString('dockSpeedCostLabel')
+	local dockSpeedLabel = economy:getString('dockSpeedLabel')
+	local dockActiveAlpha = economy:getNumber('dockActiveAlpha')
+	if dockSpeedProp and dockSpeedAffordable and dockSpeedCostLabel and dockSpeedLabel then
+		local maxed = dockSpeedProp.value >= MOVE_SPEED_MAX
+		local level = levelsBought(dockSpeedProp.value, MOVE_SPEED_STEP, MOVE_SPEED_START)
 		local cost = upgradeCost(level)
-		autoSellAffordable.value = (currencyValue >= cost and not maxed) and 1 or DIMMED_ALPHA
-		autoSellCostLabel.value = maxed and 'MAX' or tostring(cost)
+		dockSpeedAffordable.value = (currencyValue >= cost and not maxed) and 1 or DIMMED_ALPHA
+		dockSpeedCostLabel.value = maxed and 'MAX' or tostring(cost)
+		if dockSpeedProp.value <= 0 then
+			dockSpeedLabel.value = 'Auto-Sell'
+		else
+			dockSpeedLabel.value = 'Robot Speed ' .. tostring(math.floor(dockSpeedProp.value))
+		end
+	end
+	if dockActiveAlpha then
+		dockActiveAlpha.value = (dockSpeedProp and dockSpeedProp.value > 0) and 1 or DIMMED_ALPHA
 	end
 
 	-- Beach Boy purchase panel: repeatable, so just affordable/not - never
@@ -422,41 +505,6 @@ local function advance(self: ClockState, seconds: number): boolean
 		local cost = steelSeekerCost(steelSeekerCount.value)
 		steelSeekerAffordable.value = (currencyValue >= cost) and 1 or DIMMED_ALPHA
 		steelSeekerCostLabel.value = tostring(cost)
-	end
-
-	-- Auto-sell: runs the same sum+clear sweep as Sell All (sell.luau)
-	-- automatically on a timer, so a full fleet doesn't just sit idle
-	-- waiting on the player to notice and click. Upgradeable like any
-	-- other stat, via the same shared upgrade.luau/Cost(n) curve.
-	local autoSellSeconds = economy:getNumber('autoSellSeconds')
-	local lastAutoSellTime = economy:getNumber('lastAutoSellTime')
-	local autoSellCountdownLabel = economy:getString('autoSellCountdownLabel')
-	if autoSellSeconds and lastAutoSellTime and producers then
-		local remaining = autoSellSeconds.value - (gameTime - lastAutoSellTime.value)
-		if remaining <= 0 then
-			local autoSellTotal = 0
-			for i = 1, producers.length do
-				local storage = producers[i]:getList('storage')
-				if storage then
-					for j = 1, storage.length do
-						local item = storage[j]
-						local value = item:getNumber('value')
-						if value then
-							autoSellTotal += value.value
-						end
-					end
-					storage:clear()
-				end
-			end
-			if currency then
-				currency.value += autoSellTotal
-			end
-			lastAutoSellTime.value = gameTime
-			remaining = autoSellSeconds.value
-		end
-		if autoSellCountdownLabel then
-			autoSellCountdownLabel.value = tostring(math.ceil(math.max(0, remaining))) .. 's'
-		end
 	end
 
 	-- Live totals across every producer's own storage, for the bottom

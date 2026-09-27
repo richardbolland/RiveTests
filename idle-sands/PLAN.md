@@ -548,46 +548,56 @@ inspected with zero wiring problems.
    for free, with no bot-specific wiring). Verified clean, inspected
    with zero wiring problems.
 
-6. **Auto-sell** ✅ — a fleet-wide timer that runs the exact same sum+clear
-   sweep as Sell All (`sell.luau`) automatically, on an upgradeable
-   interval, so a full robot doesn't just sit stalled waiting for the
-   player to notice and click. This milestone's original description
-   predates the per-producer-storage redesign (it assumed one shared
-   `Economy.inventory` list); the mechanic carried over unchanged in
-   spirit - sell everything, automatically, on a timer - just now
-   iterating every producer's own `storage` the same way `sell.luau`
-   and the bottom-strip aggregate already do. (The other idea raised in
-   the same vision-alignment conversation - a robot physically travels
-   to a docking station to sell - stays explicitly deferred, a
-   different and more involved feature for later.)
+6. **Auto-sell** ✅ — replaced with the docking mechanic the player
+   originally floated during the vision-alignment pass ("a robot
+   travels to a docking station and automatically sells its goods
+   there"), after a first pass built a fleet-wide *timer* instead
+   (fire every N seconds regardless of what any robot was doing). The
+   player asked for the timer to be swapped out for this once it was
+   in place: a fixed `DockBox` at the bottom-center of the beach area
+   (same coordinate space `roamX`/`roamY` already use, so no coordinate
+   conversion needed); once full, a producer beelines for it instead of
+   picking another random roam target, and sells the moment it arrives
+   - automatic, but tied to *movement*, not a clock.
 
-   Implementation: `autoSellSeconds` (already declared, unused, since
-   Milestone 3) is now a real upgradeable stat - same shared
-   Cost(n) = base * growth^n curve as the other four upgrades, 90s→15s
-   over 5 steps - with a new `AutoSellPanel` mirroring
-   `DigSpeedPanel`/`StorageCapacityPanel` exactly. `clock.luau` tracks
-   `lastAutoSellTime` the same way each producer tracks its own
-   `lastDigTime`: every frame, `remaining = autoSellSeconds -
-   (gameTime - lastAutoSellTime)`; at zero, it sums and clears every
-   producer's storage into `currency` (byte-for-byte the same loop
-   `sell.luau` runs on a click) and resets. A live countdown
-   (`autoSellCountdownLabel`, e.g. "Auto-sell in 42s") sits next to the
-   "Stored: n ($v)" summary in the bottom strip - the "visible
-   countdown in UI" the original plan called for.
+   Gated behind a purchase rather than available from the start, at the
+   player's explicit request: `Economy.dockSpeed` starts at 0
+   ("locked" - a full robot just freezes, exactly as it did before this
+   milestone existed, manual click still the only way to empty it). The
+   first purchase moves it off zero, which *simultaneously* unlocks
+   docking and sets the dock-seeking speed; further purchases only make
+   the trip faster (same shared Cost(n) curve as every other upgrade,
+   0→100 over 5 steps of 20). One side panel slot serves both states,
+   because they're the same stat: `dockSpeedLabel` is a single computed
+   string, "Auto-Sell" while locked, "Robot Speed `<n>`" once bought,
+   swapped by `clock.luau` rather than two panels toggled by
+   visibility. Ambient wandering was deliberately left on the existing
+   fixed `ROAM_SPEED` throughout - only a *full* robot's behaviour
+   changes with `dockSpeed`, so nothing stands still just because
+   docking hasn't been bought yet (a real alternative that was
+   considered and explicitly ruled out before building, since it would
+   have changed the game's very-first-launch feel).
 
-   Verified headlessly: a `--data-dump-every` trace across a 95s window
-   confirmed the countdown ticks down accurately, fires within a
-   fraction of a second of the target time, and correctly resumes
-   counting from the fresh interval afterward (not from zero) - proof
-   the simulation steps per-frame rather than in one coarse jump.
-   Confirmed buying the upgrade immediately shortens the countdown
-   (90s→75s, cost $5→$14, matching the curve exactly). Most
-   importantly, confirmed the full loop this exists for: with a
-   temporarily lengthened interval, watched a robot fill to capacity
-   and freeze (badge reading "!") for over a hundred seconds, then
-   auto-sell fired, cleared its storage, paid out, and the robot
-   resumed collecting on its own the very next tick - with zero
-   player input. Verified clean, inspected with zero wiring problems.
+   `clock.luau`'s roaming block now branches per producer: full AND
+   `dockSpeed > 0` means the roam target becomes the dock's fixed
+   position and the step uses `dockSpeed` instead of `ROAM_SPEED`;
+   arrival (within a threshold) sums and clears that producer's own
+   storage into `currency` - the same sum+clear shape as a manual
+   full-click sale in `main.luau`, which stays available throughout (the
+   player's choice: wait for the walk, or click for an instant sale).
+   Reused the existing pulse/popup feedback fields for a "SOLD +$n"
+   popup on arrival, same as the manual version.
+
+   Verified headlessly: confirmed a full robot keeps wandering normally
+   (never approaching the dock's coordinates) for as long as `dockSpeed`
+   stays 0; bought the first level and watched, via a
+   `--data-dump-every` trace, `roamX`/`roamY` visibly converge on the
+   dock's position once the robot filled up, `storageLabel` flip from
+   `"!"` to `"0/3"` on arrival, and `currency` jump by exactly the sold
+   total in the same tick; confirmed manual click-to-sell still empties
+   a robot mid-walk; screenshotted both states of the panel ("Auto-Sell"
+   locked/dimmed dock vs. "Robot Speed 20" with the dock at full
+   opacity). Verified clean, inspected with zero wiring problems.
 
 7. **Persistence** — host page saves/loads `Economy` to `localStorage`;
    reload the page mid-game and confirm state survives.

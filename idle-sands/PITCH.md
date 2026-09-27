@@ -7,13 +7,17 @@ automate the collecting for you while you're away from the keyboard.
 **Core loop:** Producers dig on their own, always — clicking one just speeds
 it up, unless it's full, in which case clicking sells its own onboard
 storage on the spot. Collect items into a robot's own storage → sell (per
-robot, by clicking it when full, or all at once with Sell All) → buy
-upgrades/bots → more producers, each auto-collecting, each click-boostable
-until full, and each visibly stopping (with an on-stage badge showing
-`n/capacity`, or `!` at capacity) when it needs emptying → repeat, idly,
-forever. (Revised from an earlier click-to-collect design after milestone 3
-playtesting, then again to give each robot its own storage instead of one
-shared pool — see PLAN.md for the reasoning.)
+robot, by clicking it when full; all at once with Sell All; or, once a
+robot's Auto-Sell/Robot Speed upgrade is bought, automatically — a full
+robot walks itself to a dock at the bottom of the beach and sells on
+arrival, no click needed) → buy upgrades/bots → more producers, each
+auto-collecting, each click-boostable until full, and each visibly
+stopping (with an on-stage badge showing `n/capacity`, or `!` at capacity)
+when it needs emptying → repeat, idly, forever. (Revised from an earlier
+click-to-collect design after milestone 3 playtesting, then again to give
+each robot its own storage instead of one shared pool, then again to
+replace a flat auto-sell timer with the docking mechanic — see PLAN.md for
+the reasoning.)
 
 **Genre & tone:** Idle/incremental, browser-playable, humour-heavy writing with
 an environmental-cleanup undercurrent (you're picking junk off a beach). Playful

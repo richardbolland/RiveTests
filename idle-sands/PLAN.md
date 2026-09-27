@@ -703,11 +703,24 @@ built before it.
   `steelSeekerDiscovered`/`steelSeekerTabDisplay`/
   `steelSeekerBuyPanelDisplay` together and the tab/panel appear.
 
+- **Upgrade-panel tooltips.** All seven side-panel buttons (the four
+  class-scoped upgrades, Robot Speed/Auto-Sell, and both bot-purchase
+  panels) now show an explanation on hover, reusing the same universal
+  Tooltip overlay/scripts the robot's own tutorial tooltip uses
+  (`showTooltip.luau`/`hideTooltip.luau` - no new script needed, just
+  paired enter/exit listeners per panel with the panel's own text and a
+  fixed anchor point). Anchored at a constant root-artboard x (740, to
+  the left of the side panel) so it renders over the beach area rather
+  than clipping against the canvas edge, with a y roughly centered on
+  each panel; copy was kept short (under ~45 characters) to avoid the
+  tooltip's hug-sized width running into the panel it's describing.
+  Verified headlessly via screenshots on every one of the seven panels
+  (both class tabs and the Robots tab, including Steel Seeker's own
+  purchase panel after a temporary lowered-threshold repro to reach
+  discovery) - each shows its own text on hover with no clipping or
+  panel overlap, and hides again on pointer exit.
+
 Still to come from this same playtesting round, not yet started:
-- **Upgrade-panel tooltips** - hover explanations on all seven side-panel
-  buttons. Deliberately sequenced after the tabbed restructure above so
-  they're wired onto the final panel layout instead of being thrown away;
-  now unblocked.
 - **Bento-style stats dashboard** - a later, larger view of full
   lifetime/fleet statistics once unlocked. Explicitly scoped as a
   future milestone, not part of this pass - added here as a placeholder

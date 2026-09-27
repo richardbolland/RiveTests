@@ -651,6 +651,92 @@
                     <ScriptInputNumber propertyValue="1.6" name="growth"/>
                 </ScriptedListenerAction>
             </StateMachineListenerSingle>
+
+            <!-- Upgrade-panel tooltips: same universal Tooltip overlay the
+                 producer robot uses (showTooltip.luau/hideTooltip.luau),
+                 anchored at a fixed root-artboard point to the left of the
+                 side panel (x=740) so it renders over the beach area and
+                 never clips against the right edge of the canvas, with
+                 anchorY roughly centered on each panel's own height. All
+                 seven side-panel buttons get one: the four class-scoped
+                 upgrades, Robot Speed/Auto-Sell, and the two bot-purchase
+                 panels. -->
+            <StateMachineListenerSingle targetId="0:70" listenerTypeValue="enter" name="ShowItemsPerDigTooltip" id="0:830">
+                <ScriptedListenerAction scriptAssetId="0:315" id="0:831">
+                    <ScriptInputString propertyValue="Each dig collects more items at once." name="text"/>
+                    <ScriptInputNumber propertyValue="740" name="anchorX"/>
+                    <ScriptInputNumber propertyValue="160" name="anchorY"/>
+                </ScriptedListenerAction>
+            </StateMachineListenerSingle>
+            <StateMachineListenerSingle targetId="0:70" listenerTypeValue="exit" name="HideItemsPerDigTooltip" id="0:832">
+                <ScriptedListenerAction scriptAssetId="0:316" id="0:833"/>
+            </StateMachineListenerSingle>
+
+            <StateMachineListenerSingle targetId="0:80" listenerTypeValue="enter" name="ShowDigSpeedTooltip" id="0:834">
+                <ScriptedListenerAction scriptAssetId="0:315" id="0:835">
+                    <ScriptInputString propertyValue="Shortens the automatic dig cycle." name="text"/>
+                    <ScriptInputNumber propertyValue="740" name="anchorX"/>
+                    <ScriptInputNumber propertyValue="236" name="anchorY"/>
+                </ScriptedListenerAction>
+            </StateMachineListenerSingle>
+            <StateMachineListenerSingle targetId="0:80" listenerTypeValue="exit" name="HideDigSpeedTooltip" id="0:836">
+                <ScriptedListenerAction scriptAssetId="0:316" id="0:837"/>
+            </StateMachineListenerSingle>
+
+            <StateMachineListenerSingle targetId="0:150" listenerTypeValue="enter" name="ShowElbowGreaseTooltip" id="0:838">
+                <ScriptedListenerAction scriptAssetId="0:315" id="0:839">
+                    <ScriptInputString propertyValue="Clicking speeds up the robot's current dig cycle." name="text"/>
+                    <ScriptInputNumber propertyValue="740" name="anchorX"/>
+                    <ScriptInputNumber propertyValue="312" name="anchorY"/>
+                </ScriptedListenerAction>
+            </StateMachineListenerSingle>
+            <StateMachineListenerSingle targetId="0:150" listenerTypeValue="exit" name="HideElbowGreaseTooltip" id="0:840">
+                <ScriptedListenerAction scriptAssetId="0:316" id="0:841"/>
+            </StateMachineListenerSingle>
+
+            <StateMachineListenerSingle targetId="0:170" listenerTypeValue="enter" name="ShowStorageCapacityTooltip" id="0:842">
+                <ScriptedListenerAction scriptAssetId="0:315" id="0:843">
+                    <ScriptInputString propertyValue="How much a robot can carry before docking." name="text"/>
+                    <ScriptInputNumber propertyValue="740" name="anchorX"/>
+                    <ScriptInputNumber propertyValue="388" name="anchorY"/>
+                </ScriptedListenerAction>
+            </StateMachineListenerSingle>
+            <StateMachineListenerSingle targetId="0:170" listenerTypeValue="exit" name="HideStorageCapacityTooltip" id="0:844">
+                <ScriptedListenerAction scriptAssetId="0:316" id="0:845"/>
+            </StateMachineListenerSingle>
+
+            <StateMachineListenerSingle targetId="0:190" listenerTypeValue="enter" name="ShowAutoSellTooltip" id="0:846">
+                <ScriptedListenerAction scriptAssetId="0:315" id="0:847">
+                    <ScriptInputString propertyValue="Unlocks auto-sell, then speeds up the trip." name="text"/>
+                    <ScriptInputNumber propertyValue="740" name="anchorX"/>
+                    <ScriptInputNumber propertyValue="160" name="anchorY"/>
+                </ScriptedListenerAction>
+            </StateMachineListenerSingle>
+            <StateMachineListenerSingle targetId="0:190" listenerTypeValue="exit" name="HideAutoSellTooltip" id="0:848">
+                <ScriptedListenerAction scriptAssetId="0:316" id="0:849"/>
+            </StateMachineListenerSingle>
+
+            <StateMachineListenerSingle targetId="0:160" listenerTypeValue="enter" name="ShowBuyBeachBoyTooltip" id="0:850">
+                <ScriptedListenerAction scriptAssetId="0:315" id="0:851">
+                    <ScriptInputString propertyValue="Buy another Beach Boy for your fleet." name="text"/>
+                    <ScriptInputNumber propertyValue="740" name="anchorX"/>
+                    <ScriptInputNumber propertyValue="236" name="anchorY"/>
+                </ScriptedListenerAction>
+            </StateMachineListenerSingle>
+            <StateMachineListenerSingle targetId="0:160" listenerTypeValue="exit" name="HideBuyBeachBoyTooltip" id="0:852">
+                <ScriptedListenerAction scriptAssetId="0:316" id="0:853"/>
+            </StateMachineListenerSingle>
+
+            <StateMachineListenerSingle targetId="0:180" listenerTypeValue="enter" name="ShowBuySteelSeekerTooltip" id="0:854">
+                <ScriptedListenerAction scriptAssetId="0:315" id="0:855">
+                    <ScriptInputString propertyValue="A separate robot class, upgraded on its own." name="text"/>
+                    <ScriptInputNumber propertyValue="740" name="anchorX"/>
+                    <ScriptInputNumber propertyValue="312" name="anchorY"/>
+                </ScriptedListenerAction>
+            </StateMachineListenerSingle>
+            <StateMachineListenerSingle targetId="0:180" listenerTypeValue="exit" name="HideBuySteelSeekerTooltip" id="0:856">
+                <ScriptedListenerAction scriptAssetId="0:316" id="0:857"/>
+            </StateMachineListenerSingle>
         </StateMachine>
     </Artboard>
 
